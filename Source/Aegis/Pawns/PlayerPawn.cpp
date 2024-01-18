@@ -3,8 +3,12 @@
 
 #include "PlayerPawn.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
+#include "Aegis/Map/MapTile.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Input/InputConfigData.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -36,10 +40,43 @@ void APlayerPawn::Tick(float DeltaTime)
 
 }
 
+void APlayerPawn::Click(const FInputActionValue& InputActionValue)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("CLICK"))
+
+	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (!PlayerController) { return; }
+	
+	FHitResult HitResult; 
+	if (PlayerController->GetHitResultUnderCursorByChannel(TraceTypeQuery1, false, HitResult))
+	{
+		if (AMapTile* Tile = Cast<AMapTile>(HitResult.GetActor()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("TilerCoord: %ls"), *Tile->TileCoord.ToString())
+		}
+	}
+
+	DrawDebugSphere(GetWorld(), HitResult.Location, 5, 12, FColor::Red, false, 2, 0, 1);
+}
+
 // Called to bind functionality to input
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	
+	// Get the player controller
+	APlayerController* PC = Cast<APlayerController>(GetController());
+ 
+	// Get the local player subsystem
+	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
+	// Clear out existing mapping, and add our mapping
+	Subsystem->ClearAllMappings();
+	Subsystem->AddMappingContext(InputMapping, 0);
+
+	// Get the EnhancedInputComponent
+	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	// Bind the actions
+	PEI->BindAction(InputActions->InputClick, ETriggerEvent::Triggered, this, &APlayerPawn::Click);
 
 }
 

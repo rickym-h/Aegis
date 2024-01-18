@@ -9,9 +9,18 @@
 void AAegisGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::BeginPlay()"))
+}
+
+void AAegisGameStateBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
 
 	const UAegisMapFactory* MapFactory = NewObject<UAegisMapFactory>(GetWorld(), MapFactoryClass);
 	
 	// AegisMap = UAegisMapFactory::GenerateTestMap();
 	AegisMap = MapFactory->GenerateTestMap();
+	
+	UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::PostInitializeComponents()"))
 }

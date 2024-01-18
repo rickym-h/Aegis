@@ -42,6 +42,11 @@ struct FTileCoord
 		return FTileCoord(this->Q, this->R);
 	}
 
+	FString ToString() const
+	{
+		return FString("Q=").Append(FString::FromInt(Q)).Append(" R=").Append(FString::FromInt(R));
+	}
+
 	bool IsValid() const
 	{
 		return S == -Q-R;
@@ -94,13 +99,17 @@ public:
 
 	UFUNCTION()
 	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
-
 	
 	UFUNCTION()
 	bool IsCoordInPath(FTileCoord Coord) const;
 
 	UFUNCTION()
 	AMapTile* GetTile(FTileCoord Coord);
+
+	UFUNCTION()
+	FTileCoord GetEnemySpawnCoord() const;
+	UFUNCTION()
+	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
 
 protected:
 	// Map Tiles

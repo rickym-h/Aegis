@@ -46,6 +46,11 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 		const FTileCoord ToCoord = FTileCoord(Q-1,0);
 		PathRoute.Add(FromCoord, ToCoord);
 	}
+	PathRoute.Add(FTileCoord(), FTileCoord());
+
+	PathRoute.Add(FTileCoord(7,0), FTileCoord(6,1));
+	PathRoute.Add(FTileCoord(6,1), FTileCoord(6,0));
+	
 	TArray<FTileCoord> PathStartTileCoords;
 	PathStartTileCoords.Add(FTileCoord(MapRadiusInTiles, 0));
 	
