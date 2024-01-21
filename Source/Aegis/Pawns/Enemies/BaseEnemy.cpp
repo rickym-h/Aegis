@@ -62,7 +62,7 @@ void ABaseEnemy::MoveTowardsGoal(float DeltaTime)
 			TargetPos += ForwardVector * DistanceToTravel;
 			DistanceToTravel = 0;
 		} else
-		// Otherwise take distance off movement distance, and set 
+		// Otherwise take distance off movement distance, set new goal tiles, and recurse
 		{
 			DistanceToTravel -= DistanceToGoalTile(TargetPos);
 			TargetPos = GoalTile.ToWorldLocation();
@@ -74,7 +74,6 @@ void ABaseEnemy::MoveTowardsGoal(float DeltaTime)
 			}
 		}
 	}
-
 	SetActorLocation(TargetPos);
 }
 
@@ -85,11 +84,3 @@ void ABaseEnemy::Tick(float DeltaTime)
 
 	MoveTowardsGoal(DeltaTime);
 }
-
-// Called to bind functionality to input
-void ABaseEnemy::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
-
