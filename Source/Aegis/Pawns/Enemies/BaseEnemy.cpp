@@ -3,8 +3,10 @@
 
 #include "BaseEnemy.h"
 
+#include "InputBehavior.h"
 #include "LocalizationConfigurationScript.h"
 #include "Aegis/AegisGameStateBase.h"
+#include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -13,8 +15,18 @@ ABaseEnemy::ABaseEnemy()
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
+	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Collision Sphere");
+	RootComponent = CollisionSphere;
+	
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(RootComponent);
+	
+	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+	CollisionSphere->SetCollisionObjectType(ECC_GameTraceChannel2);
+	CollisionSphere->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 }
 
 // Called when the game starts or when spawned
@@ -24,14 +36,17 @@ void ABaseEnemy::BeginPlay()
 
 	GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	if (!GameState) { return; }
-	
+
+	// Initialise pathing info
 	FromTile = GameState->AegisMap->GetEnemySpawnCoord();
 	GoalTile = GameState->AegisMap->GetNextCoordInPath(FromTile);
 	UE_LOG(LogTemp, Warning, TEXT("FromTile = %ls"), *FromTile.ToString())
 	UE_LOG(LogTemp, Warning, TEXT("GoalTile = %ls"), *GoalTile.ToString())
 
+	// Set start location
 	SetActorLocation(FromTile.ToWorldLocation());
-	
+
+	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseEnemy::OverlapBegin);
 }
 
 float ABaseEnemy::DistanceToGoalTile() const
@@ -74,7 +89,15 @@ void ABaseEnemy::MoveTowardsGoal(float DeltaTime)
 			}
 		}
 	}
-	SetActorLocation(TargetPos);
+	SetActorLocation(TargetPos, true);
+}
+
+void ABaseEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	bool bFromSweep, const FHitResult& SweepResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("OVERLAP DETECTED"))
+	UGameplayStatics::ApplyDamage(OtherActor, 10, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+	Destroy();
 }
 
 // Called every frame

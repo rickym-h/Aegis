@@ -7,7 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "BaseEnemy.generated.h"
 
-
+class USphereComponent;
 class AAegisGameStateBase;
 
 UCLASS()
@@ -24,6 +24,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mesh")
+	USphereComponent* CollisionSphere;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mesh")
 	UStaticMeshComponent* Mesh;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
@@ -31,7 +33,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTileCoord GoalTile;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MovementSpeed = 1.f;
+	float MovementSpeed = 500.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	const AAegisGameStateBase* GameState;
@@ -40,6 +42,10 @@ protected:
 	float DistanceToGoalTile(const FVector& StartPos) const;
 	UFUNCTION()
 	void MoveTowardsGoal(float DeltaTime);
+	
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
