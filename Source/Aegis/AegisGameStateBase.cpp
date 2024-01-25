@@ -3,6 +3,7 @@
 
 #include "AegisGameStateBase.h"
 
+#include "EnemyFactory.h"
 #include "Map/AegisMapFactory.h"
 #include "Map/MapTile.h"
 
@@ -15,12 +16,16 @@ void AAegisGameStateBase::BeginPlay()
 
 void AAegisGameStateBase::PostInitializeComponents()
 {
+	UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::PostInitializeComponents()"))
 	Super::PostInitializeComponents();
 
 	const UAegisMapFactory* MapFactory = NewObject<UAegisMapFactory>(GetWorld(), MapFactoryClass);
-	
-	// AegisMap = UAegisMapFactory::GenerateTestMap();
 	AegisMap = MapFactory->GenerateTestMap();
+
+	if (EnemyFactoryClass)
+	{
+		EnemyFactory = NewObject<UEnemyFactory>(GetWorld(), EnemyFactoryClass);
+		EnemyFactory->OwningGameState = this;
+	}
 	
-	UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::PostInitializeComponents()"))
 }

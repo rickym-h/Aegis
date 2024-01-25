@@ -5,7 +5,6 @@
 
 #include "BuildingHealthComponent.h"
 #include "Components/CapsuleComponent.h"
-#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 ANexusBuilding::ANexusBuilding()
