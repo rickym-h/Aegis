@@ -32,8 +32,11 @@ protected:
 	FTileCoord FromTile;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTileCoord GoalTile;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MovementSpeed = 500.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DamageToNexus = 1.f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	const AAegisGameStateBase* GameState;

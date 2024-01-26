@@ -3,8 +3,6 @@
 
 #include "EnemyFactory.h"
 
-#include "AegisGameStateBase.h"
-#include "Kismet/GameplayStatics.h"
 #include "Pawns/Enemies/BaseEnemy.h"
 
 

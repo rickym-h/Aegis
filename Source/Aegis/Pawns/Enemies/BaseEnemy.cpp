@@ -96,7 +96,7 @@ void ABaseEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OVERLAP DETECTED"))
-	UGameplayStatics::ApplyDamage(OtherActor, 10, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+	UGameplayStatics::ApplyDamage(OtherActor, DamageToNexus, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
 	Destroy();
 }
 
