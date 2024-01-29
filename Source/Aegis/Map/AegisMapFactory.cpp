@@ -61,62 +61,59 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 
 	// Generate Tiles for map (looping R and Q constraints from RedBlobGames)
 	TMap<FTileCoord, AMapTile*> MapTiles;
-	for (int Q = -MapRadiusInTiles; Q <= MapRadiusInTiles; Q++)
+	for (const FTileCoord ThisTileCoord : FTileCoord::GetTilesInRadius(FTileCoord(), MapRadiusInTiles))
 	{
-		for (int R = FMath::Max(-MapRadiusInTiles, -Q-MapRadiusInTiles); R <= FMath::Min(MapRadiusInTiles, -Q+MapRadiusInTiles); R++)
+		int Q = ThisTileCoord.Q;
+		int R = ThisTileCoord.R;
+		//if (FTileCoord::HexDistance(CentreCoord, ThisTileCoord) >= MapRadiusInTiles) { continue; }
+			
+		// World location of tile BP
+		FVector Location = (R * OffsetR) + (Q * OffsetQ);
+		FRotator Rotation(0.0f, 0.0f, 0.0f);
+			
+		FActorSpawnParameters SpawnInfo;
+
+		// TODO decide if it should be a GrassTileBP or a PathTile
+		// (for now it is just visualised by toggling debug gradients at end of tile creation)
+
+		// Spawn actual tile BP in world
+		AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
+
+		FVector2D NoiseSampleLoc = FVector2D(Location.X/100, Location.Y/100) + RandomNoiseOffset;
+		float NoiseValue = FMath::PerlinNoise2D(NoiseSampleLoc);
+		NoiseValue = (NoiseValue+1)/2; // Map from -1-1 to 0-1
+
+		// Curve Temp using S curve
+		NoiseValue = 1/(1+FMath::Pow(NoiseValue/(1-NoiseValue), -3));
+		// Square to bring lower noise values lower (So pathing might opt for longer routes with less noise rather than going through higher noise tiles)
+		NoiseValue = FMath::Pow(NoiseValue, 2);
+
+		// Clamp the noise to between 0 and 1 in case scaling has placed noise out of bounds
+		NoiseValue = FMath::Min(NoiseValue, 1.f);
+		NoiseValue = FMath::Max(NoiseValue, 0.f);
+			
+		Tile->TileCoord = ThisTileCoord.Copy();
+		Tile->PathingGradient = NoiseValue;
+
+		if (PathRoute.Contains(ThisTileCoord))
 		{
-			const FTileCoord ThisTileCoord = FTileCoord(Q, R);
-			//if (FTileCoord::HexDistance(CentreCoord, ThisTileCoord) >= MapRadiusInTiles) { continue; }
+			Tile->ToggleShowGradients();
+		}
 			
-			// World location of tile BP
-			FVector Location = (R * OffsetR) + (Q * OffsetQ);
-			FRotator Rotation(0.0f, 0.0f, 0.0f);
-			
-			FActorSpawnParameters SpawnInfo;
+		//Map->AddTileToMap(ThisTileCoord, Tile);
+		MapTiles.Add(ThisTileCoord, Tile);
 
-			// TODO decide if it should be a GrassTileBP or a PathTile
-			// (for now it is just visualised by toggling debug gradients at end of tile creation)
-
-			// Spawn actual tile BP in world
-			AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
-
-			FVector2D NoiseSampleLoc = FVector2D(Location.X/100, Location.Y/100) + RandomNoiseOffset;
-			float NoiseValue = FMath::PerlinNoise2D(NoiseSampleLoc);
-			NoiseValue = (NoiseValue+1)/2; // Map from -1-1 to 0-1
-
-			// Curve Temp using S curve
-			NoiseValue = 1/(1+FMath::Pow(NoiseValue/(1-NoiseValue), -3));
-			// Square to bring lower noise values lower (So pathing might opt for longer routes with less noise rather than going through higher noise tiles)
-			NoiseValue = FMath::Pow(NoiseValue, 2);
-
-			// Clamp the noise to between 0 and 1 in case scaling has placed noise out of bounds
-			NoiseValue = FMath::Min(NoiseValue, 1.f);
-			NoiseValue = FMath::Max(NoiseValue, 0.f);
-			
-			Tile->TileCoord = ThisTileCoord.Copy();
-			Tile->PathingGradient = NoiseValue;
-
-			if (PathRoute.Contains(ThisTileCoord))
-			{
-				Tile->ToggleShowGradients();
-			}
-			
-			//Map->AddTileToMap(ThisTileCoord, Tile);
-			MapTiles.Add(ThisTileCoord, Tile);
-
-			if (ThisTileCoord.S >= 0)
-			{
-				//Tile->ToggleShowGradients();
-			}
+		if (ThisTileCoord.S >= 0)
+		{
+			//Tile->ToggleShowGradients();
 		}
 	}
-
 
 	// Add buildings
 	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
 
-	UAegisMap* Map = NewObject<UAegisMap>();
-	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding);
+	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
+	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding, TMap<FTileCoord, ABaseTower*>());
 	
 	return Map;
 }

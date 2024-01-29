@@ -23,7 +23,6 @@ ANexusBuilding::ANexusBuilding()
 	BuildingMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	
 	CollisionCapsule->SetCollisionObjectType(ECC_GameTraceChannel1);
 	CollisionCapsule->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 }

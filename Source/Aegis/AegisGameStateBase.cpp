@@ -5,7 +5,6 @@
 
 #include "EnemyFactory.h"
 #include "Map/AegisMapFactory.h"
-#include "Map/MapTile.h"
 
 void AAegisGameStateBase::BeginPlay()
 {

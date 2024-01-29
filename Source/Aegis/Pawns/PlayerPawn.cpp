@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
@@ -30,7 +31,11 @@ APlayerPawn::APlayerPawn()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	if (Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
+	{
+		GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+	}
 }
 
 // Called every frame
@@ -52,7 +57,9 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	{
 		if (AMapTile* Tile = Cast<AMapTile>(HitResult.GetActor()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TilerCoord: %ls"), *Tile->TileCoord.ToString())
+			UE_LOG(LogTemp, Warning, TEXT("TileCoord: %ls"), *Tile->TileCoord.ToString())
+
+			GameState->AegisMap->AddDefenderToMap(Tile->TileCoord);
 		}
 	}
 

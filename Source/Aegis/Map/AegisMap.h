@@ -6,6 +6,7 @@
 #include "AegisMap.generated.h"
 
 
+class ABaseTower;
 class ANexusBuilding;
 class AMapTile;
 
@@ -66,19 +67,34 @@ struct FTileCoord
 	// Calculate the HexDistance between two tiles. Similar to Manhattan distance but uses three axis (QRS) instead of two (XY) 
 	static int HexDistance(const FTileCoord TileA, const FTileCoord TileB)
 	{
-		const FTileCoord DistanceVector = TileSubtract(TileA, TileB);
+		const FTileCoord DistanceVector = TileA - TileB;
 		return FMath::Max3(FMath::Abs(DistanceVector.Q), FMath::Abs(DistanceVector.R), FMath::Abs(DistanceVector.S));
+	}
+
+	static TArray<FTileCoord> GetTilesInRadius(FTileCoord Origin, int Radius)
+	{
+		TArray<FTileCoord> TilesInRadius;
+		for (int Q = -Radius; Q <= Radius; Q++)
+		{
+			for (int R = FMath::Max(-Radius, -Q-Radius); R <= FMath::Min(Radius, -Q+Radius); R++)
+			{
+				TilesInRadius.Add(FTileCoord(Q, R) + Origin);
+			}
+		}
+		return TilesInRadius;
 	}
 
 	bool operator==(const FTileCoord &RHSTile) const
 	{
 		return (this->IsValid() && RHSTile.IsValid() && (this->Q == RHSTile.Q) && (this->R == RHSTile.R));
 	}
-
-private:
-	static FTileCoord TileSubtract(const FTileCoord TileA, const FTileCoord TileB)
+	FTileCoord operator+(const FTileCoord &RHSTile) const
 	{
-		return FTileCoord(TileA.Q-TileB.Q, TileA.R-TileB.R);
+		return FTileCoord(this->Q + RHSTile.Q, this->R + RHSTile.R);
+	}
+	FTileCoord operator-(const FTileCoord &RHSTile) const
+	{
+		return FTileCoord(this->Q - RHSTile.Q, this->R - RHSTile.R);
 	}
 };
 FORCEINLINE uint32 GetTypeHash(const FTileCoord& Coord)
@@ -89,7 +105,7 @@ FORCEINLINE uint32 GetTypeHash(const FTileCoord& Coord)
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class AEGIS_API UAegisMap : public UObject
 {
 	GENERATED_BODY()
@@ -98,7 +114,7 @@ public:
 	UAegisMap();
 
 	UFUNCTION()
-	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
+	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding, const TMap<FTileCoord, ABaseTower*>& InMapDefenders);
 	
 	UFUNCTION()
 	bool IsCoordInPath(FTileCoord Coord) const;
@@ -111,6 +127,13 @@ public:
 	UFUNCTION()
 	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Defender Classes")
+	TSubclassOf<ABaseTower> DefaultDefender;
+	
+	UFUNCTION()
+	bool AddDefenderToMap(const FTileCoord Location);
+
+
 protected:
 	// Map Tiles
 	TMap<FTileCoord, AMapTile*> MapTiles;
@@ -122,4 +145,11 @@ protected:
 	// Building Data
 	UPROPERTY()
 	ANexusBuilding* NexusBuilding;
+
+	UPROPERTY()
+	TMap<FTileCoord, ABaseTower*> MapDefenders;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsTileAvailable(FTileCoord Location);
+	
 };

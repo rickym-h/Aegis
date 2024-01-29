@@ -8,8 +8,6 @@
 
 void UEnemyFactory::SpawnTestEnemy()
 {
-	UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::SpawnTestEnemy()"))
-
 	const FVector Location = FVector::ZeroVector;
 	const FRotator Rotation = FRotator::ZeroRotator;
 

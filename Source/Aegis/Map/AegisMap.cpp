@@ -3,6 +3,8 @@
 
 #include "AegisMap.h"
 
+#include "Aegis/Buildings/Defenders/BaseTower.h"
+
 UAegisMap::UAegisMap()
 {
 }
@@ -11,12 +13,14 @@ void UAegisMap::PopulateMapData(
 	const TMap<FTileCoord, AMapTile*>& InMapTiles,
 	const TMap<FTileCoord, FTileCoord>& InPathRoute,
 	const TArray<FTileCoord>& InPathStartTiles,
-	ANexusBuilding* InNexusBuilding)
+	ANexusBuilding* InNexusBuilding,
+	const TMap<FTileCoord, ABaseTower*>& InMapDefenders)
 {
 	this->MapTiles = InMapTiles;
 	this->PathRoute = InPathRoute;
 	this->PathStartTiles = InPathStartTiles;
 	this->NexusBuilding = InNexusBuilding;
+	this->MapDefenders = InMapDefenders;
 	UE_LOG(LogTemp, Warning, TEXT("UAegisMap::PopulateMapData()"))
 }
 
@@ -32,13 +36,6 @@ AMapTile* UAegisMap::GetTile(const FTileCoord Coord)
 
 FTileCoord UAegisMap::GetEnemySpawnCoord() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("UAegisMap::GetEnemySpawnCoord()"))
-	//return FTileCoord(9, 0);
-
-	for (FTileCoord Coord : PathStartTiles)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%ls"), *Coord.ToString())
-	}
 	if (PathStartTiles.Num() == 1) { return PathStartTiles[0]; }
 	
 	const int RandomIndex = FMath::RandRange(0, PathStartTiles.Num()-1);
@@ -50,4 +47,22 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 {
 	//return FTileCoord(8, 0);
 	return PathRoute[CurrentCoord];
+}
+
+bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
+{
+	if (!IsTileAvailable(Location)) { return false; }
+
+	if (!DefaultDefender) { return false; }
+	ABaseTower* NewDefender = GetWorld()->SpawnActor<ABaseTower>(DefaultDefender, Location.ToWorldLocation(), FRotator::ZeroRotator);
+
+	MapDefenders.Add(Location, NewDefender);
+
+	return true;
+}
+
+bool UAegisMap::IsTileAvailable(FTileCoord Location)
+{
+	// TODO implement
+	return true;
 }

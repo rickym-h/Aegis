@@ -5,8 +5,7 @@
 
 ABaseProjectileTower::ABaseProjectileTower()
 {
-	RangeOverlapMesh = CreateDefaultSubobject<UStaticMeshComponent>("Range Overlap Volume");
-	RangeOverlapMesh->SetupAttachment(RootComponent);
+	
 }
 
 void ABaseProjectileTower::BeginPlay()

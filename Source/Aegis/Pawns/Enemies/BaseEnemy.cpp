@@ -6,6 +6,9 @@
 #include "InputBehavior.h"
 #include "LocalizationConfigurationScript.h"
 #include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Map/AegisMap.h"
+#include "Aegis/Buildings/NexusBuilding.h"
+#include "Chaos/GeometryParticlesfwd.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,7 +17,6 @@ ABaseEnemy::ABaseEnemy()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Collision Sphere");
 	RootComponent = CollisionSphere;
@@ -27,6 +29,7 @@ ABaseEnemy::ABaseEnemy()
 
 	CollisionSphere->SetCollisionObjectType(ECC_GameTraceChannel2);
 	CollisionSphere->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	CollisionSphere->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
 }
 
 // Called when the game starts or when spawned
@@ -40,8 +43,6 @@ void ABaseEnemy::BeginPlay()
 	// Initialise pathing info
 	FromTile = GameState->AegisMap->GetEnemySpawnCoord();
 	GoalTile = GameState->AegisMap->GetNextCoordInPath(FromTile);
-	UE_LOG(LogTemp, Warning, TEXT("FromTile = %ls"), *FromTile.ToString())
-	UE_LOG(LogTemp, Warning, TEXT("GoalTile = %ls"), *GoalTile.ToString())
 
 	// Set start location
 	SetActorLocation(FromTile.ToWorldLocation());
@@ -96,8 +97,13 @@ void ABaseEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 	bool bFromSweep, const FHitResult& SweepResult)
 {
 	UE_LOG(LogTemp, Warning, TEXT("OVERLAP DETECTED"))
-	UGameplayStatics::ApplyDamage(OtherActor, DamageToNexus, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
-	Destroy();
+
+	if (Cast<ANexusBuilding>(OtherActor))
+	{
+		UGameplayStatics::ApplyDamage(OtherActor, DamageToNexus, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+		Destroy();
+	}
+	
 }
 
 // Called every frame

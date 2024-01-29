@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Map/AegisMap.h"
 #include "GameFramework/Actor.h"
 #include "BaseTower.generated.h"
 
@@ -21,6 +22,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TowerMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Location Data")
+	FTileCoord CurrentLocation;
 
 public:	
 	// Called every frame

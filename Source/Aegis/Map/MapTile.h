@@ -15,6 +15,9 @@ class AEGIS_API AMapTile : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AMapTile();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* CollisionVolume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TileMesh;

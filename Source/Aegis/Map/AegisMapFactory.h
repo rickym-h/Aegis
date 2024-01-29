@@ -24,6 +24,10 @@ public:
 	UAegisMap* GenerateTestMap() const;
 
 protected:
+
+	UPROPERTY(EditDefaultsOnly, Category="Map")
+	TSubclassOf<UAegisMap> AegisMapClass;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Tiles")
 	TSubclassOf<AMapTile> GrassTileBP;
 	UPROPERTY(EditDefaultsOnly, Category="Tiles")

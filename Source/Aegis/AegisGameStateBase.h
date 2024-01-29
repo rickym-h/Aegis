@@ -22,7 +22,7 @@ class AEGIS_API AAegisGameStateBase : public AGameStateBase
 	virtual void PostInitializeComponents() override;
 
 public:
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
 	UAegisMap* AegisMap;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factories")

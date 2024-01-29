@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class AAegisGameStateBase;
 class USpringArmComponent;
 class UCameraComponent;
 
@@ -34,6 +35,10 @@ protected:
 	class UInputMappingContext* InputMapping;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	class UInputConfigData* InputActions;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Game")
+	AAegisGameStateBase* GameState;
+	
 
 public:	
 	// Called every frame
