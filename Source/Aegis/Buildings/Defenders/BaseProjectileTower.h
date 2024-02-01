@@ -6,6 +6,8 @@
 #include "BaseTower.h"
 #include "BaseProjectileTower.generated.h"
 
+class ABaseEnemy;
+class UDefenderRangeComponent;
 /**
  * 
  */
@@ -17,8 +19,16 @@ class AEGIS_API ABaseProjectileTower : public ABaseTower
 public:
 	ABaseProjectileTower();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Defender Stats")
+	int TowerRange;
+
 protected:
 	virtual void BeginPlay() override;
-	
+
+	UFUNCTION(BlueprintCallable)
+	void OnEnemyEnterRange(ABaseEnemy* OtherEnemy);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UDefenderRangeComponent* RangeComponent;
 	
 };

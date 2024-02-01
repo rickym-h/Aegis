@@ -3,7 +3,9 @@
 
 #include "AegisMap.h"
 
+#include "Aegis/Buildings/Defenders/BaseProjectileTower.h"
 #include "Aegis/Buildings/Defenders/BaseTower.h"
+#include "Kismet/GameplayStatics.h"
 
 UAegisMap::UAegisMap()
 {
@@ -54,7 +56,14 @@ bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
 	if (!IsTileAvailable(Location)) { return false; }
 
 	if (!DefaultDefender) { return false; }
-	ABaseTower* NewDefender = GetWorld()->SpawnActor<ABaseTower>(DefaultDefender, Location.ToWorldLocation(), FRotator::ZeroRotator);
+
+	const FTransform ActorTransform = FTransform(Location.ToWorldLocation());
+	ABaseProjectileTower* NewDefender = GetWorld()->SpawnActorDeferred<ABaseProjectileTower>(DefaultDefender, ActorTransform);
+
+	NewDefender->CurrentLocation = Location;
+	NewDefender->TowerRange = 2;
+
+	UGameplayStatics::FinishSpawningActor(NewDefender, ActorTransform);
 
 	MapDefenders.Add(Location, NewDefender);
 
@@ -63,6 +72,8 @@ bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
 
 bool UAegisMap::IsTileAvailable(FTileCoord Location)
 {
-	// TODO implement
+	if (MapDefenders.Contains(Location)) { return false; }
+
+	// TODO implement for gaia too
 	return true;
 }

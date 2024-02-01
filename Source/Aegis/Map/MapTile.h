@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "MapTile.generated.h"
 
+class ABaseEnemy;
+
 UCLASS()
 class AEGIS_API AMapTile : public AActor
 {
@@ -33,11 +35,19 @@ public:
 
 	UPROPERTY(BlueprintReadWrite)
 	bool IsShowingGradients = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemies on Tile")
+	TSet<ABaseEnemy*> EnemiesOnTile;
 	
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UFUNCTION()
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	UFUNCTION()
+	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 
 };

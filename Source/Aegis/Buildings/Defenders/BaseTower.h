@@ -22,11 +22,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TowerMesh;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Location Data")
-	FTileCoord CurrentLocation;
 
 public:	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Location Data")
+	FTileCoord CurrentLocation;
+	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

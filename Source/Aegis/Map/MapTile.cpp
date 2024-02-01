@@ -3,6 +3,7 @@
 
 #include "MapTile.h"
 
+#include "Aegis/Pawns/Enemies/BaseEnemy.h"
 #include "Chaos/AABBTree.h"
 
 // Sets default values
@@ -29,4 +30,28 @@ void AMapTile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	
+	CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentBeginOverlap);
+	CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentEndOverlap);
+
+}
+
+void AMapTile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Enemy on Tile"))
+		EnemiesOnTile.Add(Enemy);
+	}
+}
+
+void AMapTile::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+                                     int32 OtherBodyIndex)
+{
+	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Enemy off Tile"))
+		EnemiesOnTile.Remove(Enemy);
+	}
 }

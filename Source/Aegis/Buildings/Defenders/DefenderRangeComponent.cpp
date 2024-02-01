@@ -6,6 +6,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Map/MapTile.h"
+#include "Aegis/Pawns/Enemies/BaseEnemy.h"
 
 // Sets default values for this component's properties
 UDefenderRangeComponent::UDefenderRangeComponent()
@@ -30,11 +31,18 @@ void UDefenderRangeComponent::BeginPlay()
 void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ENEMY ENTERED RANGE"))
+	ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor);
+	if (!Enemy) { return; }
+
+	TSet<ABaseEnemy*> EnemiesInRange = GetEnemiesInRange();
+	EnemiesInRange.Add(Enemy);
+
+	OnEnemyEnterRangeDelegate.Execute(Enemy);
 }
 
 void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const int Range)
 {
+	UE_LOG(LogTemp, Warning, TEXT("InitRange Setting to : %i" ), Range)
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	if (!GameState) { return; }
 	
@@ -49,5 +57,15 @@ void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const in
 		// Subscribe Enemy Entered range function to Overlap delegate in Tile Collision Mesh
 		Tile->CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &UDefenderRangeComponent::OnEnemyEnterRange);
 	}
+}
+
+TSet<ABaseEnemy*> UDefenderRangeComponent::GetEnemiesInRange()
+{
+	TSet<ABaseEnemy*> Enemies;
+	for (const AMapTile* Tile : TilesInRange)
+	{
+		Enemies.Append(Tile->EnemiesOnTile);
+	}
+	return Enemies;
 }
 
