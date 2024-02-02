@@ -3,9 +3,6 @@
 
 #include "AegisMap.h"
 
-#include "Aegis/Buildings/Defenders/BaseProjectileTower.h"
-#include "Aegis/Buildings/Defenders/BaseTower.h"
-#include "Kismet/GameplayStatics.h"
 
 UAegisMap::UAegisMap()
 {
@@ -15,14 +12,12 @@ void UAegisMap::PopulateMapData(
 	const TMap<FTileCoord, AMapTile*>& InMapTiles,
 	const TMap<FTileCoord, FTileCoord>& InPathRoute,
 	const TArray<FTileCoord>& InPathStartTiles,
-	ANexusBuilding* InNexusBuilding,
-	const TMap<FTileCoord, ABaseTower*>& InMapDefenders)
+	ANexusBuilding* InNexusBuilding)
 {
 	this->MapTiles = InMapTiles;
 	this->PathRoute = InPathRoute;
 	this->PathStartTiles = InPathStartTiles;
 	this->NexusBuilding = InNexusBuilding;
-	this->MapDefenders = InMapDefenders;
 	UE_LOG(LogTemp, Warning, TEXT("UAegisMap::PopulateMapData()"))
 }
 
@@ -55,24 +50,24 @@ bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
 {
 	if (!IsTileAvailable(Location)) { return false; }
 
-	if (!DefaultDefender) { return false; }
+	// if (!DefaultDefender) { return false; }
 
-	const FTransform ActorTransform = FTransform(Location.ToWorldLocation());
-	ABaseProjectileTower* NewDefender = GetWorld()->SpawnActorDeferred<ABaseProjectileTower>(DefaultDefender, ActorTransform);
-
-	NewDefender->CurrentLocation = Location;
-	NewDefender->TowerRange = 2;
-
-	UGameplayStatics::FinishSpawningActor(NewDefender, ActorTransform);
-
-	MapDefenders.Add(Location, NewDefender);
+	// const FTransform ActorTransform = FTransform(Location.ToWorldLocation());
+	// ABaseProjectileTower* NewDefender = GetWorld()->SpawnActorDeferred<ABaseProjectileTower>(DefaultDefender, ActorTransform);
+	//
+	// NewDefender->CurrentLocation = Location;
+	// NewDefender->TowerRange = 2;
+	//
+	// UGameplayStatics::FinishSpawningActor(NewDefender, ActorTransform);
+	//
+	// MapDefenders.Add(Location, NewDefender);
 
 	return true;
 }
 
 bool UAegisMap::IsTileAvailable(FTileCoord Location)
 {
-	if (MapDefenders.Contains(Location)) { return false; }
+	// if (MapDefenders.Contains(Location)) { return false; }
 
 	// TODO implement for gaia too
 	return true;

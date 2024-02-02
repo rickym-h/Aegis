@@ -6,7 +6,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Map/MapTile.h"
-#include "Aegis/Pawns/Enemies/BaseEnemy.h"
+#include "Aegis/Enemies/BaseEnemy.h"
 
 // Sets default values for this component's properties
 UDefenderRangeComponent::UDefenderRangeComponent()

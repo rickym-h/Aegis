@@ -114,7 +114,7 @@ public:
 	UAegisMap();
 
 	UFUNCTION()
-	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding, const TMap<FTileCoord, ABaseTower*>& InMapDefenders);
+	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
 	
 	UFUNCTION()
 	bool IsCoordInPath(FTileCoord Coord) const;
@@ -127,8 +127,8 @@ public:
 	UFUNCTION()
 	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Defender Classes")
-	TSubclassOf<ABaseTower> DefaultDefender;
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Defender Classes")
+	// TSubclassOf<ABaseTower> DefaultDefender;
 	
 	UFUNCTION()
 	bool AddDefenderToMap(const FTileCoord Location);
@@ -145,9 +145,6 @@ protected:
 	// Building Data
 	UPROPERTY()
 	ANexusBuilding* NexusBuilding;
-
-	UPROPERTY()
-	TMap<FTileCoord, ABaseTower*> MapDefenders;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsTileAvailable(FTileCoord Location);

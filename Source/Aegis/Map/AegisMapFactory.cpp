@@ -113,7 +113,7 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
 
 	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
-	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding, TMap<FTileCoord, ABaseTower*>());
+	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding);
 	
 	return Map;
 }

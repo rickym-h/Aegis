@@ -3,7 +3,7 @@
 
 #include "EnemyFactory.h"
 
-#include "Pawns/Enemies/BaseEnemy.h"
+#include "Enemies/BaseEnemy.h"
 
 
 void UEnemyFactory::SpawnTestEnemy()

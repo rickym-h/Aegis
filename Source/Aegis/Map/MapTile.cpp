@@ -3,7 +3,7 @@
 
 #include "MapTile.h"
 
-#include "Aegis/Pawns/Enemies/BaseEnemy.h"
+#include "Aegis/Enemies/BaseEnemy.h"
 #include "Chaos/AABBTree.h"
 
 // Sets default values
