@@ -55,7 +55,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	FHitResult HitResult; 
 	if (PlayerController->GetHitResultUnderCursorByChannel(TraceTypeQuery1, false, HitResult))
 	{
-		if (AMapTile* Tile = Cast<AMapTile>(HitResult.GetActor()))
+		if (const AMapTile* Tile = Cast<AMapTile>(HitResult.GetActor()))
 		{
 			UE_LOG(LogTemp, Warning, TEXT("TileCoord: %ls"), *Tile->TileCoord.ToString())
 

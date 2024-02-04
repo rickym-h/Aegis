@@ -4,7 +4,7 @@
 #include "AegisMapFactory.h"
 
 #include "MapTile.h"
-#include "Aegis/Buildings/NexusBuilding.h"
+#include "Aegis/Structures/NexusBuilding.h"
 
 void UAegisMapFactory::PostInitProperties()
 {
@@ -28,14 +28,12 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 
 	// The number of steps needed to reach farthest tile from the centre(e.g. 1->1 Tile, 2->7 Tiles)
 	constexpr int MapRadiusInTiles = 9;
-
 	
 	if (!GrassTileBP)
 	{
 		UE_LOG(LogTemp, Error, TEXT("GrassTileBP not valid"))
 		return NewObject<UAegisMap>();
 	}
-
 
 	// Generate a path
 	// Set the path coords

@@ -3,12 +3,9 @@
 
 #include "BaseEnemy.h"
 
-#include "InputBehavior.h"
-#include "LocalizationConfigurationScript.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
-#include "Aegis/Buildings/NexusBuilding.h"
-#include "Chaos/GeometryParticlesfwd.h"
+#include "Aegis/Structures/NexusBuilding.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
