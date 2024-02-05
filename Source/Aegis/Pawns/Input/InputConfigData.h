@@ -18,5 +18,7 @@ class AEGIS_API UInputConfigData : public UDataAsset
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* InputClick;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
+	UInputAction* InputMove;
 	
 };

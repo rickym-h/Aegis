@@ -8,6 +8,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
 #include "Camera/CameraComponent.h"
+#include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
 
@@ -23,6 +24,8 @@ APlayerPawn::APlayerPawn()
 	SpringArm->SetupAttachment(RootComponent);
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
+
+	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("Floating Movement Component");
 
 	
 }
@@ -66,6 +69,12 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	DrawDebugSphere(GetWorld(), HitResult.Location, 5, 12, FColor::Red, false, 2, 0, 1);
 }
 
+void APlayerPawn::Move(const FInputActionValue& InputActionValue)
+{
+	//UE_LOG(LogTemp, Warning, TEXT("%ls") , *InputActionValue.ToString())
+	AddMovementInput(FVector(InputActionValue.Get<FVector2D>().X, InputActionValue.Get<FVector2D>().Y, 0), 5);
+}
+
 // Called to bind functionality to input
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
@@ -84,6 +93,7 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	// Bind the actions
 	PEI->BindAction(InputActions->InputClick, ETriggerEvent::Triggered, this, &APlayerPawn::Click);
+	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
 
 }
 

@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class UFloatingPawnMovement;
 class AAegisGameStateBase;
 class USpringArmComponent;
 class UCameraComponent;
@@ -25,6 +26,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+	UFloatingPawnMovement* MovementComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UCameraComponent* Camera;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	USpringArmComponent* SpringArm;
@@ -38,13 +41,14 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Game")
 	AAegisGameStateBase* GameState;
-	
+
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	void Click(const FInputActionValue& InputActionValue);
+	void Move(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
