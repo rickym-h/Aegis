@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "Aegis/Map/AegisMap.h"
 #include "GameFramework/Pawn.h"
-#include "BaseEnemy.generated.h"
+#include "Enemy.generated.h"
 
 class USphereComponent;
 class AAegisGameStateBase;
 
 UCLASS()
-class AEGIS_API ABaseEnemy : public AActor
+class AEGIS_API AEnemy : public AActor
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this pawn's properties
-	ABaseEnemy();
+	AEnemy();
 
 protected:
 	// Called when the game starts or when spawned

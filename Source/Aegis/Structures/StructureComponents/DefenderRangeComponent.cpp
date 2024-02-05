@@ -6,7 +6,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Map/MapTile.h"
-#include "Aegis/Enemies/BaseEnemy.h"
+#include "Aegis/Enemies/Enemy.h"
 
 // Sets default values for this component's properties
 UDefenderRangeComponent::UDefenderRangeComponent()
@@ -31,10 +31,10 @@ void UDefenderRangeComponent::BeginPlay()
 void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor);
+	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!Enemy) { return; }
 
-	TSet<ABaseEnemy*> EnemiesInRange = GetEnemiesInRange();
+	TSet<AEnemy*> EnemiesInRange = GetEnemiesInRange();
 	EnemiesInRange.Add(Enemy);
 
 	OnEnemyEnterRangeDelegate.Execute(Enemy);
@@ -59,9 +59,9 @@ void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const in
 	}
 }
 
-TSet<ABaseEnemy*> UDefenderRangeComponent::GetEnemiesInRange()
+TSet<AEnemy*> UDefenderRangeComponent::GetEnemiesInRange()
 {
-	TSet<ABaseEnemy*> Enemies;
+	TSet<AEnemy*> Enemies;
 	for (const AMapTile* Tile : TilesInRange)
 	{
 		Enemies.Append(Tile->EnemiesOnTile);

@@ -8,10 +8,10 @@
 #include "DefenderRangeComponent.generated.h"
 
 
-class ABaseEnemy;
+class AEnemy;
 class AMapTile;
 // Delegate signature
-DECLARE_DYNAMIC_DELEGATE_OneParam(FOnEnemyEnterRangeSignature, ABaseEnemy*, OutEnemy);
+DECLARE_DYNAMIC_DELEGATE_OneParam(FOnEnemyEnterRangeSignature, AEnemy*, OutEnemy);
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class AEGIS_API UDefenderRangeComponent : public UActorComponent
@@ -37,5 +37,5 @@ public:
 	
 	void InitRange(const FTileCoord DefenderCoord, const int Range);
 
-	TSet<ABaseEnemy*> GetEnemiesInRange();
+	TSet<AEnemy*> GetEnemiesInRange();
 };

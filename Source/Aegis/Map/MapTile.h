@@ -7,7 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "MapTile.generated.h"
 
-class ABaseEnemy;
+class AEnemy;
 
 UCLASS()
 class AEGIS_API AMapTile : public AActor
@@ -37,7 +37,7 @@ public:
 	bool IsShowingGradients = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemies on Tile")
-	TSet<ABaseEnemy*> EnemiesOnTile;
+	TSet<AEnemy*> EnemiesOnTile;
 	
 
 protected:

@@ -3,7 +3,7 @@
 
 #include "AegisGameStateBase.h"
 
-#include "EnemyFactory.h"
+#include "Enemies/EnemyFactory.h"
 #include "Map/AegisMapFactory.h"
 
 void AAegisGameStateBase::BeginPlay()

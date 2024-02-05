@@ -3,8 +3,7 @@
 
 #include "MapTile.h"
 
-#include "Aegis/Enemies/BaseEnemy.h"
-#include "Chaos/AABBTree.h"
+#include "Aegis/Enemies/Enemy.h"
 
 // Sets default values
 AMapTile::AMapTile()
@@ -39,7 +38,7 @@ void AMapTile::BeginPlay()
 void AMapTile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
+	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Enemy on Tile"))
 		EnemiesOnTile.Add(Enemy);
@@ -49,7 +48,7 @@ void AMapTile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 void AMapTile::OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
                                      int32 OtherBodyIndex)
 {
-	if (ABaseEnemy* Enemy = Cast<ABaseEnemy>(OtherActor))
+	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
 	{
 		//UE_LOG(LogTemp, Warning, TEXT("Enemy off Tile"))
 		EnemiesOnTile.Remove(Enemy);

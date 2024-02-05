@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "EnemyFactory.generated.h"
 
-class ABaseEnemy;
+class AEnemy;
 class AAegisGameStateBase;
 /**
  * 
@@ -20,9 +20,9 @@ public:
 	AAegisGameStateBase* OwningGameState;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
-	TSubclassOf<ABaseEnemy> TestEnemyClass;
+	TSubclassOf<AEnemy> TestEnemyClass;
 
-	TArray<ABaseEnemy*> EnemiesInWorld;
+	TArray<AEnemy*> EnemiesInWorld;
 
 	UFUNCTION(BlueprintCallable)
 	void SpawnTestEnemy();

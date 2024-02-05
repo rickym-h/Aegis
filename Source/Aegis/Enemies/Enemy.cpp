@@ -1,7 +1,7 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BaseEnemy.h"
+#include "Enemy.h"
 
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
@@ -10,7 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
-ABaseEnemy::ABaseEnemy()
+AEnemy::AEnemy()
 {
  	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -30,7 +30,7 @@ ABaseEnemy::ABaseEnemy()
 }
 
 // Called when the game starts or when spawned
-void ABaseEnemy::BeginPlay()
+void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
@@ -44,20 +44,20 @@ void ABaseEnemy::BeginPlay()
 	// Set start location
 	SetActorLocation(FromTile.ToWorldLocation());
 
-	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &ABaseEnemy::OverlapBegin);
+	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
 }
 
-float ABaseEnemy::DistanceToGoalTile() const
+float AEnemy::DistanceToGoalTile() const
 {
 	return FVector::Dist2D(GetActorLocation(), GoalTile.ToWorldLocation());
 }
 
-float ABaseEnemy::DistanceToGoalTile(const FVector& StartPos) const
+float AEnemy::DistanceToGoalTile(const FVector& StartPos) const
 {
 	return FVector::Dist2D(StartPos, GoalTile.ToWorldLocation());
 }
 
-void ABaseEnemy::MoveTowardsGoal(float DeltaTime)
+void AEnemy::MoveTowardsGoal(float DeltaTime)
 {
 	// Get movement distance
 	float DistanceToTravel = MovementSpeed * DeltaTime;
@@ -90,7 +90,7 @@ void ABaseEnemy::MoveTowardsGoal(float DeltaTime)
 	SetActorLocation(TargetPos, true);
 }
 
-void ABaseEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+void AEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	bool bFromSweep, const FHitResult& SweepResult)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("OVERLAP DETECTED"))
@@ -104,7 +104,7 @@ void ABaseEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* 
 }
 
 // Called every frame
-void ABaseEnemy::Tick(float DeltaTime)
+void AEnemy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
