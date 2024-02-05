@@ -24,7 +24,7 @@ void AAegisGameStateBase::PostInitializeComponents()
 	if (EnemyFactoryClass)
 	{
 		EnemyFactory = NewObject<UEnemyFactory>(GetWorld(), EnemyFactoryClass);
-		EnemyFactory->OwningGameState = this;
+		EnemyFactory->SetOwningGameState(this);
 	}
 	
 }
