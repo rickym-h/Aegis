@@ -6,6 +6,7 @@
 #include "AegisMap.generated.h"
 
 
+class UTowerData;
 class ABaseTower;
 class ANexusBuilding;
 class AMapTile;
@@ -129,6 +130,9 @@ public:
 
 	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Defender Classes")
 	// TSubclassOf<ABaseTower> DefaultDefender;
+
+	UFUNCTION(BlueprintCallable)
+	bool AddTowerToMap(FTileCoord Location, UTowerData* TowerData);
 	
 	UFUNCTION()
 	bool AddDefenderToMap(const FTileCoord Location);
@@ -145,6 +149,7 @@ protected:
 	// Building Data
 	UPROPERTY()
 	ANexusBuilding* NexusBuilding;
+	TMap<FTileCoord, UTowerData*> TowersDataMap;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsTileAvailable(FTileCoord Location);

@@ -13,5 +13,8 @@ UCLASS()
 class AEGIS_API UTowerData : public UObject
 {
 	GENERATED_BODY()
+
+public:
+	FString DefenderName = "Default Name";
 	
 };

@@ -46,6 +46,27 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 	return PathRoute[CurrentCoord];
 }
 
+bool UAegisMap::AddTowerToMap(FTileCoord Location, UTowerData* TowerData)
+{
+	return false;
+
+	// Check the location is valid And resources are valid
+
+	// Get the tower class needed
+
+	// Create actor instance of tower class
+
+	// Set the data of the tower actor based on tower data
+
+	// Finish spawning tower actor
+
+	// Add towerdata to map
+	
+	// Take any resources needed
+
+	// Return true
+}
+
 bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
 {
 	if (!IsTileAvailable(Location)) { return false; }
