@@ -6,6 +6,7 @@
 #include "AegisMap.generated.h"
 
 
+class AStructure;
 class UTowerData;
 class ABaseTower;
 class ANexusBuilding;
@@ -16,13 +17,13 @@ struct FTileCoord
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int Q;
 	
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int R;
 
-	UPROPERTY(VisibleAnywhere)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int S;
 
 	FTileCoord()
@@ -46,7 +47,7 @@ struct FTileCoord
 
 	FString ToString() const
 	{
-		return FString("Q=").Append(FString::FromInt(Q)).Append(" R=").Append(FString::FromInt(R));
+		return FString("Q=").Append(FString::FromInt(Q)).Append(" R=").Append(FString::FromInt(R)).Append(" S=").Append(FString::FromInt(S));
 	}
 
 	bool IsValid() const
@@ -83,6 +84,30 @@ struct FTileCoord
 			}
 		}
 		return TilesInRadius;
+	}
+
+	static FTileCoord FromLocation(const FVector& Location)
+	{
+		const float Qf = ((FMath::Sqrt(3.f)/3 * Location.X) - ((1/3) * Location.Y)) / 100;
+		const float Rf = ((2/3) * Location.Y) / 100;
+		const float Sf = -Qf-Rf;
+		// TODO integrate axial_road function
+		int Q = FMath::RoundToInt(Qf);
+		int R = FMath::RoundToInt(Rf);
+		int S = FMath::RoundToInt(Sf);
+
+		const float QDiff = FMath::Abs(Q-Qf);
+		const float RDiff = FMath::Abs(R-Rf);
+		const float SDiff = FMath::Abs(S-Sf);
+
+		if ((QDiff > RDiff) && (QDiff > SDiff))
+		{
+			Q = -R-S;
+		} else if (RDiff > SDiff)
+		{
+			R = -Q-S;
+		}
+		return FTileCoord(Q,R);
 	}
 
 	bool operator==(const FTileCoord &RHSTile) const
@@ -128,15 +153,8 @@ public:
 	UFUNCTION()
 	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
 
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Defender Classes")
-	// TSubclassOf<ABaseTower> DefaultDefender;
-
 	UFUNCTION(BlueprintCallable)
-	bool AddTowerToMap(FTileCoord Location, UTowerData* TowerData);
-	
-	UFUNCTION()
-	bool AddDefenderToMap(const FTileCoord Location);
-
+	bool AddTowerToMap(const FTileCoord Location, UTowerData* TowerData);
 
 protected:
 	// Map Tiles
@@ -146,10 +164,14 @@ protected:
 	TMap<FTileCoord, FTileCoord> PathRoute;
 	TArray<FTileCoord> PathStartTiles;
 
-	// Building Data
+	// Structure Data
 	UPROPERTY()
 	ANexusBuilding* NexusBuilding;
-	TMap<FTileCoord, UTowerData*> TowersDataMap;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
+	TMap<FTileCoord, AStructure*> MapStructures;
+	
+	
+	TMap<FTileCoord, const UTowerData*> TowersDataMap;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsTileAvailable(FTileCoord Location);

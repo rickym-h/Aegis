@@ -3,3 +3,7 @@
 
 #include "TowerData.h"
 
+TSubclassOf<ATower> UTowerData::GetTowerBlueprintClass() const
+{
+	return TowerBlueprintClass;
+}

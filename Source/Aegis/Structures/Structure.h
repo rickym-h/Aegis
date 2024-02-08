@@ -3,28 +3,25 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Structures/Structure.h"
+#include "Aegis/Map/AegisMap.h"
 #include "GameFramework/Actor.h"
-#include "Tower.generated.h"
+#include "Structure.generated.h"
+
 
 UCLASS()
-class AEGIS_API ATower : public AStructure
+class AEGIS_API AStructure : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	ATower();
-	
-	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Tower Data")
-	// UTowerData* TowerData;
+	AStructure();
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
+	FTileCoord CurrentLocation;
 };

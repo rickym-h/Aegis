@@ -3,6 +3,10 @@
 
 #include "AegisMap.h"
 
+#include "Aegis/Structures/Structure.h"
+#include "Aegis/Structures/Towers/Tower.h"
+#include "Aegis/Structures/Towers/TowerData.h"
+
 
 UAegisMap::UAegisMap()
 {
@@ -46,30 +50,35 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 	return PathRoute[CurrentCoord];
 }
 
-bool UAegisMap::AddTowerToMap(FTileCoord Location, UTowerData* TowerData)
+bool UAegisMap::AddTowerToMap(const FTileCoord Location, UTowerData* TowerData)
 {
-	return false;
-
 	// Check the location is valid And resources are valid
+	if (!IsTileAvailable(Location)) { return false; }
 
 	// Get the tower class needed
+	if (!TowerData->GetTowerBlueprintClass()) { return false; }
 
 	// Create actor instance of tower class
-
 	// Set the data of the tower actor based on tower data
-
 	// Finish spawning tower actor
-
-	// Add towerdata to map
+	ATower* Tower = TowerData->SpawnTowerFromData(Location.ToWorldLocation());
+	UE_LOG(LogTemp, Warning, TEXT("Spawning tower at: %ls"), *Location.ToString())
+	if (!Tower) { return false; }
+	//Tower->TowerData = TowerData;
 	
-	// Take any resources needed
 
-	// Return true
+	TowersDataMap.Add(Location,	TowerData);
+	AStructure* TowerStructure = Tower;
+	MapStructures.Add(Location,	TowerStructure);
+	
+	// TODO Take any resources needed
+
+	return true;
 }
 
-bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
-{
-	if (!IsTileAvailable(Location)) { return false; }
+// bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
+// {
+// 	if (!IsTileAvailable(Location)) { return false; }
 
 	// if (!DefaultDefender) { return false; }
 
@@ -83,13 +92,13 @@ bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
 	//
 	// MapDefenders.Add(Location, NewDefender);
 
-	return true;
-}
+// 	return true;
+// }
 
 bool UAegisMap::IsTileAvailable(FTileCoord Location)
 {
-	// if (MapDefenders.Contains(Location)) { return false; }
+	if (MapStructures.Contains(Location)) { return false; }
 
-	// TODO implement for gaia too
+	// TODO also check that path tiles are safe
 	return true;
 }

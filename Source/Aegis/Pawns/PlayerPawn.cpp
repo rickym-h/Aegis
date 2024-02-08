@@ -62,7 +62,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("TileCoord: %ls"), *Tile->TileCoord.ToString())
 
-			GameState->AegisMap->AddDefenderToMap(Tile->TileCoord);
+			//GameState->AegisMap->AddDefenderToMap(Tile->TileCoord);
 		}
 	}
 

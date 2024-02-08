@@ -9,9 +9,13 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(Blueprintable)
 class AEGIS_API UProjectileTowerData : public UTowerData
 {
 	GENERATED_BODY()
-	
+
+public:
+	UProjectileTowerData();
+
+	virtual ATower* SpawnTowerFromData(FVector LocationToSpawnTower) const override;
 };
