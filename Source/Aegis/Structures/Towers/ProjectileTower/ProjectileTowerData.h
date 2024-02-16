@@ -18,4 +18,7 @@ public:
 	UProjectileTowerData();
 
 	virtual ATower* SpawnTowerFromData(FVector LocationToSpawnTower) const override;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	int TowerRange;
 };

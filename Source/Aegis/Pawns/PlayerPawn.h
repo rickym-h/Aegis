@@ -7,10 +7,21 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class UStructureData;
+class UTowerData;
 class UFloatingPawnMovement;
 class AAegisGameStateBase;
 class USpringArmComponent;
 class UCameraComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTowersInHandUpdated);
+
+UENUM()
+enum EPlayerState
+{
+	Default UMETA(DisplayName = "Default"),
+	Placing UMETA(DisplayName = "Placing Structures")
+};
 
 UCLASS()
 class AEGIS_API APlayerPawn : public APawn
@@ -43,6 +54,21 @@ protected:
 	AAegisGameStateBase* GameState;
 
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
+	TEnumAsByte<EPlayerState> PlayerActionState;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
+	UStructureData* StructureToPlace;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
+	UStaticMeshComponent* StructureHologram;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
+	TArray<UTowerData*> TowerCardsInHand;
+
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
+	FHitResult HitResultUnderCursor;
+	FHitResult* UpdateHitResultUnderCursor();
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -51,5 +77,16 @@ public:
 	void Move(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UPROPERTY(BlueprintAssignable)
+	FOnTowersInHandUpdated OnTowersInHandUpdatedDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	bool AddTowerCardToHand(UTowerData* TowerData);
+	UFUNCTION(BlueprintCallable)
+	bool RemoveTowerCardFromHand(UTowerData* TowerData);
+
+	UFUNCTION(BlueprintCallable)
+	void BeginPlacingStructure(UStructureData* StructureData);
 
 };

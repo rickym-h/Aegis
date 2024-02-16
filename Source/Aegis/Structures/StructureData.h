@@ -4,13 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UObject/NoExportTypes.h"
-#include "TowerFactory.generated.h"
+#include "StructureData.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class AEGIS_API UTowerFactory : public UObject
+class AEGIS_API UStructureData : public UObject
 {
 	GENERATED_BODY()
 	

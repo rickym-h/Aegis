@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "AegisGameStateBase.generated.h"
 
+class UTowerDataFactory;
 class UEnemyFactory;
 class UAegisMapFactory;
 class UAegisMap;
@@ -25,8 +26,12 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
 	UAegisMap* AegisMap;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factories")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
+	UAegisMapFactory* MapFactory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UEnemyFactory* EnemyFactory;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
+	UTowerDataFactory* TowerDataFactory;
 	
 protected:
 	
@@ -35,4 +40,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UEnemyFactory> EnemyFactoryClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
+	TSubclassOf<UTowerDataFactory> TowerDataFactoryClass;
 };

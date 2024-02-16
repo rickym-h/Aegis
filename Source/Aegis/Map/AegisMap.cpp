@@ -61,8 +61,9 @@ bool UAegisMap::AddTowerToMap(const FTileCoord Location, UTowerData* TowerData)
 	// Create actor instance of tower class
 	// Set the data of the tower actor based on tower data
 	// Finish spawning tower actor
+	//UE_LOG(LogTemp, Warning, TEXT("Spawning tower at: %ls"), *Location.ToString())
 	ATower* Tower = TowerData->SpawnTowerFromData(Location.ToWorldLocation());
-	UE_LOG(LogTemp, Warning, TEXT("Spawning tower at: %ls"), *Location.ToString())
+	Tower->CurrentLocation = Location;
 	if (!Tower) { return false; }
 	//Tower->TowerData = TowerData;
 	
@@ -76,29 +77,12 @@ bool UAegisMap::AddTowerToMap(const FTileCoord Location, UTowerData* TowerData)
 	return true;
 }
 
-// bool UAegisMap::AddDefenderToMap(const FTileCoord Location)
-// {
-// 	if (!IsTileAvailable(Location)) { return false; }
 
-	// if (!DefaultDefender) { return false; }
-
-	// const FTransform ActorTransform = FTransform(Location.ToWorldLocation());
-	// ABaseProjectileTower* NewDefender = GetWorld()->SpawnActorDeferred<ABaseProjectileTower>(DefaultDefender, ActorTransform);
-	//
-	// NewDefender->CurrentLocation = Location;
-	// NewDefender->TowerRange = 2;
-	//
-	// UGameplayStatics::FinishSpawningActor(NewDefender, ActorTransform);
-	//
-	// MapDefenders.Add(Location, NewDefender);
-
-// 	return true;
-// }
-
-bool UAegisMap::IsTileAvailable(FTileCoord Location)
+bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 {
 	if (MapStructures.Contains(Location)) { return false; }
 
-	// TODO also check that path tiles are safe
+	if (PathRoute.Contains(Location)) { return false; }
+	
 	return true;
 }

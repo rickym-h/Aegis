@@ -17,9 +17,6 @@ ATower* UProjectileTowerData::SpawnTowerFromData(const FVector LocationToSpawnTo
 	const FTransform ActorTransform = FTransform(LocationToSpawnTower);
 	AProjectileTower* NewTower = GetWorld()->SpawnActorDeferred<AProjectileTower>(TowerBlueprintClass, ActorTransform);
 	//
-	UE_LOG(LogTemp, Warning, TEXT("This TileCoord is at FVector: %ls"), *LocationToSpawnTower.ToString())
-	NewTower->CurrentLocation = FTileCoord::FromLocation(LocationToSpawnTower);
-	UE_LOG(LogTemp, Warning, TEXT("Converting back to FTileCoord: %ls"), *NewTower->CurrentLocation.ToString())
 	// NewTower->TowerRange = 2;
 	//
 	UGameplayStatics::FinishSpawningActor(NewTower, ActorTransform);

@@ -15,9 +15,6 @@ class AEGIS_API ATower : public AStructure
 public:	
 	// Sets default values for this actor's properties
 	ATower();
-	
-	// UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Tower Data")
-	// UTowerData* TowerData;
 
 protected:
 	// Called when the game starts or when spawned

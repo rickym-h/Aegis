@@ -66,7 +66,8 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 		//if (FTileCoord::HexDistance(CentreCoord, ThisTileCoord) >= MapRadiusInTiles) { continue; }
 			
 		// World location of tile BP
-		FVector Location = (R * OffsetR) + (Q * OffsetQ);
+		// FVector Location = (R * OffsetR) + (Q * OffsetQ);
+		FVector Location = ThisTileCoord.ToWorldLocation();
 		FRotator Rotation(0.0f, 0.0f, 0.0f);
 			
 		FActorSpawnParameters SpawnInfo;

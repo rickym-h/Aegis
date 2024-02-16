@@ -7,10 +7,12 @@
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
+#include "Aegis/Structures/Towers/TowerData.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -25,9 +27,14 @@ APlayerPawn::APlayerPawn()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
+	StructureHologram = CreateDefaultSubobject<UStaticMeshComponent>("Hologram Structure");
+	StructureHologram->SetupAttachment(RootComponent);
+	StructureHologram->SetVisibility(false);
+	StructureHologram->SetCollisionResponseToAllChannels(ECR_Ignore);
+
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("Floating Movement Component");
 
-	
+	PlayerActionState = Default;
 }
 
 // Called when the game starts or when spawned
@@ -35,10 +42,24 @@ void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+
 	if (Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{
 		GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	}
+
+	StructureHologram->SetWorldLocation(FTileCoord().ToWorldLocation());
+}
+
+FHitResult* APlayerPawn::UpdateHitResultUnderCursor()
+{
+	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
+	if (!PlayerController) { return nullptr; }
+
+	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel3));
+	PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResultUnderCursor);
+	return &HitResultUnderCursor;
 }
 
 // Called every frame
@@ -46,27 +67,43 @@ void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (PlayerActionState == EPlayerState::Placing)
+	{
+		// Set the hologram static mesh to where the player is looking;
+		UpdateHitResultUnderCursor();
+
+		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
+		{
+			StructureHologram->SetWorldLocation(MapTile->TileCoord.ToWorldLocation());
+		}
+	}
 }
 
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("CLICK"))
+	UpdateHitResultUnderCursor();
 
-	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	if (!PlayerController) { return; }
-	
-	FHitResult HitResult; 
-	if (PlayerController->GetHitResultUnderCursorByChannel(TraceTypeQuery1, false, HitResult))
+	const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor());
+	if (!Tile) { return; }
+
+
+	// Try to place tower
+	if (PlayerActionState == EPlayerState::Placing)
 	{
-		if (const AMapTile* Tile = Cast<AMapTile>(HitResult.GetActor()))
+		UE_LOG(LogTemp, Warning, TEXT("ATTEMPTING TO PLACE STRUCTURE AT %ls"), *Tile->TileCoord.ToString())
+		if (UTowerData* TowerData = Cast<UTowerData>(StructureToPlace))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("TileCoord: %ls"), *Tile->TileCoord.ToString())
-
-			//GameState->AegisMap->AddDefenderToMap(Tile->TileCoord);
+			if (GameState->AegisMap->AddTowerToMap(Tile->TileCoord, TowerData))
+			{
+				PlayerActionState = EPlayerState::Default;StructureToPlace = nullptr;
+				StructureHologram->SetVisibility(false);
+				RemoveTowerCardFromHand(TowerData);
+			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Click TileCoord: %ls"), *Tile->TileCoord.ToString())
 
-	DrawDebugSphere(GetWorld(), HitResult.Location, 5, 12, FColor::Red, false, 2, 0, 1);
+	//DrawDebugSphere(GetWorld(), HitResultUnderCursor.Location, 5, 12, FColor::Red, false, 2, 0, 1);
 }
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
@@ -95,5 +132,28 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PEI->BindAction(InputActions->InputClick, ETriggerEvent::Triggered, this, &APlayerPawn::Click);
 	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
 
+}
+
+bool APlayerPawn::AddTowerCardToHand(UTowerData* TowerData)
+{
+	TowerCardsInHand.Add(TowerData);
+	OnTowersInHandUpdatedDelegate.Broadcast();
+	return true;
+}
+
+bool APlayerPawn::RemoveTowerCardFromHand(UTowerData* TowerData)
+{
+	TowerCardsInHand.RemoveSingle(TowerData);
+	OnTowersInHandUpdatedDelegate.Broadcast();
+	return true;
+}
+
+
+void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
+{
+	PlayerActionState = EPlayerState::Placing;
+	StructureToPlace = StructureData;
+
+	StructureHologram->SetVisibility(true);
 }
 
