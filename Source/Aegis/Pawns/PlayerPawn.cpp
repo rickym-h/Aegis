@@ -93,12 +93,18 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 		UE_LOG(LogTemp, Warning, TEXT("ATTEMPTING TO PLACE STRUCTURE AT %ls"), *Tile->TileCoord.ToString())
 		if (UTowerData* TowerData = Cast<UTowerData>(StructureToPlace))
 		{
-			if (GameState->AegisMap->AddTowerToMap(Tile->TileCoord, TowerData))
+			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, TowerData))
 			{
 				PlayerActionState = EPlayerState::Default;StructureToPlace = nullptr;
 				StructureHologram->SetVisibility(false);
 				RemoveTowerCardFromHand(TowerData);
+			} else
+			{
+				UE_LOG(LogTemp, Error, TEXT("Could not place tower"))
 			}
+		} else
+		{
+			UE_LOG(LogTemp, Error, TEXT("Casting to UTowerData failed"))
 		}
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Click TileCoord: %ls"), *Tile->TileCoord.ToString())

@@ -3,3 +3,7 @@
 
 #include "StructureData.h"
 
+TSubclassOf<AStructure> UStructureData::GetStructureBlueprintClass() const
+{
+	return StructureBlueprintClass;
+}

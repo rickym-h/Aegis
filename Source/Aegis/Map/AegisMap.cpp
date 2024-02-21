@@ -50,27 +50,24 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 	return PathRoute[CurrentCoord];
 }
 
-bool UAegisMap::AddTowerToMap(const FTileCoord Location, UTowerData* TowerData)
+bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* StructureData)
 {
 	// Check the location is valid And resources are valid
 	if (!IsTileAvailable(Location)) { return false; }
 
 	// Get the tower class needed
-	if (!TowerData->GetTowerBlueprintClass()) { return false; }
+	if (!StructureData->GetStructureBlueprintClass()) { return false; }
 
 	// Create actor instance of tower class
 	// Set the data of the tower actor based on tower data
 	// Finish spawning tower actor
 	//UE_LOG(LogTemp, Warning, TEXT("Spawning tower at: %ls"), *Location.ToString())
-	ATower* Tower = TowerData->SpawnTowerFromData(Location.ToWorldLocation());
-	Tower->CurrentLocation = Location;
-	if (!Tower) { return false; }
+	AStructure* Structure = StructureData->SpawnStructureFromData(Location);
+	
+	if (!Structure) { return false; }
 	//Tower->TowerData = TowerData;
 	
-
-	TowersDataMap.Add(Location,	TowerData);
-	AStructure* TowerStructure = Tower;
-	MapStructures.Add(Location,	TowerStructure);
+	MapStructures.Add(Location,	Structure);
 	
 	// TODO Take any resources needed
 

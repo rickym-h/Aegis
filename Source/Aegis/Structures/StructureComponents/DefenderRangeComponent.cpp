@@ -34,10 +34,10 @@ void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedC
 	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!Enemy) { return; }
 
-	TSet<AEnemy*> EnemiesInRange = GetEnemiesInRange();
+	TSet<AEnemy*> EnemiesInRange = GetAllEnemiesInRange();
 	EnemiesInRange.Add(Enemy);
 
-	OnEnemyEnterRangeDelegate.Execute(Enemy);
+	OnEnemyEnterRangeDelegate.Broadcast(GetFrontEnemy(EnemiesInRange));
 }
 
 void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const int Range)
@@ -59,7 +59,7 @@ void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const in
 	}
 }
 
-TSet<AEnemy*> UDefenderRangeComponent::GetEnemiesInRange()
+TSet<AEnemy*> UDefenderRangeComponent::GetAllEnemiesInRange()
 {
 	TSet<AEnemy*> Enemies;
 	for (const AMapTile* Tile : TilesInRange)
@@ -69,3 +69,14 @@ TSet<AEnemy*> UDefenderRangeComponent::GetEnemiesInRange()
 	return Enemies;
 }
 
+AEnemy* UDefenderRangeComponent::GetFrontEnemy(TSet<AEnemy*> Enemies)
+{
+	if (Enemies.Num() <= 0) { return nullptr; }
+
+	// TODO find the front enemy to return rather than the first one
+	for (AEnemy* Enemy : Enemies)
+	{
+		return Enemy;
+	}
+	return nullptr;
+}

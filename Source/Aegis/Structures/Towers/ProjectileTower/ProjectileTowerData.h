@@ -17,7 +17,7 @@ class AEGIS_API UProjectileTowerData : public UTowerData
 public:
 	UProjectileTowerData();
 
-	virtual ATower* SpawnTowerFromData(FVector LocationToSpawnTower) const override;
+	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure) const override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
 	int TowerRange;

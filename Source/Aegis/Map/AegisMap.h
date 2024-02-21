@@ -7,6 +7,7 @@
 #include "AegisMap.generated.h"
 
 
+class UStructureData;
 class AStructure;
 class UTowerData;
 class ABaseTower;
@@ -39,7 +40,7 @@ public:
 	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool AddTowerToMap(const FTileCoord Location, UTowerData* TowerData);
+	bool AddStructureToMap(const FTileCoord Location, UStructureData* StructureData);
 
 protected:
 	// Map Tiles
@@ -54,9 +55,6 @@ protected:
 	ANexusBuilding* NexusBuilding;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AStructure*> MapStructures;
-	
-	
-	TMap<FTileCoord, const UTowerData*> TowersDataMap;
 
 	UFUNCTION(BlueprintCallable)
 	bool IsTileAvailable(const FTileCoord Location) const;

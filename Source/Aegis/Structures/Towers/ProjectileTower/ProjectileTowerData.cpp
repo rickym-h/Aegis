@@ -10,17 +10,18 @@ UProjectileTowerData::UProjectileTowerData()
 {
 }
 
-ATower* UProjectileTowerData::SpawnTowerFromData(const FVector LocationToSpawnTower) const
+AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordToSpawnStructure) const
 {
-	if (!TowerBlueprintClass) { return nullptr; }
+	if (!StructureBlueprintClass) { return nullptr; }
 
-	const FTransform ActorTransform = FTransform(LocationToSpawnTower);
-	AProjectileTower* NewTower = GetWorld()->SpawnActorDeferred<AProjectileTower>(TowerBlueprintClass, ActorTransform);
-	//
-	// NewTower->TowerRange = 2;
-	//
+	const FTransform ActorTransform = FTransform(CoordToSpawnStructure.ToWorldLocation());
+	AProjectileTower* NewTower = GetWorld()->SpawnActorDeferred<AProjectileTower>(StructureBlueprintClass, ActorTransform);
+
+	NewTower->CurrentLocation = CoordToSpawnStructure;
+	NewTower->SetTowerRange(2);
+
 	UGameplayStatics::FinishSpawningActor(NewTower, ActorTransform);
 
-	UE_LOG(LogTemp, Warning, TEXT("UProjectileTowerData::SpawnTowerFromData - Successfully spawned tower!"))
+	UE_LOG(LogTemp, Warning, TEXT("UProjectileTowerData::SpawnStructureFromData - Successfully spawned tower!"))
 	return NewTower;
 }
