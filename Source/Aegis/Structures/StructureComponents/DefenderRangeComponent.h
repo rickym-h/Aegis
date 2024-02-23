@@ -39,5 +39,5 @@ public:
 
 	TSet<AEnemy*> GetAllEnemiesInRange();
 
-	AEnemy* GetFrontEnemy(TSet<AEnemy*> Enemies);
+	static AEnemy* GetFrontEnemy(const TSet<AEnemy*>& Enemies);
 };

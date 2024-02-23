@@ -74,6 +74,21 @@ bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* Str
 	return true;
 }
 
+int UAegisMap::GetNumOfTilesToEnd(const FTileCoord StartCoord)
+{
+	int DistanceSoFar = 0;
+	FTileCoord CurrentCoord = StartCoord;
+	while (PathRoute.Contains(CurrentCoord))
+	{
+		FTileCoord NextCoord = PathRoute[CurrentCoord];
+		if (CurrentCoord == NextCoord) { break; }
+
+		DistanceSoFar++;
+		CurrentCoord = NextCoord;
+	}
+	return DistanceSoFar;
+}
+
 
 bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 {

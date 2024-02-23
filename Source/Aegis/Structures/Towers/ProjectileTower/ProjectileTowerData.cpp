@@ -18,7 +18,7 @@ AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordT
 	AProjectileTower* NewTower = GetWorld()->SpawnActorDeferred<AProjectileTower>(StructureBlueprintClass, ActorTransform);
 
 	NewTower->CurrentLocation = CoordToSpawnStructure;
-	NewTower->SetTowerRange(2);
+	NewTower->SetTowerRange(3);
 
 	UGameplayStatics::FinishSpawningActor(NewTower, ActorTransform);
 

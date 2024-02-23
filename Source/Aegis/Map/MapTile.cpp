@@ -3,6 +3,7 @@
 
 #include "MapTile.h"
 
+#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 
 // Sets default values
@@ -29,6 +30,9 @@ void AMapTile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MapReference = Cast<AAegisGameStateBase>(GetWorld()->GetGameState())->AegisMap;
+
+	TilesToEnd = MapReference->GetNumOfTilesToEnd(TileCoord);
 	
 	CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentBeginOverlap);
 	CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentEndOverlap);

@@ -85,39 +85,6 @@ struct FTileCoord
 		return TilesInRadius;
 	}
 
-	// static FTileCoord FromLocation(const FVector& Location)
-	// {
-	// 	const float Right = Location.Y;
-	// 	const float Forward = Location.X;
-	// 	
-	// 	const float Qf = ((FMath::Sqrt(3.f)/3.f * Right) - ((1.f/3.f) * Forward)) / 100.f;
-	// 	const float Rf = ((2.f/3.f) * Right) / 100.f;
-	// 	const float Sf = -Qf-Rf;
-	
-	// 	// integrate axial_round function
-	// 	int Q = FMath::RoundToInt(Qf);
-	// 	int R = FMath::RoundToInt(Rf);
-	// 	int S = FMath::RoundToInt(Sf);
-	//
-	// 	const float QDiff = FMath::Abs(static_cast<float>(Q)-Qf);
-	// 	const float RDiff = FMath::Abs(static_cast<float>(R)-Rf);
-	// 	const float SDiff = FMath::Abs(static_cast<float>(S)-Sf);
-	//
-	// 	if ((QDiff > RDiff) && (QDiff > SDiff))
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("Q Updating!"))
-	// 		Q = -R-S;
-	// 	} else if (RDiff > SDiff)
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("R Updating!"))
-	// 		R = -Q-S;
-	// 	} else
-	// 	{
-	// 		UE_LOG(LogTemp, Warning, TEXT("S Updating!"))
-	// 		S = -Q-R;
-	// 	}
-	// 	return FTileCoord(Q,R);
-	// }
 
 	bool operator==(const FTileCoord &RHSTile) const
 	{

@@ -42,6 +42,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	bool AddStructureToMap(const FTileCoord Location, UStructureData* StructureData);
 
+	UFUNCTION(BlueprintCallable)
+	int GetNumOfTilesToEnd(const FTileCoord StartCoord);
+
 protected:
 	// Map Tiles
 	TMap<FTileCoord, AMapTile*> MapTiles;

@@ -5,6 +5,7 @@
 
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
+#include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/NexusBuilding.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
@@ -109,4 +110,14 @@ void AEnemy::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	MoveTowardsGoal(DeltaTime);
+}
+
+float AEnemy::GetDistanceToNexus() const
+{
+	float DistanceToNexus = ((GameState->AegisMap->GetTile(GoalTile)->TilesToEnd) * 100 * FMath::Sqrt(3.f));
+	UE_LOG(LogTemp, Warning, TEXT("AEnemy::GetDistanceToNexus() - Goal distance to nexus: %f"), DistanceToNexus)
+	DistanceToNexus += DistanceToGoalTile();
+	UE_LOG(LogTemp, Warning, TEXT("AEnemy::GetDistanceToNexus() - Total distance to nexus: %f"), DistanceToNexus)
+	
+	return DistanceToNexus;
 }

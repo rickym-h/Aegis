@@ -36,7 +36,7 @@ void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedC
 
 	TSet<AEnemy*> EnemiesInRange = GetAllEnemiesInRange();
 	EnemiesInRange.Add(Enemy);
-
+	
 	OnEnemyEnterRangeDelegate.Broadcast(GetFrontEnemy(EnemiesInRange));
 }
 
@@ -69,14 +69,24 @@ TSet<AEnemy*> UDefenderRangeComponent::GetAllEnemiesInRange()
 	return Enemies;
 }
 
-AEnemy* UDefenderRangeComponent::GetFrontEnemy(TSet<AEnemy*> Enemies)
+AEnemy* UDefenderRangeComponent::GetFrontEnemy(const TSet<AEnemy*>& Enemies)
 {
 	if (Enemies.Num() <= 0) { return nullptr; }
 
-	// TODO find the front enemy to return rather than the first one
-	for (AEnemy* Enemy : Enemies)
+	TArray<AEnemy*> EnemiesList = Enemies.Array();
+	
+	AEnemy* FrontEnemy = EnemiesList[0];
+	float FrontEnemyDistanceToNexus = FrontEnemy->GetDistanceToNexus();
+	
+	for (AEnemy* Enemy : EnemiesList)
 	{
-		return Enemy;
+		const float CurrentEnemyDistanceToNexus = Enemy->GetDistanceToNexus();
+		if (CurrentEnemyDistanceToNexus < FrontEnemyDistanceToNexus)
+		{
+			FrontEnemy = Enemy;
+			FrontEnemyDistanceToNexus = CurrentEnemyDistanceToNexus;
+		}
 	}
-	return nullptr;
+	UE_LOG(LogTemp, Warning, TEXT("Front Enemy is : %f away from the nexus." ), FrontEnemyDistanceToNexus)
+	return FrontEnemy;
 }
