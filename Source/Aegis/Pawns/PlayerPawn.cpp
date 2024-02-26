@@ -12,7 +12,6 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
-#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -41,8 +40,6 @@ APlayerPawn::APlayerPawn()
 void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
-
-	MovementComponent->MaxSpeed = 100000.f;
 
 	if (Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{
@@ -78,7 +75,8 @@ void APlayerPawn::Tick(float DeltaTime)
 			StructureHologram->SetWorldLocation(MapTile->TileCoord.ToWorldLocation());
 		}
 	}
-	
+
+	UE_LOG(LogTemp, Warning, TEXT("Velocity: %f"), MovementComponent->Velocity.Length())
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
@@ -88,7 +86,6 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 
 	const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor());
 	if (!Tile) { return; }
-
 
 	// Try to place tower if a tower is selected
 	if (PlayerActionState == EPlayerState::Placing)
@@ -112,8 +109,13 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 	// Get the target zoom location
 	BoomArmTargetLength += (InputActionValue.Get<FVector>().Z * 1000);
 	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
+	
+	MovementComponent->MaxSpeed = 3000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
+	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 6;
+	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
 
-	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.5));
+	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.01));
+	//AddActorLocalOffset(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0) * FMath::Pow(SpringArm->TargetArmLength, 1.01) * 0.1);
 }
 
 // Called to bind functionality to input
