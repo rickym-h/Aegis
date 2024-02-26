@@ -113,7 +113,7 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 	BoomArmTargetLength += (InputActionValue.Get<FVector>().Z * 1000);
 	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
 
-	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.05));
+	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.5));
 }
 
 // Called to bind functionality to input
