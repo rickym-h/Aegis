@@ -42,7 +42,6 @@ void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
 void AProjectileTower::ReloadShot()
 {
 	ShotAvailable = true;
-	UE_LOG(LogTemp, Warning, TEXT("AProjectileTower::ReloadShot() - Reloaded!!!"))
 
 	if (AEnemy* Enemy = RangeComponent->GetFrontEnemy(RangeComponent->GetAllEnemiesInRange()))
 	{

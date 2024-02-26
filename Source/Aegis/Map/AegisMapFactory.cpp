@@ -24,8 +24,6 @@ void UAegisMapFactory::PostInitProperties()
 
 UAegisMap* UAegisMapFactory::GenerateTestMap() const
 {
-	UE_LOG(LogTemp, Warning, TEXT("GENERATING TEST MAP"))
-
 	// The number of steps needed to reach farthest tile from the centre(e.g. 1->1 Tile, 2->7 Tiles)
 	constexpr int MapRadiusInTiles = 15;
 	

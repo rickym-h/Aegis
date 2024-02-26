@@ -87,35 +87,28 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	if (!Tile) { return; }
 
 
-	// Try to place tower
+	// Try to place tower if a tower is selected
 	if (PlayerActionState == EPlayerState::Placing)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ATTEMPTING TO PLACE STRUCTURE AT %ls"), *Tile->TileCoord.ToString())
 		if (UTowerData* TowerData = Cast<UTowerData>(StructureToPlace))
 		{
 			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, TowerData))
 			{
-				PlayerActionState = EPlayerState::Default;StructureToPlace = nullptr;
+				PlayerActionState = EPlayerState::Default;
+				StructureToPlace = nullptr;
 				StructureHologram->SetVisibility(false);
 				RemoveTowerCardFromHand(TowerData);
-			} else
-			{
-				UE_LOG(LogTemp, Error, TEXT("Could not place tower"))
 			}
-		} else
-		{
-			UE_LOG(LogTemp, Error, TEXT("Casting to UTowerData failed"))
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("Click TileCoord: %ls"), *Tile->TileCoord.ToString())
-
-	//DrawDebugSphere(GetWorld(), HitResultUnderCursor.Location, 5, 12, FColor::Red, false, 2, 0, 1);
+	
 }
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("%ls") , *InputActionValue.ToString())
-	AddMovementInput(FVector(InputActionValue.Get<FVector2D>().X, InputActionValue.Get<FVector2D>().Y, 0), 5);
+	const FVector ForwardPart = Camera->GetForwardVector() * InputActionValue.Get<FVector>().Z * 50;
+	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0) + ForwardPart, 5);
 }
 
 // Called to bind functionality to input

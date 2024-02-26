@@ -115,9 +115,7 @@ void AEnemy::Tick(float DeltaTime)
 float AEnemy::GetDistanceToNexus() const
 {
 	float DistanceToNexus = ((GameState->AegisMap->GetTile(GoalTile)->TilesToEnd) * 100 * FMath::Sqrt(3.f));
-	UE_LOG(LogTemp, Warning, TEXT("AEnemy::GetDistanceToNexus() - Goal distance to nexus: %f"), DistanceToNexus)
 	DistanceToNexus += DistanceToGoalTile();
-	UE_LOG(LogTemp, Warning, TEXT("AEnemy::GetDistanceToNexus() - Total distance to nexus: %f"), DistanceToNexus)
 	
 	return DistanceToNexus;
 }

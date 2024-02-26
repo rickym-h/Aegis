@@ -47,6 +47,7 @@ public:
 
 protected:
 	// Map Tiles
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AMapTile*> MapTiles;
 
 	// Path Data

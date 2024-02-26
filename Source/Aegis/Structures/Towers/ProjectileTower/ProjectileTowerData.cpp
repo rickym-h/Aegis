@@ -22,6 +22,5 @@ AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordT
 
 	UGameplayStatics::FinishSpawningActor(NewTower, ActorTransform);
 
-	UE_LOG(LogTemp, Warning, TEXT("UProjectileTowerData::SpawnStructureFromData - Successfully spawned tower!"))
 	return NewTower;
 }

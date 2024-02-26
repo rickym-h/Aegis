@@ -11,12 +11,10 @@ void AAegisGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::BeginPlay()"))
 }
 
 void AAegisGameStateBase::PostInitializeComponents()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::PostInitializeComponents()"))
 	Super::PostInitializeComponents();
 
 	if (MapFactoryClass)

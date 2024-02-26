@@ -22,7 +22,6 @@ void UAegisMap::PopulateMapData(
 	this->PathRoute = InPathRoute;
 	this->PathStartTiles = InPathStartTiles;
 	this->NexusBuilding = InNexusBuilding;
-	UE_LOG(LogTemp, Warning, TEXT("UAegisMap::PopulateMapData()"))
 }
 
 bool UAegisMap::IsCoordInPath(const FTileCoord Coord) const
@@ -32,7 +31,12 @@ bool UAegisMap::IsCoordInPath(const FTileCoord Coord) const
 
 AMapTile* UAegisMap::GetTile(const FTileCoord Coord)
 {
-	return *MapTiles.Find(Coord);
+	// For some reason TMap::Find throws an error, so we manually check if is contained and then return the value.
+	if (MapTiles.Contains(Coord))
+	{
+		return MapTiles[Coord];
+	}
+	return nullptr;
 }
 
 FTileCoord UAegisMap::GetEnemySpawnCoord() const
