@@ -69,6 +69,8 @@ protected:
 	FHitResult HitResultUnderCursor;
 	FHitResult* UpdateHitResultUnderCursor();
 
+	int BoomArmTargetLength;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

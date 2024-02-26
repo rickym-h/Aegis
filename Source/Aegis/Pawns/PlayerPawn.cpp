@@ -42,6 +42,7 @@ void APlayerPawn::BeginPlay()
 {
 	Super::BeginPlay();
 
+	MovementComponent->MaxSpeed = 100000.f;
 
 	if (Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{
@@ -77,6 +78,8 @@ void APlayerPawn::Tick(float DeltaTime)
 			StructureHologram->SetWorldLocation(MapTile->TileCoord.ToWorldLocation());
 		}
 	}
+	
+	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
@@ -106,9 +109,11 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
-	//UE_LOG(LogTemp, Warning, TEXT("%ls") , *InputActionValue.ToString())
-	const FVector ForwardPart = Camera->GetForwardVector() * InputActionValue.Get<FVector>().Z * 50;
-	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0) + ForwardPart, 5);
+	// Get the target zoom location
+	BoomArmTargetLength += (InputActionValue.Get<FVector>().Z * 1000);
+	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
+
+	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.05));
 }
 
 // Called to bind functionality to input
