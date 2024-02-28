@@ -3,6 +3,7 @@
 
 #include "AegisMap.h"
 
+#include "MapTile.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Aegis/Structures/Towers/TowerData.h"
@@ -37,6 +38,16 @@ AMapTile* UAegisMap::GetTile(const FTileCoord Coord)
 		return MapTiles[Coord];
 	}
 	return nullptr;
+}
+
+TArray<AMapTile*> UAegisMap::GetTiles()
+{
+	TArray<AMapTile*> Tiles;
+	for (const TPair<FTileCoord, AMapTile*>& Entry : MapTiles)
+	{
+		Tiles.Add(Entry.Value);
+	}
+	return Tiles;
 }
 
 FTileCoord UAegisMap::GetEnemySpawnCoord() const

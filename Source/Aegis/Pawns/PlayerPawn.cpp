@@ -76,7 +76,6 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Velocity: %f"), MovementComponent->Velocity.Length())
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
@@ -110,12 +109,11 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 	BoomArmTargetLength += (InputActionValue.Get<FVector>().Z * 1000);
 	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
 	
-	MovementComponent->MaxSpeed = 3000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
+	MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
 	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 6;
 	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
 
 	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.01));
-	//AddActorLocalOffset(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0) * FMath::Pow(SpringArm->TargetArmLength, 1.01) * 0.1);
 }
 
 // Called to bind functionality to input

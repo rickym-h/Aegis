@@ -20,8 +20,6 @@ class AEGIS_API AAegisGameStateBase : public AGameStateBase
 
 	virtual void BeginPlay() override;
 
-	virtual void PostInitializeComponents() override;
-
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
 	UAegisMap* AegisMap;

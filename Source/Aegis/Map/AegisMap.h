@@ -33,6 +33,8 @@ public:
 
 	UFUNCTION()
 	AMapTile* GetTile(FTileCoord Coord);
+	UFUNCTION()
+	TArray<AMapTile*> GetTiles();
 
 	UFUNCTION()
 	FTileCoord GetEnemySpawnCoord() const;

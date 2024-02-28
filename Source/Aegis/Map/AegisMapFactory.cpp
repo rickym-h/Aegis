@@ -111,6 +111,11 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 
 	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
 	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding);
+
+	for (AMapTile* Tile : Map->GetTiles())
+	{
+		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
+	}
 	
 	return Map;
 }

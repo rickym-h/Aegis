@@ -31,8 +31,6 @@ void AMapTile::BeginPlay()
 	Super::BeginPlay();
 
 	MapReference = Cast<AAegisGameStateBase>(GetWorld()->GetGameState())->AegisMap;
-
-	TilesToEnd = MapReference->GetNumOfTilesToEnd(TileCoord);
 	
 	CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentBeginOverlap);
 	CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentEndOverlap);

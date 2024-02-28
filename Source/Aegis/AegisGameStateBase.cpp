@@ -10,12 +10,6 @@
 void AAegisGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
-}
-
-void AAegisGameStateBase::PostInitializeComponents()
-{
-	Super::PostInitializeComponents();
 
 	if (MapFactoryClass)
 	{
@@ -34,5 +28,4 @@ void AAegisGameStateBase::PostInitializeComponents()
 		TowerDataFactory = NewObject<UTowerDataFactory>(GetWorld(), TowerDataFactoryClass);
 		TowerDataFactory->WorldReference = GetWorld();
 	}
-	
 }
