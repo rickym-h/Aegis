@@ -11,10 +11,10 @@ USTRUCT(BlueprintType, meta = (HasNativeMake = "Aegis.TileCoordHelperLibrary.Mak
 struct FTileCoord
 {
 	GENERATED_BODY()
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int Q;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	int R;
 
@@ -32,7 +32,7 @@ struct FTileCoord
 	{
 		Q = InQ;
 		R = InR;
-		S = -Q-R;
+		S = -Q - R;
 	}
 
 	FTileCoord Copy() const
@@ -47,12 +47,12 @@ struct FTileCoord
 
 	bool IsValid() const
 	{
-		return S == -Q-R;
+		return S == -Q - R;
 	}
 
 	FVector ToWorldLocation(const float TileRadius = 100) const
 	{
-		const float Right = TileRadius * ((FMath::Sqrt(3.f) * this->Q) + ((FMath::Sqrt(3.f)/2) * this->R));
+		const float Right = TileRadius * ((FMath::Sqrt(3.f) * this->Q) + ((FMath::Sqrt(3.f) / 2) * this->R));
 		const float Forward = TileRadius * (1.5 * this->R);
 		return FVector(Forward, Right, 0);
 		// const float VerticalSpacing = 1.5 * TileRadius;
@@ -62,7 +62,6 @@ struct FTileCoord
 		// const FVector OffsetR = FVector(VerticalSpacing, HorizontalSpacing/2, 0);
 		//
 		// return (R * OffsetR) + (Q * OffsetQ);
-		
 	}
 
 	// Calculate the HexDistance between two tiles. Similar to Manhattan distance but uses three axis (QRS) instead of two (XY) 
@@ -77,7 +76,7 @@ struct FTileCoord
 		TArray<FTileCoord> TilesInRadius;
 		for (int Q = -Radius; Q <= Radius; Q++)
 		{
-			for (int R = FMath::Max(-Radius, -Q-Radius); R <= FMath::Min(Radius, -Q+Radius); R++)
+			for (int R = FMath::Max(-Radius, -Q - Radius); R <= FMath::Min(Radius, -Q + Radius); R++)
 			{
 				TilesInRadius.Add(FTileCoord(Q, R) + Origin);
 			}
@@ -86,19 +85,22 @@ struct FTileCoord
 	}
 
 
-	bool operator==(const FTileCoord &RHSTile) const
+	bool operator==(const FTileCoord& RHSTile) const
 	{
 		return (this->IsValid() && RHSTile.IsValid() && (this->Q == RHSTile.Q) && (this->R == RHSTile.R));
 	}
-	FTileCoord operator+(const FTileCoord &RHSTile) const
+
+	FTileCoord operator+(const FTileCoord& RHSTile) const
 	{
 		return FTileCoord(this->Q + RHSTile.Q, this->R + RHSTile.R);
 	}
-	FTileCoord operator-(const FTileCoord &RHSTile) const
+
+	FTileCoord operator-(const FTileCoord& RHSTile) const
 	{
 		return FTileCoord(this->Q - RHSTile.Q, this->R - RHSTile.R);
 	}
 };
+
 FORCEINLINE uint32 GetTypeHash(const FTileCoord& Coord)
 {
 	return FCrc::MemCrc32(&Coord, sizeof(FTileCoord));

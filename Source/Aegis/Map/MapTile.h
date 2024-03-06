@@ -13,20 +13,20 @@ UCLASS()
 class AEGIS_API AMapTile : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AMapTile();
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* CollisionVolume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TileMesh;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
 	FTileCoord TileCoord;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
 	float PathingGradient;
 
@@ -41,7 +41,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
 	int TilesToEnd = 0;
-	
 
 protected:
 	// Called when the game starts or when spawned
@@ -51,9 +50,8 @@ protected:
 	UAegisMap* MapReference;
 
 	UFUNCTION()
-	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	                             bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-
-
 };

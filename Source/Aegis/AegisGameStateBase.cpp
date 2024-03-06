@@ -14,7 +14,7 @@ void AAegisGameStateBase::BeginPlay()
 	if (MapFactoryClass)
 	{
 		MapFactory = NewObject<UAegisMapFactory>(GetWorld(), MapFactoryClass);
-		AegisMap = MapFactory->GenerateTestMap();
+		//GenerateTestMapFromMapFactory();
 	}
 
 	if (EnemyFactoryClass)
@@ -28,4 +28,9 @@ void AAegisGameStateBase::BeginPlay()
 		TowerDataFactory = NewObject<UTowerDataFactory>(GetWorld(), TowerDataFactoryClass);
 		TowerDataFactory->WorldReference = GetWorld();
 	}
+}
+
+void AAegisGameStateBase::GenerateTestMapFromMapFactory()
+{
+	AegisMap = MapFactory->GenerateTestMap();
 }

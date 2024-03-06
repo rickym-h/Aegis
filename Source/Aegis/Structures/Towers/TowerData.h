@@ -21,6 +21,4 @@ protected:
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
 	FString DefenderName = "Default Name";
-
-
 };

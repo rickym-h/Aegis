@@ -10,10 +10,10 @@
 UTowerData* UTowerDataFactory::GenerateTestTowerData() const
 {
 	if (!TestTowerDataClass) { return nullptr; }
-	
+
 	UProjectileTowerData* TowerData = NewObject<UProjectileTowerData>(WorldReference, TestTowerDataClass);
 
 	TowerData->TowerRange = 3;
-	
+
 	return TowerData;
 }

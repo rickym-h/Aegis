@@ -13,15 +13,15 @@
 // Sets default values
 AEnemy::AEnemy()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Collision Sphere");
 	RootComponent = CollisionSphere;
-	
+
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(RootComponent);
-	
+
 	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
 
@@ -36,7 +36,19 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-	if (!GameState) { return; }
+	if (!GameState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AEnemy::BeginPlay() - No GameState reference found."))
+		Destroy();
+		return;
+	}
+
+	if (!GameState->AegisMap)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AEnemy::BeginPlay() - No AegisMap reference found."))
+		Destroy();
+		return;
+	}
 
 	// Initialise pathing info
 	FromTile = GameState->AegisMap->GetEnemySpawnCoord();
@@ -75,7 +87,8 @@ void AEnemy::MoveTowardsGoal(float DeltaTime)
 			ForwardVector.Normalize();
 			TargetPos += ForwardVector * DistanceToTravel;
 			DistanceToTravel = 0;
-		} else
+		}
+		else
 		// Otherwise take distance off movement distance, set new goal tiles, and recurse
 		{
 			DistanceToTravel -= DistanceToGoalTile(TargetPos);
@@ -92,7 +105,7 @@ void AEnemy::MoveTowardsGoal(float DeltaTime)
 }
 
 void AEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-	bool bFromSweep, const FHitResult& SweepResult)
+                          bool bFromSweep, const FHitResult& SweepResult)
 {
 	//UE_LOG(LogTemp, Warning, TEXT("OVERLAP DETECTED"))
 
@@ -101,7 +114,6 @@ void AEnemy::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 		UGameplayStatics::ApplyDamage(OtherActor, DamageToNexus, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
 		Destroy();
 	}
-	
 }
 
 // Called every frame
@@ -116,6 +128,6 @@ float AEnemy::GetDistanceToNexus() const
 {
 	float DistanceToNexus = ((GameState->AegisMap->GetTile(GoalTile)->TilesToEnd) * 100 * FMath::Sqrt(3.f));
 	DistanceToNexus += DistanceToGoalTile();
-	
+
 	return DistanceToNexus;
 }

@@ -28,7 +28,7 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void TryFireAtEnemy(AEnemy* Enemy);
-	
+
 	UFUNCTION(BlueprintCallable)
 	void FireProjectileAtEnemy(AEnemy* Enemy);
 

@@ -20,5 +20,4 @@ public:
 	UInputAction* InputClick;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	UInputAction* InputMove;
-	
 };

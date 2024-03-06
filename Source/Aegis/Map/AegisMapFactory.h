@@ -24,7 +24,6 @@ public:
 	UAegisMap* GenerateTestMap() const;
 
 protected:
-
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSubclassOf<UAegisMap> AegisMapClass;
 	
@@ -49,6 +48,4 @@ protected:
 	FVector OffsetQ;
 	UPROPERTY(BlueprintReadOnly, Category="Tiles")
 	FVector OffsetR;
-
-	
 };

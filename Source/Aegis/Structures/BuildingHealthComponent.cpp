@@ -19,13 +19,14 @@ void UBuildingHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (AActor *Owner = GetOwner(); Owner != nullptr) {
+	if (AActor* Owner = GetOwner(); Owner != nullptr)
+	{
 		Owner->OnTakeAnyDamage.AddDynamic(this, &UBuildingHealthComponent::TakeDamage);
-	} else
+	}
+	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("Health Component failed to bind OnTakeAnyDamage for: %s"), *GetOwner()->GetActorNameOrLabel())
 	}
-	
 }
 
 
@@ -38,7 +39,7 @@ void UBuildingHealthComponent::TickComponent(float DeltaTime, ELevelTick TickTyp
 }
 
 void UBuildingHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
-	AActor* DamageCauser)
+                                          AActor* DamageCauser)
 {
 	// Perform logic for damaging building
 	this->CurrentHealth -= Damage;
@@ -50,10 +51,9 @@ void UBuildingHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, co
 			// TODO animation and sound effects before destroying
 			Owner->Destroy();
 		}
-	} else
+	}
+	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Taking Damage! CurrentHealth: %f"), CurrentHealth)
 	}
-
 }
-

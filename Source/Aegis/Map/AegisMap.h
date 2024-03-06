@@ -26,8 +26,9 @@ public:
 	UAegisMap();
 
 	UFUNCTION()
-	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
-	
+	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute,
+	                     const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
+
 	UFUNCTION()
 	bool IsCoordInPath(FTileCoord Coord) const;
 
@@ -64,5 +65,4 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsTileAvailable(const FTileCoord Location) const;
-	
 };

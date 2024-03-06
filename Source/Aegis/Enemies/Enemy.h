@@ -32,7 +32,7 @@ protected:
 	FTileCoord FromTile;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTileCoord GoalTile;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float MovementSpeed = 500.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -40,14 +40,15 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	const AAegisGameStateBase* GameState;
-	
+
 	float DistanceToGoalTile() const;
 	float DistanceToGoalTile(const FVector& StartPos) const;
 	UFUNCTION()
 	void MoveTowardsGoal(float DeltaTime);
-	
+
 	UFUNCTION()
-	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
+	                  bool bFromSweep, const FHitResult& SweepResult);
 
 public:
 	// Called every frame
@@ -55,5 +56,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetDistanceToNexus() const;
-
 };

@@ -20,7 +20,8 @@ void UEnemyFactory::SpawnTestEnemy()
 	{
 		AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(TestEnemyClass, Location, Rotation);
 		EnemiesInWorld.Add(Enemy);
-	} else
+	}
+	else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::SpawnTestEnemy() - No TestEnemyClass"))
 	}

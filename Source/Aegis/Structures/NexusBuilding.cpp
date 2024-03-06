@@ -9,17 +9,17 @@
 // Sets default values
 ANexusBuilding::ANexusBuilding()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
 
 	CollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
 	RootComponent = CollisionCapsule;
-	
+
 	BuildingMesh = CreateDefaultSubobject<UStaticMeshComponent>("Building Mesh");
 	BuildingMesh->SetupAttachment(RootComponent);
-	
+
 	HealthComponent = CreateDefaultSubobject<UBuildingHealthComponent>("Health Component");
-	
+
 	BuildingMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionCapsule->SetCollisionResponseToAllChannels(ECR_Ignore);
 
@@ -40,13 +40,10 @@ void ANexusBuilding::BeginPlay()
 	// GetWorld()->GetTimerManager().SetTimer(DealDamageTimerHandle, Delegate, 5, true);
 
 	//UGameplayStatics::ApplyDamage(this, 10, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
-
 }
 
 // Called every frame
 void ANexusBuilding::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-

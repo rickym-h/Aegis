@@ -9,9 +9,9 @@
 // Sets default values
 AMapTile::AMapTile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
-	
+
 	CollisionVolume = CreateDefaultSubobject<UStaticMeshComponent>("Collision Volume");
 	RootComponent = CollisionVolume;
 	CollisionVolume->SetVisibility(false);
@@ -31,14 +31,13 @@ void AMapTile::BeginPlay()
 	Super::BeginPlay();
 
 	MapReference = Cast<AAegisGameStateBase>(GetWorld()->GetGameState())->AegisMap;
-	
+
 	CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentBeginOverlap);
 	CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentEndOverlap);
-
 }
 
 void AMapTile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+                                       int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
 	{

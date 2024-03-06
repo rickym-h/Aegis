@@ -21,10 +21,9 @@ protected:
 	TSubclassOf<UTowerData> TestTowerDataClass;
 
 public:
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="World")
 	UWorld* WorldReference;
-	
+
 	UFUNCTION(BlueprintCallable)
 	UTowerData* GenerateTestTowerData() const;
 };

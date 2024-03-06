@@ -20,6 +20,9 @@ class AEGIS_API AAegisGameStateBase : public AGameStateBase
 
 	virtual void BeginPlay() override;
 
+	UFUNCTION(BlueprintCallable)
+	void GenerateTestMapFromMapFactory();
+
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
 	UAegisMap* AegisMap;

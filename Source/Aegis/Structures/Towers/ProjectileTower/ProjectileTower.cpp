@@ -16,7 +16,7 @@ AProjectileTower::AProjectileTower()
 void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
-	
+
 	if (ShotAvailable)
 	{
 		ShotAvailable = false;
@@ -32,10 +32,10 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 }
 
 void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
-{	
+{
 	// TODO actually fire projectile
-	const FVector Start = GetActorLocation() + FVector(0,0,100);
-	const FVector End = Enemy->GetActorLocation() + FVector(0,0,100);
+	const FVector Start = GetActorLocation() + FVector(0, 0, 100);
+	const FVector End = Enemy->GetActorLocation() + FVector(0, 0, 100);
 	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1, 0, 5);
 }
 
@@ -51,11 +51,10 @@ void AProjectileTower::ReloadShot()
 
 void AProjectileTower::SetTowerRange(const int NewRange)
 {
-	if (NewRange<=0) { return; }
+	if (NewRange <= 0) { return; }
 
 	TowerRange = NewRange;
 	RangeComponent->InitRange(CurrentLocation, NewRange);
 
 	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
 }
- 

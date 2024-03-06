@@ -16,10 +16,10 @@
 // Sets default values
 APlayerPawn::APlayerPawn()
 {
- 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	FocusPoint=CreateDefaultSubobject<UStaticMeshComponent>("Focus Point");
+	FocusPoint = CreateDefaultSubobject<UStaticMeshComponent>("Focus Point");
 	RootComponent = FocusPoint;
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
 	SpringArm->SetupAttachment(RootComponent);
@@ -65,7 +65,7 @@ void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PlayerActionState == EPlayerState::Placing)
+	if (PlayerActionState == Placing)
 	{
 		// Set the hologram static mesh to where the player is looking;
 		UpdateHitResultUnderCursor();
@@ -76,7 +76,8 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 	}
 
-	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
+	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000),
+	                                              GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
@@ -87,20 +88,19 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	if (!Tile) { return; }
 
 	// Try to place tower if a tower is selected
-	if (PlayerActionState == EPlayerState::Placing)
+	if (PlayerActionState == Placing)
 	{
 		if (UTowerData* TowerData = Cast<UTowerData>(StructureToPlace))
 		{
 			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, TowerData))
 			{
-				PlayerActionState = EPlayerState::Default;
+				PlayerActionState = Default;
 				StructureToPlace = nullptr;
 				StructureHologram->SetVisibility(false);
 				RemoveTowerCardFromHand(TowerData);
 			}
 		}
 	}
-	
 }
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
@@ -108,7 +108,7 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 	// Get the target zoom location
 	BoomArmTargetLength += (InputActionValue.Get<FVector>().Z * 1000);
 	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
-	
+
 	MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
 	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 6;
 	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
@@ -120,10 +120,10 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-	
+
 	// Get the player controller
 	APlayerController* PC = Cast<APlayerController>(GetController());
- 
+
 	// Get the local player subsystem
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());
 	// Clear out existing mapping, and add our mapping
@@ -135,7 +135,6 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Bind the actions
 	PEI->BindAction(InputActions->InputClick, ETriggerEvent::Triggered, this, &APlayerPawn::Click);
 	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
-
 }
 
 bool APlayerPawn::AddTowerCardToHand(UTowerData* TowerData)
@@ -155,9 +154,8 @@ bool APlayerPawn::RemoveTowerCardFromHand(UTowerData* TowerData)
 
 void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 {
-	PlayerActionState = EPlayerState::Placing;
+	PlayerActionState = Placing;
 	StructureToPlace = StructureData;
 
 	StructureHologram->SetVisibility(true);
 }
-

@@ -13,8 +13,8 @@ UCLASS()
 class AEGIS_API ANexusBuilding : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ANexusBuilding();
 
@@ -29,8 +29,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UBuildingHealthComponent* HealthComponent;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
 };

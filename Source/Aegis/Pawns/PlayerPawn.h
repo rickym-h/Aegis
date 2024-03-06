@@ -60,7 +60,7 @@ protected:
 	UStructureData* StructureToPlace;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	UStaticMeshComponent* StructureHologram;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
 	TArray<UTowerData*> TowerCardsInHand;
 
@@ -71,7 +71,7 @@ protected:
 
 	int BoomArmTargetLength;
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -90,5 +90,4 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void BeginPlacingStructure(UStructureData* StructureData);
-
 };
