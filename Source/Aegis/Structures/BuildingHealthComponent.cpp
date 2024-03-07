@@ -57,3 +57,14 @@ void UBuildingHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, co
 		UE_LOG(LogTemp, Warning, TEXT("Taking Damage! CurrentHealth: %f"), CurrentHealth)
 	}
 }
+
+int UBuildingHealthComponent::GetCurrentHealth()
+{
+	return CurrentHealth;
+}
+
+void UBuildingHealthComponent::SetCurrentHealth(int Health)
+{
+	CurrentHealth = Health;
+}
+

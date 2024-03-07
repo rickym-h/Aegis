@@ -48,6 +48,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetNumOfTilesToEnd(const FTileCoord StartCoord);
 
+	UPROPERTY()
+	ANexusBuilding* NexusBuilding;
 protected:
 	// Map Tiles
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
@@ -58,8 +60,6 @@ protected:
 	TArray<FTileCoord> PathStartTiles;
 
 	// Structure Data
-	UPROPERTY()
-	ANexusBuilding* NexusBuilding;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AStructure*> MapStructures;
 

@@ -31,4 +31,10 @@ public:
 
 	UFUNCTION()
 	void TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
+
+	UFUNCTION()
+	int GetCurrentHealth();
+
+	UFUNCTION()
+	void SetCurrentHealth(int Health);
 };

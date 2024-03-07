@@ -6,6 +6,8 @@
 #include "GameFramework/GameStateBase.h"
 #include "AegisGameStateBase.generated.h"
 
+class USaveGame;
+class UAegisSaveGame;
 class UTowerDataFactory;
 class UEnemyFactory;
 class UAegisMapFactory;
@@ -22,6 +24,12 @@ class AEGIS_API AAegisGameStateBase : public AGameStateBase
 
 	UFUNCTION(BlueprintCallable)
 	void GenerateTestMapFromMapFactory();
+	
+	UFUNCTION(BlueprintCallable)
+	void SaveGame();
+	
+	UFUNCTION(BlueprintCallable)
+	void LoadGame();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
@@ -44,4 +52,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UTowerDataFactory> TowerDataFactoryClass;
+
+	UFUNCTION()
+	void SaveGameDelegateFunction(const FString& SlotName, const int32 UserIndex, bool bSuccess);
+	UFUNCTION()
+	void LoadGameDelegateFunction(const FString& SlotName, const int32 UserIndex, USaveGame* LoadedGameData);
 };

@@ -18,6 +18,8 @@ public:
 	// Sets default values for this actor's properties
 	ANexusBuilding();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
+	UBuildingHealthComponent* HealthComponent;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -26,8 +28,6 @@ protected:
 	UCapsuleComponent* CollisionCapsule;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* BuildingMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
-	UBuildingHealthComponent* HealthComponent;
 
 public:
 	// Called every frame
