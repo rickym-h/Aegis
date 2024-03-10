@@ -109,7 +109,7 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
 
 	MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
-	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 6;
+	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 4;
 	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
 
 	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.01));

@@ -8,6 +8,8 @@ AStructure::AStructure()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	StructureMesh = CreateDefaultSubobject<UStaticMeshComponent>("Structure Mesh");
 }
 
 // Called when the game starts or when spawned
