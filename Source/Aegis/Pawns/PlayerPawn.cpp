@@ -76,8 +76,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 	}
 
-	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000),
-	                                              GetWorld()->DeltaRealTimeSeconds, 10);
+	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
@@ -156,6 +155,11 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 {
 	PlayerActionState = Placing;
 	StructureToPlace = StructureData;
+
+	if (UStaticMesh* Mesh = StructureToPlace->GetMeshRepresentation())
+	{
+		StructureHologram->SetStaticMesh(Mesh);
+	}
 
 	StructureHologram->SetVisibility(true);
 }

@@ -19,8 +19,14 @@ class AEGIS_API UStructureData : public UObject
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
 	TSubclassOf<AStructure> StructureBlueprintClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
+	UStaticMesh* MeshRepresentation;
 
 public:
+	UFUNCTION()
+	UStaticMesh* GetMeshRepresentation() const;
+
 	UFUNCTION()
 	TSubclassOf<AStructure> GetStructureBlueprintClass() const;
 
