@@ -22,49 +22,62 @@ void UAegisMapFactory::PostInitProperties()
 	OffsetR = FVector(VerticalSpacing, HorizontalSpacing/2, 0);
 }
 
-UAegisMap* UAegisMapFactory::GenerateTestMap() const
+UAegisMap* UAegisMapFactory::GenerateMap(const int MapClusterRadius, const int PathClusterLength) const
 {
-	// The number of steps needed to reach farthest tile from the centre(e.g. 1->1 Tile, 2->7 Tiles)
-	constexpr int MapRadiusInTiles = 15;
-	
+	// Check the input parameters are valid
+	if (MapClusterRadius < 1 || MapClusterRadius > 20)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateMap() - MapClusterRadius Out of range."))
+	}
+	if (PathClusterLength < MapClusterRadius)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateMap() - PathClusterLength too short."))
+	}
+	// Check factory classes are valid
 	if (!GrassTileBP)
 	{
 		UE_LOG(LogTemp, Error, TEXT("GrassTileBP not valid"))
 		return NewObject<UAegisMap>();
 	}
 
-	// Generate a path
-	// Set the path coords
-	TMap<FTileCoord, FTileCoord> PathRoute;
-	for (int Q = MapRadiusInTiles; Q > 0; Q--)
+	// Generate Map Data
+
+	const TMap<FTileCoord, FTileCoord> PathRoute = GeneratePath(MapClusterRadius, PathClusterLength);
+
+	const TMap<FTileCoord, AMapTile*> MapTiles = GenerateMapTiles(MapClusterRadius, PathRoute);
+
+	const TArray<FTileCoord> PathStartTileCoords = GetPathStartCoords(PathRoute);
+	
+	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
+
+	// Create Map
+	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
+	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding);
+
+	// Post Map creation settings
+	for (AMapTile* Tile : Map->GetTiles())
 	{
-		const FTileCoord FromCoord = FTileCoord(Q,0);
-		const FTileCoord ToCoord = FTileCoord(Q-1,0);
-		PathRoute.Add(FromCoord, ToCoord);
+		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
 	}
-	PathRoute.Add(FTileCoord(), FTileCoord());
 
-	PathRoute.Add(FTileCoord(7,0), FTileCoord(6,1));
-	PathRoute.Add(FTileCoord(6,1), FTileCoord(6,0));
-	
-	TArray<FTileCoord> PathStartTileCoords;
-	PathStartTileCoords.Add(FTileCoord(MapRadiusInTiles, 0));
-	
-	
+	return Map;
+}
 
+
+
+TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const int MapClusterRadius, const TMap<FTileCoord, FTileCoord>& PathRoute) const
+{
+	const int MapRadiusInTiles = MapClusterRadius * 3;
 	// Random offset to use for perlin noise generation (to be seemingly unique every time) as FMath::PerlinNoise2D is not seeded
 	const FVector2D RandomNoiseOffset = FVector2D(FMath::FRandRange(-100000.f, 1000000.f));
-
-	// Generate Tiles for map (looping R and Q constraints from RedBlobGames)
+	
 	TMap<FTileCoord, AMapTile*> MapTiles;
 	for (const FTileCoord ThisTileCoord : FTileCoord::GetTilesInRadius(FTileCoord(), MapRadiusInTiles))
 	{
 		int Q = ThisTileCoord.Q;
 		int R = ThisTileCoord.R;
-		//if (FTileCoord::HexDistance(CentreCoord, ThisTileCoord) >= MapRadiusInTiles) { continue; }
-			
+		
 		// World location of tile BP
-		// FVector Location = (R * OffsetR) + (Q * OffsetQ);
 		FVector Location = ThisTileCoord.ToWorldLocation();
 		FRotator Rotation(0.0f, 0.0f, 0.0f);
 			
@@ -99,23 +112,41 @@ UAegisMap* UAegisMapFactory::GenerateTestMap() const
 			
 		//Map->AddTileToMap(ThisTileCoord, Tile);
 		MapTiles.Add(ThisTileCoord, Tile);
-
-		if (ThisTileCoord.S >= 0)
-		{
-			//Tile->ToggleShowGradients();
-		}
 	}
 
-	// Add buildings
-	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
+	return MapTiles;
+}
 
-	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
-	Map->PopulateMapData(MapTiles, PathRoute, PathStartTileCoords, NexusBuilding);
-
-	for (AMapTile* Tile : Map->GetTiles())
-	{
-		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
-	}
+TMap<FTileCoord, FTileCoord> UAegisMapFactory::GeneratePath(int MapClusterRadius, int PathClusterLength) const
+{
+	const int MapRadiusInTiles = MapClusterRadius * 3;
 	
-	return Map;
+	TMap<FTileCoord, FTileCoord> PathRoute;
+	for (int Q = MapRadiusInTiles; Q > 0; Q--)
+	{
+		const FTileCoord FromCoord = FTileCoord(Q,0);
+		const FTileCoord ToCoord = FTileCoord(Q-1,0);
+		PathRoute.Add(FromCoord, ToCoord);
+	}
+	PathRoute.Add(FTileCoord(), FTileCoord());
+
+	return PathRoute;
+}
+
+TArray<FTileCoord> UAegisMapFactory::GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute) const
+{
+	// Get all coords where no other tiles points into it
+	TSet<FTileCoord> PathStartCoords;
+	
+	// Get all starting coords
+	for (const TTuple<FTileCoord, FTileCoord> Pair : PathRoute)
+	{
+		PathStartCoords.Add(Pair.Key);
+	}
+	// Remove all coords which are pointed to
+	for (const TTuple<FTileCoord, FTileCoord> Pair : PathRoute)
+	{
+		PathStartCoords.Remove(Pair.Value);
+	}
+	return PathStartCoords.Array();
 }

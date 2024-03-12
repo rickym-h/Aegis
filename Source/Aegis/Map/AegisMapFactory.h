@@ -20,8 +20,15 @@ class AEGIS_API UAegisMapFactory : public UObject
 public:
 	virtual void PostInitProperties() override;
 	
+	// UFUNCTION()
+	// UAegisMap* GenerateTestMap() const;
+
+	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const int MapClusterRadius, const TMap<FTileCoord, FTileCoord>& PathRoute) const;
+	TMap<FTileCoord, FTileCoord> GeneratePath(int MapClusterRadius, int PathClusterLength) const;
+	TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute) const;
+	
 	UFUNCTION()
-	UAegisMap* GenerateTestMap() const;
+	UAegisMap* GenerateMap(const int MapClusterRadius, const int PathClusterLength) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")

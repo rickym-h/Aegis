@@ -56,7 +56,9 @@ protected:
 	TMap<FTileCoord, AMapTile*> MapTiles;
 
 	// Path Data
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, FTileCoord> PathRoute;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TArray<FTileCoord> PathStartTiles;
 
 	// Structure Data
