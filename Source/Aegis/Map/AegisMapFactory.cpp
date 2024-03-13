@@ -4,6 +4,7 @@
 #include "AegisMapFactory.h"
 
 #include "MapTile.h"
+#include "PathGenerationBlueprintLibrary.h"
 #include "Aegis/Structures/NexusBuilding.h"
 
 void UAegisMapFactory::PostInitProperties()
@@ -70,6 +71,8 @@ TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const int MapClus
 	const int MapRadiusInTiles = MapClusterRadius * 3;
 	// Random offset to use for perlin noise generation (to be seemingly unique every time) as FMath::PerlinNoise2D is not seeded
 	const FVector2D RandomNoiseOffset = FVector2D(FMath::FRandRange(-100000.f, 1000000.f));
+
+	TArray<FTileCoord> CoordsToColour = UPathGenerationBlueprintLibrary::GetClustersInRange(MapRadiusInTiles);
 	
 	TMap<FTileCoord, AMapTile*> MapTiles;
 	for (const FTileCoord ThisTileCoord : FTileCoord::GetTilesInRadius(FTileCoord(), MapRadiusInTiles))
@@ -105,7 +108,7 @@ TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const int MapClus
 		Tile->TileCoord = ThisTileCoord.Copy();
 		Tile->PathingGradient = NoiseValue;
 
-		if (PathRoute.Contains(ThisTileCoord))
+		if (PathRoute.Contains(ThisTileCoord) || CoordsToColour.Contains(ThisTileCoord))
 		{
 			Tile->ToggleShowGradients();
 		}
@@ -113,6 +116,7 @@ TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const int MapClus
 		//Map->AddTileToMap(ThisTileCoord, Tile);
 		MapTiles.Add(ThisTileCoord, Tile);
 	}
+	
 
 	return MapTiles;
 }
