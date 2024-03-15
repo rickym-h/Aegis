@@ -6,7 +6,6 @@
 #include "Kismet/BlueprintFunctionLibrary.h"
 #include "TileCoordHelperLibrary.generated.h"
 
-
 USTRUCT(BlueprintType, meta = (HasNativeMake = "Aegis.TileCoordHelperLibrary.MakeTileCoordStruct"))
 struct FTileCoord
 {
@@ -88,6 +87,11 @@ struct FTileCoord
 	bool operator==(const FTileCoord& RHSTile) const
 	{
 		return (this->IsValid() && RHSTile.IsValid() && (this->Q == RHSTile.Q) && (this->R == RHSTile.R));
+	}
+	
+	bool operator!=(const FTileCoord& RHSTile) const
+	{
+		return (this->IsValid() && RHSTile.IsValid() && ((this->Q != RHSTile.Q) || (this->R != RHSTile.R)));
 	}
 
 	FTileCoord operator+(const FTileCoord& RHSTile) const

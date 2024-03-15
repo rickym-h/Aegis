@@ -23,12 +23,12 @@ public:
 	// UFUNCTION()
 	// UAegisMap* GenerateTestMap() const;
 
-	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const int MapClusterRadius, const TMap<FTileCoord, FTileCoord>& PathRoute) const;
-	TMap<FTileCoord, FTileCoord> GeneratePath(int MapClusterRadius, int PathClusterLength) const;
+	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute) const;
+	static TMap<FTileCoord, FTileCoord> GeneratePath(const int PathLengthInClusters, const int PathsCount, const int BranchesCount);
 	TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute) const;
 	
 	UFUNCTION()
-	UAegisMap* GenerateMap(const int MapClusterRadius, const int PathClusterLength) const;
+	UAegisMap* GenerateMap(const int PathClusterLength, const int PathsCount) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
