@@ -18,7 +18,7 @@ class AEGIS_API UPathGenerationBlueprintLibrary : public UBlueprintFunctionLibra
 
 public:
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
-	static TArray<FTileCoord> GetClustersInRange(const int MapRadius);
+	static TArray<FTileCoord> GetClustersInRange(const FTileCoord Origin, const int MapRadius);
 	
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static TArray<FTileCoord> GetAdjacentClusters(const FTileCoord Coord);

@@ -23,7 +23,7 @@ public:
 	// UFUNCTION()
 	// UAegisMap* GenerateTestMap() const;
 
-	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute) const;
+	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute, const TMap<FTileCoord, FTileCoord>& PathClusters) const;
 	static TMap<FTileCoord, FTileCoord> GeneratePath(const int PathLengthInClusters, const int PathsCount, const int BranchesCount);
 	TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute) const;
 	

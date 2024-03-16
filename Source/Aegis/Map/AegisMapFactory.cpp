@@ -26,7 +26,7 @@ void UAegisMapFactory::PostInitProperties()
 UAegisMap* UAegisMapFactory::GenerateMap(const int PathClusterLength, const int PathsCount) const
 {
 	// Check the input parameters are valid
-	if (PathClusterLength < 4)
+	if (PathClusterLength < 2)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateMap() - PathClusterLength too short."))
 	}
@@ -38,10 +38,18 @@ UAegisMap* UAegisMapFactory::GenerateMap(const int PathClusterLength, const int 
 	}
 
 	// Generate Map Data
-
-	const TMap<FTileCoord, FTileCoord> PathRoute = GeneratePath(PathClusterLength, PathsCount, 0);
+	const TMap<FTileCoord, FTileCoord> PathClusters = GeneratePath(PathClusterLength, PathsCount, 0);
+	const TMap<FTileCoord, FTileCoord> PathRoute = UPathGenerationBlueprintLibrary::GetFullPathFromClusters(PathClusters);
 	
-	const TMap<FTileCoord, AMapTile*> MapTiles = GenerateMapTiles(PathRoute);
+	const TMap<FTileCoord, AMapTile*> MapTiles = GenerateMapTiles(PathRoute, PathClusters);
+
+	for (TTuple<FTileCoord, FTileCoord> Entry : PathRoute)
+	{
+		if (AMapTile* Tile = MapTiles[Entry.Key])
+		{
+			Tile->ToggleShowGradients();
+		}
+	}
 
 	const TArray<FTileCoord> PathStartTileCoords = GetPathStartCoords(PathRoute);
 	
@@ -62,21 +70,34 @@ UAegisMap* UAegisMapFactory::GenerateMap(const int PathClusterLength, const int 
 
 
 
-TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute) const
+TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute, const TMap<FTileCoord, FTileCoord>& PathClusters) const
 {
-	const int MapRadiusInTiles = 20;
 	// Random offset to use for perlin noise generation (to be seemingly unique every time) as FMath::PerlinNoise2D is not seeded
 	const FVector2D RandomNoiseOffset = FVector2D(FMath::FRandRange(-100000.f, 1000000.f));
 
 	TSet<FTileCoord> CoordsInRangeOfPath;
+	// Ensure all path tiles are generated
 	for (TTuple<FTileCoord, FTileCoord> Entry : PathRoute)
 	{
-		TArray<FTileCoord> TilesInRadius = FTileCoord::GetTilesInRadius(Entry.Value, 3);
+		TArray<FTileCoord> TilesInRadius = FTileCoord::GetTilesInRadius(Entry.Key, 1);
 		for (FTileCoord TileCoord : TilesInRadius)
 		{
 			CoordsInRangeOfPath.Add(TileCoord);
 		}
 	}
+	// Generate tiles near each path cluster
+	for (TTuple<FTileCoord, FTileCoord> Entry : PathClusters)
+	{
+		for (FTileCoord Cluster : UPathGenerationBlueprintLibrary::GetClustersInRange(Entry.Key, 1))
+		{
+			TArray<FTileCoord> TilesInRadius = FTileCoord::GetTilesInRadius(Cluster, 2);
+			for (FTileCoord TileCoord : TilesInRadius)
+			{
+				CoordsInRangeOfPath.Add(TileCoord);
+			}
+		}
+	}
+	
 	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateMapTiles() - Generating %d tiles."), CoordsInRangeOfPath.Num())
 	
 	TMap<FTileCoord, AMapTile*> MapTiles;
@@ -112,11 +133,6 @@ TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileC
 			
 		Tile->TileCoord = ThisTileCoord.Copy();
 		Tile->PathingGradient = NoiseValue;
-
-		if (PathRoute.Contains(ThisTileCoord))
-		{
-			Tile->ToggleShowGradients();
-		}
 			
 		//Map->AddTileToMap(ThisTileCoord, Tile);
 		MapTiles.Add(ThisTileCoord, Tile);
@@ -156,7 +172,7 @@ TMap<FTileCoord, FTileCoord> UAegisMapFactory::GeneratePath(const int PathLength
 		// If the path is in the goal state, return it.
 		if (UPathGenerationBlueprintLibrary::PathMapIsValid(Path, PathLengthInClusters, PathsCount, BranchesCount))
 		{
-			return UPathGenerationBlueprintLibrary::GetFullPathFromClusters(Path);
+			return Path;
 		}
 
 		// Enumerate all possible next states, and add them to the stack

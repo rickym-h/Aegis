@@ -3,22 +3,18 @@
 
 #include "PathGenerationBlueprintLibrary.h"
 
-#include <algorithm>
-
-#include "HeadMountedDisplayTypes.h"
-
-TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetClustersInRange(const int MapRadius)
+TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetClustersInRange(const FTileCoord Origin, const int MapRadius)
 {
 	TArray<FTileCoord> ClustersQueue;
 	TSet<FTileCoord> ClustersInRange;
-	if (MapRadius < 5)
+	if (MapRadius < 1)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UPathGenerationBlueprintLibrary::GetClustersInRange() - MapRadius is out of range."))
 		return ClustersQueue;
 	}
 
-	ClustersQueue.Add(FTileCoord());
-	ClustersInRange.Add(FTileCoord());
+	ClustersQueue.Add(Origin);
+	ClustersInRange.Add(Origin);
 	while (ClustersQueue.Num() > 0)
 	{
 		// Pop the top off the queue
@@ -40,13 +36,15 @@ TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetClustersInRange(const int
 
 TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetAdjacentClusters(const FTileCoord Coord)
 {
+	constexpr int ClusterSpacing = 4;
+	
 	TArray<FTileCoord> TileCoordOffsets;
-	TileCoordOffsets.Add(FTileCoord(3,0));
-	TileCoordOffsets.Add(FTileCoord(0,3));
-	TileCoordOffsets.Add(FTileCoord(-3,3));
-	TileCoordOffsets.Add(FTileCoord(-3,0));
-	TileCoordOffsets.Add(FTileCoord(0,-3));
-	TileCoordOffsets.Add(FTileCoord(3,-3));
+	TileCoordOffsets.Add(FTileCoord(ClusterSpacing,0));
+	TileCoordOffsets.Add(FTileCoord(0,ClusterSpacing));
+	TileCoordOffsets.Add(FTileCoord(-ClusterSpacing,ClusterSpacing));
+	TileCoordOffsets.Add(FTileCoord(-ClusterSpacing,0));
+	TileCoordOffsets.Add(FTileCoord(0,-ClusterSpacing));
+	TileCoordOffsets.Add(FTileCoord(ClusterSpacing,-ClusterSpacing));
 
 	TArray<FTileCoord> AdjacentClusterCoords;
 	for (FTileCoord TileCoordOffset : TileCoordOffsets)
