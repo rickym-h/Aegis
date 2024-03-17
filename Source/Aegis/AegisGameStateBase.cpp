@@ -37,7 +37,7 @@ void AAegisGameStateBase::BeginPlay()
 void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 {
 	//AegisMap = MapFactory->GenerateMap(18, 4);
-	AegisMap = MapFactory->GenerateMap(8, 2);
+	AegisMap = MapFactory->GenerateMap(12, 2, 1);
 }
 
 void AAegisGameStateBase::SaveGame()

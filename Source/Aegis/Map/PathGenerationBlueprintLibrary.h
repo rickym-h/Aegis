@@ -24,10 +24,11 @@ public:
 	static TArray<FTileCoord> GetAdjacentClusters(const FTileCoord Coord);
 
 	static TMap<FTileCoord, FTileCoord> GenerateStraightPathBetweenPoints(FTileCoord Start, FTileCoord End);
+
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static TMap<FTileCoord, FTileCoord> GetFullPathFromClusters(TMap<FTileCoord, FTileCoord> PathClusters);
 	
-	static int WeightedRandomIndex(TArray<FTileCoord> Items, TArray<float> Weights);
+	static int WeightedRandomIndex(const TArray<FTileCoord>& Items, TArray<float> Weights);
 	
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static TArray<FTileCoord> GetAdjacentClustersRandom(const FTileCoord Coord);
@@ -36,7 +37,17 @@ public:
 	static bool PathMapIsValid(const TMap<FTileCoord, FTileCoord> Map, const int PathLengthInClusters, const int PathsCount, const int BranchesCount);
 	
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
+	static TArray<FTileCoord> GetAllPathEnds(const TMap<FTileCoord, FTileCoord> Map);
+
+	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static FTileCoord GetClosestEndToCentre(const TMap<FTileCoord, FTileCoord> Map);
+	
+	static bool IsClusterBranchable(FTileCoord TileCoord, const TMap<FTileCoord, FTileCoord>& Map);
+
+	static int GetNumOfBranchesFromPath(FTileCoord PathEnd, const TMap<FTileCoord, FTileCoord>& Map);
+
+	UFUNCTION(BlueprintCallable, Category="Path Generation")
+	static FTileCoord GetClusterToBranchFrom(const TMap<FTileCoord, FTileCoord> Map);
 	
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static TMap<FTileCoord, FTileCoord> DeepCopyPath(const TMap<FTileCoord, FTileCoord> Map);

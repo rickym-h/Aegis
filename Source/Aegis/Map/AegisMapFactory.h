@@ -28,7 +28,7 @@ public:
 	TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute) const;
 	
 	UFUNCTION()
-	UAegisMap* GenerateMap(const int PathClusterLength, const int PathsCount) const;
+	UAegisMap* GenerateMap(const int PathClusterLength, const int PathsCount, const int BranchesCount) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")

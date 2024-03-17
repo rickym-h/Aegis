@@ -81,7 +81,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GetFullPathFromClu
 {
 	TMap<FTileCoord, FTileCoord> FullPath;
 
-	for (TTuple<FTileCoord, FTileCoord> Entry : PathClusters)
+	for (const TTuple<FTileCoord, FTileCoord> Entry : PathClusters)
 	{
 		 FullPath.Append(GenerateStraightPathBetweenPoints(Entry.Key, Entry.Value));
 	}
@@ -89,7 +89,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GetFullPathFromClu
 	return FullPath;
 }
 
-int UPathGenerationBlueprintLibrary::WeightedRandomIndex(TArray<FTileCoord> Items, TArray<float> Weights)
+int UPathGenerationBlueprintLibrary::WeightedRandomIndex(const TArray<FTileCoord>& Items, TArray<float> Weights)
 {
 	float TotalWeight = 0;
 	for (const float Weight : Weights)
@@ -171,31 +171,37 @@ bool UPathGenerationBlueprintLibrary::PathMapIsValid(const TMap<FTileCoord, FTil
 	return false;
 }
 
-FTileCoord UPathGenerationBlueprintLibrary::GetClosestEndToCentre(const TMap<FTileCoord, FTileCoord> Map)
+TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetAllPathEnds(const TMap<FTileCoord, FTileCoord> Map)
 {
-	if (Map.Num() == 1)  { return FTileCoord(); }
-	FTileCoord ClosestSoFar;
-	int ClosestCountSoFar = INT_MAX;
-
 	TSet<FTileCoord> NodesPointedTo;
 	for (const TTuple<FTileCoord, FTileCoord> Entry : Map)
 	{
 		NodesPointedTo.Add(Entry.Value);
 	}
-	TMap<FTileCoord, FTileCoord> NodesToCheck;
+	TArray<FTileCoord> PathEnds;
 	for (const TTuple<FTileCoord, FTileCoord> Entry : Map)
 	{
 		if (!NodesPointedTo.Contains(Entry.Key))
 		{
-			NodesToCheck.Add(Entry.Key, Entry.Value);
+			PathEnds.Add(Entry.Key);
 		}
 	}
+	return PathEnds;
+}
 
-	for (const TTuple<FTileCoord, FTileCoord> Entry : NodesToCheck)
+FTileCoord UPathGenerationBlueprintLibrary::GetClosestEndToCentre(const TMap<FTileCoord, FTileCoord> Map)
+{
+	if (Map.Num() == 1)  { return FTileCoord(); }
+	FTileCoord ClosestSoFar = FTileCoord();
+	int ClosestCountSoFar = INT_MAX;
+
+	TArray<FTileCoord> PathEnds = GetAllPathEnds(Map);
+
+	for (const FTileCoord End : PathEnds)
 	{
 		// If there exists another coords that points to this coord, skip it
 		int DistanceToCentre = 0;
-		FTileCoord PointingTo = Entry.Value;
+		FTileCoord PointingTo = Map[End];
 		while (PointingTo != FTileCoord())
 		{
 			DistanceToCentre++;
@@ -205,11 +211,75 @@ FTileCoord UPathGenerationBlueprintLibrary::GetClosestEndToCentre(const TMap<FTi
 		if (DistanceToCentre < ClosestCountSoFar)
 		{
 			ClosestCountSoFar = DistanceToCentre;
-			ClosestSoFar = Entry.Key;
+			ClosestSoFar = End;
 		}
 	}
 
 	return ClosestSoFar;
+}
+
+bool UPathGenerationBlueprintLibrary::IsClusterBranchable(const FTileCoord Cluster, const TMap<FTileCoord, FTileCoord>& Map)
+{
+	for (const FTileCoord AdjacentTile : GetAdjacentClusters(Cluster))
+	{
+		if (!Map.Contains(AdjacentTile))
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
+int UPathGenerationBlueprintLibrary::GetNumOfBranchesFromPath(FTileCoord PathEnd, const TMap<FTileCoord, FTileCoord>& Map)
+{
+	// CoordsInPath should exclude the FTileCoord()
+	TArray<FTileCoord> CoordsInPath;
+	FTileCoord NextCoord = PathEnd;
+	while (NextCoord != FTileCoord())
+	{
+		CoordsInPath.Add(NextCoord);
+		NextCoord = Map[NextCoord];
+	}
+
+	int Count = 0;
+	for (TTuple<FTileCoord, FTileCoord> Entry : Map)
+	{
+		if (CoordsInPath.Contains(Entry.Value) && !CoordsInPath.Contains(Entry.Key))
+		{
+			Count++;
+		}
+	}
+
+	return Count;
+}
+
+FTileCoord UPathGenerationBlueprintLibrary::GetClusterToBranchFrom(const TMap<FTileCoord, FTileCoord> Map)
+{
+	TArray<FTileCoord> EndClusters = GetAllPathEnds(Map);
+
+	// TODO sort by branches so far
+	// TODO if multiple, select the one that is furthest from the centre
+    
+	
+	EndClusters.Sort([Map](const FTileCoord Left, const FTileCoord Right)
+	{
+		return GetNumOfBranchesFromPath(Left, Map) < GetNumOfBranchesFromPath(Right, Map);
+	});
+
+	for (FTileCoord EndCluster : EndClusters)
+	{
+		FTileCoord NodeToCheck = Map[EndCluster];
+		while (NodeToCheck != FTileCoord())
+		{
+			if (IsClusterBranchable(NodeToCheck, Map))
+			{
+				return NodeToCheck;
+			}
+			NodeToCheck = Map[NodeToCheck];
+		}
+	}
+	
+	return FTileCoord();
 }
 
 TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::DeepCopyPath(const TMap<FTileCoord, FTileCoord> Map)
