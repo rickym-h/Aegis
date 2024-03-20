@@ -256,10 +256,8 @@ int UPathGenerationBlueprintLibrary::GetNumOfBranchesFromPath(FTileCoord PathEnd
 FTileCoord UPathGenerationBlueprintLibrary::GetClusterToBranchFrom(const TMap<FTileCoord, FTileCoord> Map)
 {
 	TArray<FTileCoord> EndClusters = GetAllPathEnds(Map);
-
-	// TODO sort by branches so far
+	
 	// TODO if multiple, select the one that is furthest from the centre
-    
 	
 	EndClusters.Sort([Map](const FTileCoord Left, const FTileCoord Right)
 	{
