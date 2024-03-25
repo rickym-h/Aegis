@@ -51,16 +51,42 @@ struct FTileCoord
 
 	FVector ToWorldLocation(const float TileRadius = 100) const
 	{
-		const float Right = TileRadius * ((FMath::Sqrt(3.f) * this->Q) + ((FMath::Sqrt(3.f) / 2) * this->R));
-		const float Forward = TileRadius * (1.5 * this->R);
+		const float Right = TileRadius * ((FMath::Sqrt(3.f) * this->Q) + ((FMath::Sqrt(3.f) / 2.f) * this->R));
+		const float Forward = TileRadius * (1.5f * this->R);
 		return FVector(Forward, Right, 0);
-		// const float VerticalSpacing = 1.5 * TileRadius;
-		// const float HorizontalSpacing = FMath::Sqrt(3.f) * TileRadius;
-		//
-		// const FVector OffsetQ = FVector(0, HorizontalSpacing, 0);
-		// const FVector OffsetR = FVector(VerticalSpacing, HorizontalSpacing/2, 0);
-		//
-		// return (R * OffsetR) + (Q * OffsetQ);
+	}
+
+	static FTileCoord AxialRound(const float InQ, const float InR)
+	{
+		const float InS = -InQ-InR;
+		int Q = FMath::RoundHalfToZero(InQ);
+		int R = FMath::RoundHalfToZero(InR);
+		int S = FMath::RoundHalfToZero(InS);
+
+		float q_diff = abs(Q - InQ);
+		float r_diff = abs(R - InR);
+		float s_diff = abs(S - InS);
+
+		if (q_diff > r_diff && q_diff > s_diff)
+		{
+			Q = -R-S;
+		} else if (r_diff > s_diff)
+		{
+			R = -Q-S;
+		} else
+		{
+			S = -Q-R;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("Rounded to: Q=%i, R=%i, S=%i"), Q, R, S)
+		return FTileCoord(Q, R);
+	}
+
+	static FTileCoord PixelToHex(const FVector& PixelPoint, const float TileRadius = 100)
+	{
+		const float q = (sqrt(3)/3 * PixelPoint.Y  -  1./3 * PixelPoint.X) / TileRadius;
+		const float r = (2./3 * PixelPoint.X) / TileRadius;
+		return AxialRound(q, r);
 	}
 
 	// Calculate the HexDistance between two tiles. Similar to Manhattan distance but uses three axis (QRS) instead of two (XY) 

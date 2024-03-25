@@ -82,6 +82,14 @@ void APlayerPawn::Tick(float DeltaTime)
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 {
 	UpdateHitResultUnderCursor();
+	
+	const FVector Location = HitResultUnderCursor.Location;
+	DrawDebugSphere(GetWorld(), Location, 50, 12, FColor::Green, false, 3, 0, 3);
+	UE_LOG(LogTemp, Warning, TEXT("Round the FVector: %ls"), *Location.ToString())
+	const FTileCoord RoundedCoord = FTileCoord::PixelToHex(Location);
+	DrawDebugSphere(GetWorld(), RoundedCoord.ToWorldLocation(), 50, 12, FColor::Red, false, 3, 0, 3);
+
+	
 
 	const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor());
 	if (!Tile) { return; }
