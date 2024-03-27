@@ -30,6 +30,10 @@ public:
 	UFUNCTION()
 	UAegisMap* GenerateMap(const int PathClusterLength, const int PathsCount, const int BranchesCount) const;
 
+	
+	UFUNCTION()
+	UAegisMap* GenerateMapWithNoise(const int MainPathLength, const int BranchesCount, const int BranchesLength) const;
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSubclassOf<UAegisMap> AegisMapClass;

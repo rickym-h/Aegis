@@ -68,7 +68,45 @@ UAegisMap* UAegisMapFactory::GenerateMap(const int PathClusterLength, const int 
 	return Map;
 }
 
+UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, const int BranchesCount, const int BranchesLength) const
+{
+	
+	// Set Perlin Boundary points - These are the peaks and troughs of the noise to be impassable (e.g. low is water, high is cliff, which paths cannot cross)
+	float BoundaryLimit = 0.5f;
+	
+	// Get the poisson sampled node points using the blue noise algorithm
+	TArray<FVector2d> PoissonClusters = UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(500, 25, 200);
+	for (FVector2d Point : PoissonClusters)
+	{
+		FTileCoord ThisTileCoord = FTileCoord::PixelToHex(FVector(Point.X, Point.Y, 0)*100);
+		FVector Location = ThisTileCoord.ToWorldLocation();
+		FRotator Rotation(0.0f, 0.0f, 0.0f);
+			
+		FActorSpawnParameters SpawnInfo;
+		
+		// Spawn actual tile BP in world
+		AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
+		Tile->TileCoord = ThisTileCoord.Copy();
+	}
+	
+	// While the path length is less than MainPathLength, add the closest node to the head of the path to the path, and use A* to connect it to the current head
+		// If no A* path is found (or if the path found is longer than the 2x the noise MinDist), apply a softening function to reduce the number of impassable tiles
 
+	// Trim the path to the length of the MainPathLength
+
+	// Deal with branches?
+
+	// Add nexus building
+
+	// Set path start tile coords
+
+	// Generate tiles - setting tile heights, and tile types
+
+	// Create Map instance
+
+	// Set TilesToEnd of every tile
+	return nullptr;
+}
 
 TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute, const TMap<FTileCoord, FTileCoord>& PathClusters) const
 {
@@ -76,15 +114,7 @@ TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileC
 	const FVector2D RandomNoiseOffset = FVector2D(FMath::FRandRange(-100000.f, 1000000.f));
 
 	TSet<FTileCoord> CoordsInRangeOfPath;
-	// Ensure all path tiles are generated
-	// for (TTuple<FTileCoord, FTileCoord> Entry : PathRoute)
-	// {
-	// 	TArray<FTileCoord> TilesInRadius = FTileCoord::GetTilesInRadius(Entry.Key, 1);
-	// 	for (FTileCoord TileCoord : TilesInRadius)
-	// 	{
-	// 		CoordsInRangeOfPath.Add(TileCoord);
-	// 	}
-	// }
+	
 	// Generate tiles near each path cluster
 	for (TTuple<FTileCoord, FTileCoord> Entry : PathClusters)
 	{

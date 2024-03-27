@@ -51,4 +51,6 @@ public:
 	
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static TMap<FTileCoord, FTileCoord> DeepCopyPath(const TMap<FTileCoord, FTileCoord> Map);
+	
+	static TArray<FVector2d> GetBlueNoiseClusters(int GenerationRadius, int PoissonRadius, int SamplesCount);
 };

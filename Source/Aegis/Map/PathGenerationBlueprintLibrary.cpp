@@ -3,6 +3,8 @@
 
 #include "PathGenerationBlueprintLibrary.h"
 
+#include "Kismet/KismetArrayLibrary.h"
+
 TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetClustersInRange(const FTileCoord Origin, const int MapRadius)
 {
 	TArray<FTileCoord> ClustersQueue;
@@ -290,4 +292,95 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::DeepCopyPath(const
 	}
 
 	return CopiedPath;
+}
+
+TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount)
+{
+	// ReSharper disable once CppTooWideScope
+	// ReSharper disable once CppUE4CodingStandardNamingViolationWarning
+	constexpr int MAX_TRIALS = 30;
+
+	// Shouldn't *really* use FTileCoord, but we basically just want to be able to compare pairs of ints, and FTileCoord has that functionality,
+	// We just have to map X->Q, Y->R, and ignore S
+	TMap<FTileCoord, FVector2d> Grid;
+	TArray<FVector2d> List;
+	const float Bin = static_cast<float>(PoissonRadius) / FMath::Sqrt(2.f);
+
+	// Place the initial point in the Grid and List
+	constexpr float X = 0;
+	constexpr float Y = 0;
+	Grid.Add(FTileCoord(static_cast<int>(X / Bin), static_cast<int>(Y / Bin)), FVector2d(X, Y));
+	List.Add(FVector2d(X, Y));
+
+	// Loop until List is empty
+	while (List.Num() > 0)
+	{
+		// Pick a random point from List
+		const int K = FMath::RandRange(0, List.Num()-1);
+		const float X0 = List[K].X;
+		const float Y0 = List[K].Y;
+
+		// Trials to place the next point
+        bool FoundTrialPoint =  false;
+		for (int Trial = 0; Trial < MAX_TRIALS; Trial++)
+		{
+			// Generate a trial point int he annulus r->2*r around x0,y0
+			const float R = FMath::FRandRange(static_cast<float>(PoissonRadius), static_cast<float>(2*PoissonRadius));
+			const float Phi = FMath::FRandRange(0.f, static_cast<float>(2*PI));
+			const float TrialX = X0 + R * FMath::Cos(Phi);
+			const float TrialY = Y0 + R * FMath::Sin(Phi);
+
+			// Reject point if it is outside the GenerationRadius
+			if (TrialX < -GenerationRadius || TrialX > GenerationRadius || TrialY < -GenerationRadius || TrialY > GenerationRadius)
+			{
+				continue;
+			}
+
+			// Find the Grid cell of the trial point
+			const int I = static_cast<int>(TrialX / Bin);
+			const int J = static_cast<int>(TrialY / Bin);
+
+			// Iterate over neighbours, looking for conflicts with occupied cells
+			bool Conflict = false;
+			for (int u = -1; u <= 1; u++)
+			{
+				for (int v = -1; v <= 1; v++)
+				{
+					if (Grid.Contains(FTileCoord(I + u, J + v)))
+					{
+						Conflict = true;
+						break;
+					}
+				}
+			}
+
+			// If no Conflict, accept trial point into List, and stop trials
+			if (!Conflict)
+			{
+				Grid.Add(FTileCoord(I, J), FVector2d(TrialX, TrialY));
+				List.Add(FVector2d(TrialX, TrialY));
+				FoundTrialPoint = true;
+				break;
+			}
+		}
+
+		// If gone through all trial points without success, remove initial point from List
+		if (!FoundTrialPoint)
+		{
+			List.RemoveAt(K);
+		}
+
+		// Stop if enough points have been generated
+		if (Grid.Num() >= SamplesCount)
+		{
+			break;
+		}
+	}
+
+	TArray<FVector2d> OutputLocations;
+	for (TTuple<FTileCoord, FVector2d> Element : Grid)
+	{
+		OutputLocations.Add(Element.Value);
+	}
+	return OutputLocations;	
 }
