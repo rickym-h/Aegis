@@ -67,7 +67,7 @@ struct FTileCoord
 		float r_diff = abs(R - InR);
 		float s_diff = abs(S - InS);
 
-		if (q_diff > r_diff && q_diff > s_diff)
+		if (q_diff > r_diff && q_diff > s_diff) 
 		{
 			Q = -R-S;
 		} else if (r_diff > s_diff)
@@ -78,7 +78,6 @@ struct FTileCoord
 			S = -Q-R;
 		}
 
-		UE_LOG(LogTemp, Warning, TEXT("Rounded to: Q=%i, R=%i, S=%i"), Q, R, S)
 		return FTileCoord(Q, R);
 	}
 
@@ -96,7 +95,7 @@ struct FTileCoord
 		return FMath::Max3(FMath::Abs(DistanceVector.Q), FMath::Abs(DistanceVector.R), FMath::Abs(DistanceVector.S));
 	}
 
-	static TArray<FTileCoord> GetTilesInRadius(FTileCoord Origin, int Radius)
+	static TArray<FTileCoord> GetTilesInRadius(const FTileCoord Origin, const int Radius)
 	{
 		TArray<FTileCoord> TilesInRadius;
 		for (int Q = -Radius; Q <= Radius; Q++)
@@ -107,6 +106,17 @@ struct FTileCoord
 			}
 		}
 		return TilesInRadius;
+	}
+	static TArray<FTileCoord> GetTilesInRadius(const TArray<FTileCoord>& Origins, const int Radius)
+	{
+		TSet<FTileCoord> Tiles;
+
+		for (const FTileCoord OriginTile : Origins)
+		{
+			Tiles.Append(GetTilesInRadius(OriginTile, Radius));
+		}
+
+		return Tiles.Array();
 	}
 
 

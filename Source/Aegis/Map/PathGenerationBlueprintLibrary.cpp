@@ -3,6 +3,7 @@
 
 #include "PathGenerationBlueprintLibrary.h"
 
+#include "Aegis/Utilities/TPriorityQueue.h"
 #include "Kismet/KismetArrayLibrary.h"
 
 TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetClustersInRange(const FTileCoord Origin, const int MapRadius)
@@ -384,3 +385,133 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	}
 	return OutputLocations;	
 }
+
+float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset)
+{	
+	const FVector Location = Tile.ToWorldLocation();
+	const FVector2D NoiseSampleLoc = FVector2D(Location.X/100, Location.Y/100) + NoiseOffset;
+	const float x = (FMath::PerlinNoise2D(NoiseSampleLoc) + 1.f) / 2.f;
+	
+	//const float SmoothedNoise = 1.f / (1.f + FMath::Pow((NoiseValue)/(1.f-NoiseValue), -4.f));
+	const float SmoothedNoise = 1+FMath::Pow(x + 0.5, 6.f);
+	
+	return SmoothedNoise;
+}
+
+bool UPathGenerationBlueprintLibrary::IsPathValid(FTileCoord StartTile, FTileCoord GoalTile, TMap<FTileCoord, FTileCoord> Map)
+{
+	if (!Map.Contains(GoalTile))
+	{
+		return false;
+	}
+
+	FTileCoord CurrentTile = GoalTile;
+	FTileCoord NextTile = Map[GoalTile];
+
+	while (NextTile != StartTile)
+	{
+		CurrentTile = NextTile;
+
+		if (!Map.Contains(CurrentTile)) { return false; }
+		
+		NextTile = Map[CurrentTile];
+	}
+
+	return true;
+}
+
+TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile,
+                                                                            FVector2D NoiseOffset, TMap<FTileCoord, FTileCoord> ExistingPath)
+{
+	bool PathFound = false;
+	TMap<FTileCoord, FTileCoord> Path;
+
+	while (!PathFound)
+	{
+		TPriorityQueue<FTileCoord> Frontier;
+		Frontier.Push(StartTile, 0);
+
+		TMap<FTileCoord, FTileCoord> CameFrom;
+		TMap<FTileCoord, float> CostSoFar;
+		CostSoFar.Add(StartTile, 0);
+
+		FVector GoalTileLocation = GoalTile.ToWorldLocation();
+
+		while (!Frontier.IsEmpty())
+		{
+			const FTileCoord Current = Frontier.Pop();
+			if (Current == GoalTile)
+			{
+				break;
+			}
+
+			for (FTileCoord Neighbour : FTileCoord::GetTilesInRadius(Current , 1))
+			{
+				TSet<FTileCoord> ExistingPathAndAdjacent;
+				for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
+				{
+					if (Element.Value == FTileCoord()) { continue; }
+					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
+				}
+				if (ExistingPathAndAdjacent.Contains(Neighbour) && (Neighbour!=GoalTile))
+				{
+					continue;
+				}
+				// Find the weight of the neighbor tile. If the tile is in the exclusion list or is outside the boundary, returns -1
+				// If the neighbor tile is the goal tile, ignores the impassable weight
+				float NextWeight = GetNodeWeight(Neighbour, NoiseOffset);
+			
+				float NewCost = CostSoFar[Current] + NextWeight;
+				if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])
+				{
+					CameFrom.Add(Neighbour, Current);
+					CostSoFar.Add(Neighbour, NewCost);
+					float Heuristic = FVector::Distance(GoalTileLocation, Neighbour.ToWorldLocation())/100.f;
+					float Priority = NewCost + Heuristic;
+					Frontier.Push(Neighbour, Priority);
+				}
+			}
+		}
+
+		if (IsPathValid(StartTile, GoalTile, CameFrom))
+		{
+			PathFound = true;
+
+			FTileCoord CurrentTile = GoalTile;
+			while (CurrentTile != StartTile)
+			{
+				FTileCoord CameFromTile = CameFrom[CurrentTile];
+				Path.Add(CameFromTile, CurrentTile);
+				CurrentTile = CameFromTile;
+			}
+		} else
+		{
+			UE_LOG(LogTemp, Fatal, TEXT("UPathGenerationBlueprintLibrary::AStarPathFind() - No path found."))
+			break;
+		}
+	}
+
+	return Path;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
