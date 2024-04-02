@@ -54,7 +54,7 @@ public:
 	
 	static TArray<FVector2d> GetBlueNoiseClusters(int GenerationRadius, int PoissonRadius, int SamplesCount);
 
-	static float GetNodeWeight(FTileCoord Tile, FVector2D NoiseOffset);
+	static float GetNodeWeight(FTileCoord Tile, FVector2D NoiseOffset, const bool bSmoothForPathing);
 	static bool IsPathValid(FTileCoord StartTile, FTileCoord GoalTile, TMap<FTileCoord, FTileCoord> Map);
 	// Uses A* to find a path between two points. Graph weights calculated using Perlin noise, making terrain impassable when noise is more/less than the boundary limit, and where there is already a path 
 	static TMap<FTileCoord, FTileCoord> AStarPathFind(FTileCoord StartTile, FTileCoord GoalTile, FVector2D NoiseOffset, TMap<FTileCoord, FTileCoord> ExistingPath);

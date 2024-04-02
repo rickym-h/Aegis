@@ -386,16 +386,24 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	return OutputLocations;	
 }
 
-float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset)
-{	
+float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bSmoothForPathing)
+{
+	int PerlinScale = 1000;
+	if (bSmoothForPathing)
+	{
+		PerlinScale = 500;
+	}
 	const FVector Location = Tile.ToWorldLocation();
-	const FVector2D NoiseSampleLoc = FVector2D(Location.X/100, Location.Y/100) + NoiseOffset;
+	const FVector2D NoiseSampleLoc = FVector2D(Location.X/PerlinScale, Location.Y/PerlinScale) + NoiseOffset;
 	const float x = (FMath::PerlinNoise2D(NoiseSampleLoc) + 1.f) / 2.f;
 	
-	//const float SmoothedNoise = 1.f / (1.f + FMath::Pow((NoiseValue)/(1.f-NoiseValue), -4.f));
-	const float SmoothedNoise = 1+FMath::Pow(x + 0.5, 6.f);
+	// If used for pathing, the noise is multiplied exponentially to make high weights worth more, and clamped to above 0 to avoid negative weights 
+	if (bSmoothForPathing)
+	{
+		return 1+FMath::Pow(x + 0.5, 6.f);
+	}
 	
-	return SmoothedNoise;
+	return x;
 }
 
 bool UPathGenerationBlueprintLibrary::IsPathValid(FTileCoord StartTile, FTileCoord GoalTile, TMap<FTileCoord, FTileCoord> Map)
@@ -459,7 +467,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				}
 				// Find the weight of the neighbor tile. If the tile is in the exclusion list or is outside the boundary, returns -1
 				// If the neighbor tile is the goal tile, ignores the impassable weight
-				float NextWeight = GetNodeWeight(Neighbour, NoiseOffset);
+				float NextWeight = GetNodeWeight(Neighbour, NoiseOffset, true);
 			
 				float NewCost = CostSoFar[Current] + NextWeight;
 				if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])

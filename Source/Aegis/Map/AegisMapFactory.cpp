@@ -3,6 +3,7 @@
 
 #include "AegisMapFactory.h"
 
+#include "IContentBrowserSingleton.h"
 #include "MapTile.h"
 #include "PathGenerationBlueprintLibrary.h"
 #include "Aegis/Structures/NexusBuilding.h"
@@ -122,6 +123,8 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 		Path.Append(PathFromGoalToStart);
 	}
 
+	TArray<float> NoiseDistribution;
+	TMap<FTileCoord, AMapTile*> MapTiles;
 	TArray<FTileCoord> PathTiles;
 	for (TTuple<FTileCoord, FTileCoord> Elem : Path)
 	{
@@ -129,7 +132,7 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 	}
 	for (const FTileCoord Coord : FTileCoord::GetTilesInRadius(PathTiles, 10))
 	{
-		if (Path.Contains(Coord)) { continue; }
+		//if (Path.Contains(Coord)) { continue; }
 		FVector Location = Coord.ToWorldLocation();
 		FRotator Rotation(0.0f, 0.0f, 0.0f);
 		
@@ -139,10 +142,56 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 		AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
 		Tile->TileCoord = Coord.Copy();
 
-		Tile->PathingGradient = UPathGenerationBlueprintLibrary::GetNodeWeight(Coord, RandomNoiseOffset);
+		float Gradient = (UPathGenerationBlueprintLibrary::GetNodeWeight(Coord, RandomNoiseOffset, false) + 1.f)/2.f;
+		Tile->PathingGradient = Gradient;
+		NoiseDistribution.Emplace(Gradient);
+		
 		Tile->ToggleShowGradients();
+
+		MapTiles.Add(Coord, Tile);
 	}
+
+	NoiseDistribution.Sort();
+	// Water	10%
+	float WaterLimit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.1)];
+	// Grass 1	50%
+	float Grass1Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.8)];
+	// Grass 2	10%
+	float Grass2Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.85)];
+	// Grass 3	10%
+	float Grass3Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.9)];
+	// Grass 4	10%
+	float Grass4Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.95)];
+	// Stone 5	10%
+	//float StoneLimit = NoiseDistribution[static_cast<int>(NoiseDistribution.Num() * 1)];
 	
+	for (TTuple<FTileCoord, AMapTile*> Elem : MapTiles)
+	{
+		if (PathTiles.Contains(Elem.Key))
+		{
+			continue;
+		}
+		Elem.Value->ToggleShowGradients();
+		if (Elem.Value->PathingGradient < WaterLimit)
+		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 1));
+		} else if (Elem.Value->PathingGradient < Grass1Limit)
+		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 4));
+		} else if (Elem.Value->PathingGradient < Grass2Limit)
+		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 6));
+		} else if (Elem.Value->PathingGradient < Grass3Limit)
+		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 8));
+		} else if (Elem.Value->PathingGradient < Grass4Limit)
+		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 10));
+		} else
+		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 12));
+		}
+	}
 	
 	// for (TTuple<FTileCoord, FTileCoord> PathNode : Path)
 	// {
@@ -157,21 +206,34 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 	// 	Tile->TileCoord = Point.Copy();
 	// }
 	
+	
+
 
 	// Trim the path to the length of the MainPathLength
 
 	// Deal with branches?
 
 	// Add nexus building
+	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
 
 	// Set path start tile coords
+	const TArray<FTileCoord> PathStartTileCoords = GetPathStartCoords(Path);
 
 	// Generate tiles - setting tile heights, and tile types
 
 	// Create Map instance
+	// Create Map
+	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
+	Map->PopulateMapData(MapTiles, Path, PathStartTileCoords, NexusBuilding);
 
 	// Set TilesToEnd of every tile
-	return nullptr;
+	// Post Map creation settings
+	for (AMapTile* Tile : Map->GetTiles())
+	{
+		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
+	}
+	
+	return Map;
 }
 
 TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileCoord, FTileCoord>& PathRoute, const TMap<FTileCoord, FTileCoord>& PathClusters) const
@@ -209,7 +271,7 @@ TMap<FTileCoord, AMapTile*> UAegisMapFactory::GenerateMapTiles(const TMap<FTileC
 		// Spawn actual tile BP in world
 		AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
 
-		FVector2D NoiseSampleLoc = FVector2D(Location.X/100, Location.Y/100) + RandomNoiseOffset;
+		FVector2D NoiseSampleLoc = FVector2D(Location.X/1000, Location.Y/1000) + RandomNoiseOffset;
 		float NoiseValue = FMath::PerlinNoise2D(NoiseSampleLoc);
 		NoiseValue = (NoiseValue+1)/2; // Map from -1-1 to 0-1
 
