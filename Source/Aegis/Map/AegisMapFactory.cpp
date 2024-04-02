@@ -155,13 +155,13 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 	// Water	10%
 	float WaterLimit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.1)];
 	// Grass 1	50%
-	float Grass1Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.8)];
+	float Grass1Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.9)];
 	// Grass 2	10%
-	float Grass2Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.85)];
+	float Grass2Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.95)];
 	// Grass 3	10%
-	float Grass3Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.9)];
+	float Grass3Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.97)];
 	// Grass 4	10%
-	float Grass4Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.95)];
+	float Grass4Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.99)];
 	// Stone 5	10%
 	//float StoneLimit = NoiseDistribution[static_cast<int>(NoiseDistribution.Num() * 1)];
 	

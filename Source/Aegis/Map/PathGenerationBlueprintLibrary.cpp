@@ -388,19 +388,23 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 
 float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bSmoothForPathing)
 {
-	int PerlinScale = 1000;
+	// Larger Perlin Scale means more spread out and smoother (1000 is a good baseline)
+	// Smaller Perlin Scale means higher frequency and more random (e.g. 100 for pathfinding randomness)
+	int PerlinScale = 700;
+	int Multiplier = 1;
 	if (bSmoothForPathing)
 	{
-		PerlinScale = 500;
+		PerlinScale = 10;
+		Multiplier = -1;
 	}
 	const FVector Location = Tile.ToWorldLocation();
-	const FVector2D NoiseSampleLoc = FVector2D(Location.X/PerlinScale, Location.Y/PerlinScale) + NoiseOffset;
+	const FVector2D NoiseSampleLoc = FVector2D(Location.X/PerlinScale, Location.Y/PerlinScale) + (NoiseOffset * Multiplier);
 	const float x = (FMath::PerlinNoise2D(NoiseSampleLoc) + 1.f) / 2.f;
 	
 	// If used for pathing, the noise is multiplied exponentially to make high weights worth more, and clamped to above 0 to avoid negative weights 
 	if (bSmoothForPathing)
 	{
-		return 1+FMath::Pow(x + 0.5, 6.f);
+		return 1+FMath::Pow(x + 0.5, 10.f);
 	}
 	
 	return x;
