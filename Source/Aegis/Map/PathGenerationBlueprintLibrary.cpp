@@ -390,7 +390,7 @@ float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, cons
 {
 	// Larger Perlin Scale means more spread out and smoother (1000 is a good baseline)
 	// Smaller Perlin Scale means higher frequency and more random (e.g. 100 for pathfinding randomness)
-	int PerlinScale = 700;
+	int PerlinScale = 600;
 	int Multiplier = 1;
 	if (bSmoothForPathing)
 	{

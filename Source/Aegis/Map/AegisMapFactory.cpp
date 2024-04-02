@@ -169,27 +169,28 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 	{
 		if (PathTiles.Contains(Elem.Key))
 		{
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 0.75));
 			continue;
 		}
 		Elem.Value->ToggleShowGradients();
 		if (Elem.Value->PathingGradient < WaterLimit)
 		{
-			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 1));
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 0.5));
 		} else if (Elem.Value->PathingGradient < Grass1Limit)
 		{
-			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 4));
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 1));
 		} else if (Elem.Value->PathingGradient < Grass2Limit)
 		{
-			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 6));
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 1.5));
 		} else if (Elem.Value->PathingGradient < Grass3Limit)
 		{
-			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 8));
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 2));
 		} else if (Elem.Value->PathingGradient < Grass4Limit)
 		{
-			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 10));
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 2.5));
 		} else
 		{
-			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 12));
+			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 3));
 		}
 	}
 	
