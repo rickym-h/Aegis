@@ -123,6 +123,8 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 		Path.Append(PathFromGoalToStart);
 	}
 
+	// TODO trim path to MainPathLength length
+
 	TArray<float> NoiseDistribution;
 	TMap<FTileCoord, AMapTile*> MapTiles;
 	TArray<FTileCoord> PathTiles;
