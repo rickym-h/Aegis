@@ -2,9 +2,7 @@
 
 
 #include "PathGenerationBlueprintLibrary.h"
-
 #include "Aegis/Utilities/TPriorityQueue.h"
-#include "Kismet/KismetArrayLibrary.h"
 
 
 TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount, FRandomStream RandomStream)
@@ -29,7 +27,7 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	while (List.Num() > 0)
 	{
 		// Pick a random point from List
-		const int K = FMath::RandRange(0, List.Num()-1);
+		const int K = RandomStream.RandRange(0, List.Num()-1);
 		const float X0 = List[K].X;
 		const float Y0 = List[K].Y;
 

@@ -28,7 +28,7 @@ void UAegisMapFactory::PostInitProperties()
 UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) const
 {
 	
-	FRandomStream RandomStream = FRandomStream(0);
+	FRandomStream RandomStream = FRandomStream(static_cast<int32>(FDateTime::Now().ToUnixTimestamp()));
 	const FVector2D ElevationNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 	const FVector2D ResourceNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 	
