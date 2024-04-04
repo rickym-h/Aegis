@@ -52,10 +52,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category="Path Generation")
 	static TMap<FTileCoord, FTileCoord> DeepCopyPath(const TMap<FTileCoord, FTileCoord> Map);
 	
-	static TArray<FVector2d> GetBlueNoiseClusters(int GenerationRadius, int PoissonRadius, int SamplesCount);
+	static TArray<FVector2d> GetBlueNoiseClusters(int GenerationRadius, int PoissonRadius, int SamplesCount, FRandomStream RandomStream);
 
 	static float GetNodeWeight(FTileCoord Tile, FVector2D NoiseOffset, const bool bSmoothForPathing);
 	static bool IsPathValid(FTileCoord StartTile, FTileCoord GoalTile, TMap<FTileCoord, FTileCoord> Map);
 	// Uses A* to find a path between two points. Graph weights calculated using Perlin noise, making terrain impassable when noise is more/less than the boundary limit, and where there is already a path 
 	static TMap<FTileCoord, FTileCoord> AStarPathFind(FTileCoord StartTile, FTileCoord GoalTile, FVector2D NoiseOffset, TMap<FTileCoord, FTileCoord> ExistingPath);
+	static TArray<FTileCoord> GetPoissonClusterCoords(int GenerationRadius, int Poisson_Radius, int SamplesCount, FRandomStream RandomStream);
+	static TMap<FTileCoord, FTileCoord> GenerateGreedyPoissonPath(const int MainPathLength, const FVector2d ElevationNoiseOffset, FRandomStream RandomStream);
 };

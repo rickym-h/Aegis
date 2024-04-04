@@ -295,7 +295,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::DeepCopyPath(const
 	return CopiedPath;
 }
 
-TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount)
+TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount, FRandomStream RandomStream)
 {
 	// ReSharper disable once CppTooWideScope
 	// ReSharper disable once CppUE4CodingStandardNamingViolationWarning
@@ -326,8 +326,8 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 		for (int Trial = 0; Trial < MAX_TRIALS; Trial++)
 		{
 			// Generate a trial point int he annulus r->2*r around x0,y0
-			const float R = FMath::FRandRange(static_cast<float>(PoissonRadius), static_cast<float>(2*PoissonRadius));
-			const float Phi = FMath::FRandRange(0.f, static_cast<float>(2*PI));
+			const float R = RandomStream.FRandRange(static_cast<float>(PoissonRadius), static_cast<float>(2*PoissonRadius));
+			const float Phi = RandomStream.FRandRange(0.f, static_cast<float>(2*PI));
 			const float TrialX = X0 + R * FMath::Cos(Phi);
 			const float TrialY = Y0 + R * FMath::Sin(Phi);
 
@@ -503,6 +503,65 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 		}
 	}
 
+	return Path;
+}
+
+TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, int Poisson_Radius, int SamplesCount, FRandomStream RandomStream)
+{
+	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(500, Poisson_Radius, 200, RandomStream);
+	TArray<FTileCoord> NodePoints;
+	for (const FVector2d PoissonCluster : PoissonClusters)
+	{
+		NodePoints.Emplace(FTileCoord::PixelToHex(FVector(PoissonCluster.X, PoissonCluster.Y, 0)*100));
+	}
+	return NodePoints;
+}
+
+TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int MainPathLength, const FVector2d ElevationNoiseOffset, FRandomStream RandomStream)
+{
+	constexpr int POISSON_RADIUS = 10;
+	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength)/static_cast<float>(POISSON_RADIUS));
+	
+	TMap<FTileCoord, FTileCoord> Path;
+
+	TArray<FTileCoord> PoissonNodeCoords = GetPoissonClusterCoords(500, POISSON_RADIUS, 200, RandomStream);
+
+	// Get the Path Nodes using a Greedy closest Node search of the poisson clusters
+	TArray<FTileCoord> NodesInPathSoFar;
+	NodesInPathSoFar.Add(FTileCoord(0,0));
+	for (int i = 0; i < NODE_LENGTH; i++)
+	{
+		FTileCoord Head = NodesInPathSoFar.Top();
+
+		// Find the closest node to the Head of the Path
+		FTileCoord Closest = FTileCoord(INT_MAX, INT_MAX);
+		for (FTileCoord Point : PoissonNodeCoords)
+		{
+			if ((Point == Head) || NodesInPathSoFar.Contains(Point)) { continue; }
+
+			const float DistanceToHead = FTileCoord::HexDistance(Point, Head);
+			if (DistanceToHead < FTileCoord::HexDistance(Closest, Head))
+			{
+				Closest = Point;
+			}
+		}
+		NodesInPathSoFar.Emplace(Closest);
+	}
+	
+	// For every node in the Path array, use A* to connect it to the previous node
+	// If no A* path is found (or if the path found is longer than the 2x the HexDistance), apply a softening function to reduce the number of impassable tiles
+	Path.Add(FTileCoord(), FTileCoord());
+	for (int StartTileIndex = 1; StartTileIndex < NodesInPathSoFar.Num(); StartTileIndex++)
+	{
+		const FTileCoord StartTile = NodesInPathSoFar[StartTileIndex];
+		const FTileCoord GoalTile = NodesInPathSoFar[StartTileIndex-1];
+		
+		TMap<FTileCoord, FTileCoord> PathFromGoalToStart = AStarPathFind(StartTile, GoalTile, ElevationNoiseOffset, Path);
+		Path.Append(PathFromGoalToStart);
+	}
+
+	// TODO trim path to MainPathLength length
+	
 	return Path;
 }
 

@@ -70,60 +70,16 @@ UAegisMap* UAegisMapFactory::GenerateMap(const int PathClusterLength, const int 
 	return Map;
 }
 
-UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, const int BranchesCount, const int BranchesLength) const
+UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) const
 {
-	constexpr int POISSON_RADIUS = 10;
-	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength)/static_cast<float>(POISSON_RADIUS));
 	
-	// Set Perlin Boundary points - These are the peaks and troughs of the noise to be impassable (e.g. low is water, high is cliff, which paths cannot cross)
-	float BoundaryLimit = 0.5f;
-	const FVector2D RandomNoiseOffset = FVector2D(FMath::FRandRange(-100000.f, 100000.f));
+	FRandomStream RandomStream = FRandomStream(0);
+	const FVector2D ElevationNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
+	const FVector2D ResourceNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 	
 	// Get the poisson sampled node points using the blue noise algorithm
-	TArray<FVector2d> PoissonClusters = UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(500, POISSON_RADIUS, 200);
-	TArray<FTileCoord> NodePoints;
-	for (const FVector2d PoissonCluster : PoissonClusters)
-	{
-		NodePoints.Emplace(FTileCoord::PixelToHex(FVector(PoissonCluster.X, PoissonCluster.Y, 0)*100));
-	}
-
-	// Get the Path Nodes using a Greedy closest Node search of the poisson clusters
-	TArray<FTileCoord> NodesInPathSoFar;
-	NodesInPathSoFar.Add(FTileCoord(0,0));
-	for (int i = 0; i < NODE_LENGTH; i++)
-	{
-		FTileCoord Head = NodesInPathSoFar.Top();
-
-		// Find the closest node to the Head of the Path
-		FTileCoord Closest = FTileCoord(INT_MAX, INT_MAX);
-		for (FTileCoord Point : NodePoints)
-		{
-			if ((Point == Head) || NodesInPathSoFar.Contains(Point)) { continue; }
-
-			const float DistanceToHead = FTileCoord::HexDistance(Point, Head);
-			if (DistanceToHead < FTileCoord::HexDistance(Closest, Head))
-			{
-				Closest = Point;
-			}
-		}
-		NodesInPathSoFar.Emplace(Closest);
-	}
+	TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, ElevationNoiseOffset, RandomStream);
 	
-	
-	// For every node in the Path array, use A* to connect it to the previous node
-		// If no A* path is found (or if the path found is longer than the 2x the HexDistance), apply a softening function to reduce the number of impassable tiles
-	TMap<FTileCoord, FTileCoord> Path;
-	Path.Add(FTileCoord(), FTileCoord());
-	for (int StartTileIndex = 1; StartTileIndex < NodesInPathSoFar.Num(); StartTileIndex++)
-	{
-		const FTileCoord StartTile = NodesInPathSoFar[StartTileIndex];
-		const FTileCoord GoalTile = NodesInPathSoFar[StartTileIndex-1];
-		
-		TMap<FTileCoord, FTileCoord> PathFromGoalToStart = UPathGenerationBlueprintLibrary::AStarPathFind(StartTile, GoalTile, RandomNoiseOffset, Path);
-		Path.Append(PathFromGoalToStart);
-	}
-
-	// TODO trim path to MainPathLength length
 
 	TArray<float> NoiseDistribution;
 	TMap<FTileCoord, AMapTile*> MapTiles;
@@ -144,7 +100,7 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 		AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
 		Tile->TileCoord = Coord.Copy();
 
-		float Gradient = (UPathGenerationBlueprintLibrary::GetNodeWeight(Coord, RandomNoiseOffset, false) + 1.f)/2.f;
+		float Gradient = (UPathGenerationBlueprintLibrary::GetNodeWeight(Coord, ElevationNoiseOffset, false) + 1.f)/2.f;
 		Tile->PathingGradient = Gradient;
 		NoiseDistribution.Emplace(Gradient);
 		
@@ -195,27 +151,8 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength, cons
 			Elem.Value->TileMesh->SetWorldScale3D(FVector(1, 1, 3));
 		}
 	}
+
 	
-	// for (TTuple<FTileCoord, FTileCoord> PathNode : Path)
-	// {
-	// 	FTileCoord Point = PathNode.Key;
-	// 	FVector Location = Point.ToWorldLocation();
-	// 	FRotator Rotation(0.0f, 0.0f, 0.0f);
-	// 		
-	// 	FActorSpawnParameters SpawnInfo;
-	// 	
-	// 	// Spawn actual tile BP in world
-	// 	AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(GrassTileBP, Location, Rotation);
-	// 	Tile->TileCoord = Point.Copy();
-	// }
-	
-	
-
-
-	// Trim the path to the length of the MainPathLength
-
-	// Deal with branches?
-
 	// Add nexus building
 	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
 

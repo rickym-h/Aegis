@@ -32,7 +32,7 @@ public:
 
 	
 	UFUNCTION()
-	UAegisMap* GenerateMapWithNoise(const int MainPathLength, const int BranchesCount, const int BranchesLength) const;
+	UAegisMap* GenerateMapWithNoise(const int MainPathLength) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
