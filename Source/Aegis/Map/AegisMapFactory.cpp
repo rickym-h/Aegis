@@ -32,7 +32,7 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 	const FVector2D ElevationNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 	const FVector2D ResourceNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 	
-	// Get the poisson sampled node points using the blue noise algorithm
+	// Generate a Path - this is done using a Greedy search through some Poisson Blue Noise
 	TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, ElevationNoiseOffset, RandomStream);
 	
 
