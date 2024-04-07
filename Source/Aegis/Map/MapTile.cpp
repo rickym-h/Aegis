@@ -40,6 +40,7 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 		{
 		case Water:
 			TileMesh->SetStaticMesh(WaterMesh);
+			TileMesh->bAffectDistanceFieldLighting = false;
 			break;
 		case Grass:
 			TileMesh->SetStaticMesh(GrassMesh);
