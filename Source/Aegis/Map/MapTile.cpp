@@ -3,8 +3,10 @@
 
 #include "MapTile.h"
 
+#include "IContentBrowserSingleton.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
+#include "MapTiles/MapTileData.h"
 
 // Sets default values
 AMapTile::AMapTile()
@@ -23,6 +25,36 @@ AMapTile::AMapTile()
 	TileMesh->SetupAttachment(RootComponent);
 	TileMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	TileMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+}
+
+void AMapTile::SetMapTileData(UMapTileData* Data)
+{
+	MapTileData = Data;
+
+	const FVector NewMeshLocation = FVector(0, 0, MapTileData->Elevation * 40);
+	TileMesh->SetRelativeLocation(NewMeshLocation);
+
+	if (!MapTileData->bIsPath)
+	{
+		switch (MapTileData->TerrainType)
+		{
+		case Water:
+			TileMesh->SetStaticMesh(WaterMesh);
+			break;
+		case Grass:
+			TileMesh->SetStaticMesh(GrassMesh);
+			break;
+		case Cliff:
+			TileMesh->SetStaticMesh(CliffMesh);
+			break;
+		default:
+			TileMesh->SetStaticMesh(DefaultMesh);
+			break;
+		}
+	} else
+	{
+		TileMesh->SetStaticMesh(PathMesh180);
+	}
 }
 
 // Called when the game starts or when spawned

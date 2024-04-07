@@ -100,7 +100,7 @@ float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, cons
 {
 	// Larger Perlin Scale means more spread out and smoother (1000 is a good baseline)
 	// Smaller Perlin Scale means higher frequency and more random (e.g. 100 for pathfinding randomness)
-	int PerlinScale = 600;
+	int PerlinScale = 1000;
 	int Multiplier = 1;
 	if (bSmoothForPathing)
 	{
@@ -143,7 +143,7 @@ bool UPathGenerationBlueprintLibrary::IsPathValid(FTileCoord StartTile, FTileCoo
 }
 
 TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile,
-                                                                            FVector2D NoiseOffset, TMap<FTileCoord, FTileCoord> ExistingPath)
+                                                                            FVector2D PathingNoiseOffset, TMap<FTileCoord, FTileCoord> ExistingPath)
 {
 	bool PathFound = false;
 	TMap<FTileCoord, FTileCoord> Path;
@@ -181,7 +181,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				}
 				// Find the weight of the neighbor tile. If the tile is in the exclusion list or is outside the boundary, returns -1
 				// If the neighbor tile is the goal tile, ignores the impassable weight
-				float NextWeight = GetNodeWeight(Neighbour, NoiseOffset, true);
+				float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true);
 			
 				float NewCost = CostSoFar[Current] + NextWeight;
 				if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])
@@ -273,6 +273,75 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
 	// TODO trim path to MainPathLength length
 	
 	return Path;
+}
+
+TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTilesData(const TMap<FTileCoord, FTileCoord>& Path,
+                                                                                      const FVector2D ElevationNoiseOffset, FRandomStream RandomStream)
+{
+	TArray<float> NoiseDistribution;
+	TMap<FTileCoord, UMapTileData*> MapTilesData;
+	TArray<FTileCoord> PathTiles;
+	
+	Path.GenerateKeyArray(PathTiles);
+	
+	for (const FTileCoord Coord : FTileCoord::GetTilesInRadius(PathTiles, 10))
+	{
+		UMapTileData *MapTileData = NewObject<UMapTileData>();
+		
+		float Gradient = (GetNodeWeight(Coord, ElevationNoiseOffset, false) + 1.f)/2.f;
+		NoiseDistribution.Emplace(Gradient);
+		MapTileData->ElevationNoise = Gradient;
+
+		MapTilesData.Add(Coord, MapTileData);
+	}
+
+	NoiseDistribution.Sort();
+	
+	const float WaterLimit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.1)];
+	const float Grass1Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.8)];
+	const float Grass2Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.9)];
+	const float Grass3Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.95)];
+	const float Grass4Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.98)];
+	const float CliffLimit = NoiseDistribution[static_cast<int>(NoiseDistribution.Num()-1 * 1)];
+	
+	for (TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
+	{
+		if (Path.Contains(Elem.Key))
+		{
+			Elem.Value->bIsPath = true;
+			Elem.Value->Elevation = 0.5;
+			
+			continue;
+		}
+		
+		if (Elem.Value->ElevationNoise < WaterLimit)
+		{
+			Elem.Value->TerrainType = Water;
+			Elem.Value->Elevation = 0;
+		} else if (Elem.Value->ElevationNoise < Grass1Limit)
+		{
+			Elem.Value->TerrainType = Grass;
+			Elem.Value->Elevation = 1;
+		} else if (Elem.Value->ElevationNoise < Grass2Limit)
+		{
+			Elem.Value->TerrainType = Grass;
+			Elem.Value->Elevation = 2;
+		} else if (Elem.Value->ElevationNoise < Grass3Limit)
+		{
+			Elem.Value->TerrainType = Grass;
+			Elem.Value->Elevation = 3;
+		} else if (Elem.Value->ElevationNoise < Grass4Limit)
+		{
+			Elem.Value->TerrainType = Grass;
+			Elem.Value->Elevation = 4;
+		} else
+		{
+			Elem.Value->TerrainType = Cliff;
+			Elem.Value->Elevation = 5;
+		}
+	}
+	
+	return MapTilesData;
 }
 
 

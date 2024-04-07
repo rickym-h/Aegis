@@ -7,6 +7,7 @@
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Aegis/Structures/Towers/TowerData.h"
+#include "MapTiles/MapTileData.h"
 
 
 UAegisMap::UAegisMap()
@@ -14,12 +15,12 @@ UAegisMap::UAegisMap()
 }
 
 void UAegisMap::PopulateMapData(
-	const TMap<FTileCoord, AMapTile*>& InMapTiles,
+	const TMap<FTileCoord, UMapTileData*>& InMapTileData,
 	const TMap<FTileCoord, FTileCoord>& InPathRoute,
 	const TArray<FTileCoord>& InPathStartTiles,
 	ANexusBuilding* InNexusBuilding)
-{
-	this->MapTiles = InMapTiles;
+{	
+	this->MapTiles = GenerateMapTiles(InMapTileData);
 	this->PathRoute = InPathRoute;
 	this->PathStartTiles = InPathStartTiles;
 	this->NexusBuilding = InNexusBuilding;
@@ -102,6 +103,32 @@ int UAegisMap::GetNumOfTilesToEnd(const FTileCoord StartCoord)
 		CurrentCoord = NextCoord;
 	}
 	return DistanceSoFar;
+}
+
+AMapTile* UAegisMap::CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const
+{
+	const FVector Location = Coord.ToWorldLocation();
+	const FRotator Rotation = FRotator::ZeroRotator;
+	
+	AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(MapTileBP, Location, Rotation);
+	Tile->TileCoord = Coord.Copy();
+
+	Tile->SetMapTileData(MapTileData);
+	
+	return Tile;
+}
+
+TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const
+{
+	TMap<FTileCoord, AMapTile*> OutMapTiles;
+	
+	for (TTuple<FTileCoord, UMapTileData*> Element : MapTileData)
+	{
+		AMapTile* MapTile = CreateMapTile(Element.Key, Element.Value);
+		OutMapTiles.Add(Element.Key, MapTile);		
+	}
+	
+	return OutMapTiles;
 }
 
 

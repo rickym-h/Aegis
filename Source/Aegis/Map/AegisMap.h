@@ -7,6 +7,7 @@
 #include "AegisMap.generated.h"
 
 
+class UMapTileData;
 class UStructureData;
 class AStructure;
 class UTowerData;
@@ -25,8 +26,9 @@ class AEGIS_API UAegisMap : public UObject
 public:
 	UAegisMap();
 
+	
 	UFUNCTION()
-	void PopulateMapData(const TMap<FTileCoord, AMapTile*>& InMapTiles, const TMap<FTileCoord, FTileCoord>& InPathRoute,
+	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPathRoute,
 	                     const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
 
 	UFUNCTION()
@@ -50,10 +52,16 @@ public:
 
 	UPROPERTY()
 	ANexusBuilding* NexusBuilding;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Blueprints")
+	TSubclassOf<AMapTile> MapTileBP;
+
 protected:
 	// Map Tiles
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AMapTile*> MapTiles;
+	AMapTile* CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const;
+	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const;
 
 	// Path Data
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")

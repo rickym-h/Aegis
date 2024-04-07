@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
-#include "UObject/NoExportTypes.h"
 #include "StructureData.generated.h"
 
 class AStructure;

@@ -41,6 +41,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
 	int TilesToEnd = 0;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
+	UMapTileData* MapTileData;
+
+	void SetMapTileData(UMapTileData* Data);
 
 protected:
 	// Called when the game starts or when spawned
@@ -48,6 +53,17 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
 	UAegisMap* MapReference;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* WaterMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* GrassMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* CliffMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* DefaultMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* PathMesh180;
 
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
