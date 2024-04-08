@@ -96,23 +96,27 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	return OutputLocations;	
 }
 
-float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bSmoothForPathing)
+float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bDistortNoise, const int32 PerlinScale)
 {
 	// Larger Perlin Scale means more spread out and smoother (1000 is a good baseline)
-	// Smaller Perlin Scale means higher frequency and more random (e.g. 100 for pathfinding randomness)
-	int PerlinScale = 1000;
-	int Multiplier = 1;
-	if (bSmoothForPathing)
-	{
-		PerlinScale = 10;
-		Multiplier = -1;
-	}
+	// Smaller Perlin Scale means higher frequency and more random (e.g. 10 for pathfinding randomness)
+	//int PerlinScale = 1000;
 	const FVector Location = Tile.ToWorldLocation();
-	const FVector2D NoiseSampleLoc = FVector2D(Location.X/PerlinScale, Location.Y/PerlinScale) + (NoiseOffset * Multiplier);
+	FVector2D NoiseSampleLoc = FVector2D(Location.X/PerlinScale, Location.Y/PerlinScale) + (NoiseOffset);
+	if (!bDistortNoise)
+	{
+		const float x = NoiseSampleLoc.X;
+		const float y = NoiseSampleLoc.Y;
+		// Distort the noise if not used for pathing
+		const float XDistortion = 0 * FMath::PerlinNoise2D(FVector2D(4.7*(x+2.3), 4.7*(y+2.9)));
+		const float YDistortion = 0 * FMath::PerlinNoise2D(FVector2D(4.7*(x-3.1), 4.7*(y-4.3)));
+		
+		NoiseSampleLoc = FVector2D(x+XDistortion, y+YDistortion);
+	}
 	const float x = (FMath::PerlinNoise2D(NoiseSampleLoc) + 1.f) / 2.f;
 	
 	// If used for pathing, the noise is multiplied exponentially to make high weights worth more, and clamped to above 0 to avoid negative weights 
-	if (bSmoothForPathing)
+	if (bDistortNoise)
 	{
 		return 1+FMath::Pow(x + 0.5, 10.f);
 	}
@@ -120,7 +124,7 @@ float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, cons
 	return x;
 }
 
-bool UPathGenerationBlueprintLibrary::IsPathValid(FTileCoord StartTile, FTileCoord GoalTile, TMap<FTileCoord, FTileCoord> Map)
+bool UPathGenerationBlueprintLibrary::IsPathValid(const FTileCoord StartTile, const FTileCoord GoalTile, TMap<FTileCoord, FTileCoord> Map)
 {
 	if (!Map.Contains(GoalTile))
 	{
@@ -181,7 +185,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				}
 				// Find the weight of the neighbor tile. If the tile is in the exclusion list or is outside the boundary, returns -1
 				// If the neighbor tile is the goal tile, ignores the impassable weight
-				float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true);
+				float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true, 10);
 			
 				float NewCost = CostSoFar[Current] + NextWeight;
 				if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])
@@ -276,33 +280,43 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
 }
 
 TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTilesData(const TMap<FTileCoord, FTileCoord>& Path,
-                                                                                      const FVector2D ElevationNoiseOffset, FRandomStream RandomStream)
+                                                                                      const FVector2D ElevationNoiseOffset, FVector2D TreeNoiseOffset, FVector2D StoneNoiseOffset, FRandomStream RandomStream)
 {
-	TArray<float> NoiseDistribution;
+	TArray<float> ElevationNoiseDistribution;
+	TArray<float> TreeNoiseDistribution;
+	TArray<float> StoneNoiseDistribution;
 	TMap<FTileCoord, UMapTileData*> MapTilesData;
-	TArray<FTileCoord> PathTiles;
 	
+	TArray<FTileCoord> PathTiles;
 	Path.GenerateKeyArray(PathTiles);
 	
 	for (const FTileCoord Coord : FTileCoord::GetTilesInRadius(PathTiles, 10))
 	{
-		UMapTileData *MapTileData = NewObject<UMapTileData>();
+		UMapTileData* MapTileData = NewObject<UMapTileData>();
 		
-		float Gradient = (GetNodeWeight(Coord, ElevationNoiseOffset, false) + 1.f)/2.f;
-		NoiseDistribution.Emplace(Gradient);
-		MapTileData->ElevationNoise = Gradient;
+		const float ElevationGradient = (GetNodeWeight(Coord, ElevationNoiseOffset, false, 1000) + 1.f)/2.f;
+		MapTileData->ElevationNoise = ElevationGradient;
+		ElevationNoiseDistribution.Emplace(ElevationGradient);
+		
+		const float TreeGradient = (GetNodeWeight(Coord, TreeNoiseOffset, false, 700) + 1.f)/2.f;
+		MapTileData->TreeNoise = TreeGradient;
+		//TreeNoiseDistribution.Emplace(TreeGradient);
+		
+		const float StoneGradient = (GetNodeWeight(Coord, StoneNoiseOffset, false, 100) + 1.f)/2.f;
+		MapTileData->StoneNoise = StoneGradient;
+		//StoneNoiseDistribution.Emplace(StoneGradient);
 
 		MapTilesData.Add(Coord, MapTileData);
 	}
 
-	NoiseDistribution.Sort();
+	ElevationNoiseDistribution.Sort();
 	
-	const float WaterLimit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.1)];
-	const float Grass1Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.8)];
-	const float Grass2Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.9)];
-	const float Grass3Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.95)];
-	const float Grass4Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.98)];
-	const float CliffLimit = NoiseDistribution[static_cast<int>(NoiseDistribution.Num()-1 * 1)];
+	const float WaterLimit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.1)];
+	const float Grass1Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.8)];
+	const float Grass2Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.9)];
+	const float Grass3Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.95)];
+	const float Grass4Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.98)];
+	const float CliffLimit = ElevationNoiseDistribution[static_cast<int>(ElevationNoiseDistribution.Num()-1 * 1)];
 
 	TMap<int, ETerrainType> ElevationTerrainMap;
 	ElevationTerrainMap.Add(0, Water);
@@ -311,7 +325,8 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	ElevationTerrainMap.Add(3, Grass);
 	ElevationTerrainMap.Add(4, Grass);
 	ElevationTerrainMap.Add(5, Cliff);
-	
+
+	// Set Terrain and Elevation
 	for (TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
 	{
 		// If the tile is part of the path, set some path default values
@@ -348,6 +363,51 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		Elem.Value->Elevation = FMath::Min(Elem.Value->Elevation, MaxElevation);
 
 		Elem.Value->TerrainType = ElevationTerrainMap[Elem.Value->Elevation];
+	}
+
+
+	auto CanTileHaveTree = [](const UMapTileData* MapTileData)
+	{
+		const TArray<ETerrainType> TreeAllowedTerrain = {Grass};
+		return (!MapTileData->bIsPath && TreeAllowedTerrain.Contains(MapTileData->TerrainType));
+	};
+	auto CanTileHaveStone = [](const UMapTileData* MapTileData)
+	{
+		const TArray<ETerrainType> StoneAllowedTerrain = {Grass, Cliff};
+		return (!MapTileData->bIsPath && StoneAllowedTerrain.Contains(MapTileData->TerrainType));
+	};
+
+	// Set Resources
+	for(TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
+	{
+		// Only count towards tree noise distribution if the tile can have a tree on it (e.g trees cannot be on water)
+		if (CanTileHaveTree(Elem.Value))
+		{
+			TreeNoiseDistribution.Emplace(Elem.Value->TreeNoise);
+		}
+		if (CanTileHaveStone(Elem.Value))
+		{
+			StoneNoiseDistribution.Emplace(Elem.Value->StoneNoise);
+		}
+	}
+	TreeNoiseDistribution.Sort();
+	StoneNoiseDistribution.Sort();
+	const float TreeLimit = ElevationNoiseDistribution[static_cast<int>((TreeNoiseDistribution.Num()-1) * 0.2)];
+	const float StoneLimit = ElevationNoiseDistribution[static_cast<int>((TreeNoiseDistribution.Num()-1) * 0.1)];
+	for(TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
+	{
+		if (CanTileHaveTree(Elem.Value) && Elem.Value->TreeNoise < TreeLimit)
+		{
+			Elem.Value->ResourceType = Tree;
+		}
+		if (CanTileHaveStone(Elem.Value) && Elem.Value->StoneNoise < StoneLimit)
+		{
+			Elem.Value->ResourceType = Stone;
+		}
+		if (CanTileHaveStone(Elem.Value) && Elem.Value->TreeNoise < TreeLimit && Elem.Value->StoneNoise < StoneLimit)
+		{
+			Elem.Value->ResourceType = TreeStone;
+		}
 	}
 	
 	return MapTilesData;

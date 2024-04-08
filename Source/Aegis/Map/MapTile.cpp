@@ -24,6 +24,11 @@ AMapTile::AMapTile()
 	TileMesh->SetupAttachment(RootComponent);
 	TileMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	TileMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
+	
+	ResourceMesh = CreateDefaultSubobject<UStaticMeshComponent>("Resource Mesh");
+	ResourceMesh->SetupAttachment(RootComponent);
+	ResourceMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	ResourceMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
 }
 
 void AMapTile::SetMapTileData(UMapTileData* Data)
@@ -74,6 +79,24 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 	}
 
 	StructureLocation = TileCoord.ToWorldLocation() + NewMeshLocation + FVector(0,0,86);
+
+	ResourceMesh->SetWorldLocation(StructureLocation);
+
+	switch (MapTileData->ResourceType)
+	{
+	case Tree:
+		ResourceMesh->SetStaticMesh(TreesMesh);
+		break;
+	case Stone:
+		ResourceMesh->SetStaticMesh(StoneMesh);
+		break;
+	case TreeStone:
+		ResourceMesh->SetStaticMesh(TreeStoneMesh);
+		break;
+	default:
+		ResourceMesh->SetStaticMesh(nullptr);
+		break;
+	}
 }
 
 // Called when the game starts or when spawned

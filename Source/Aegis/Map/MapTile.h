@@ -23,6 +23,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TileMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* ResourceMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	TArray<UStaticMeshComponent*> BedrockMeshes;
@@ -71,6 +74,13 @@ protected:
 	UStaticMesh* DefaultMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
 	UStaticMesh* PathMesh180;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* TreesMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* StoneMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* TreeStoneMesh;
 
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,

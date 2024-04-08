@@ -22,6 +22,7 @@ enum EResourceType
 	None UMETA(DisplayName = "None"),
 	Tree UMETA(DisplayName = "Stone"),
 	Stone UMETA(DisplayName = "Stone"),
+	TreeStone UMETA(DisplayName = "Tree & Stone"),
 };
 
 /**
@@ -43,10 +44,14 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	TEnumAsByte<EResourceType> ResourceType;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
+	float TreeNoise;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
+	float StoneNoise;
+
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	int32 Elevation;
-	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	float ElevationNoise;
 
