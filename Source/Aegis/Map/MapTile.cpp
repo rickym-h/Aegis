@@ -3,7 +3,6 @@
 
 #include "MapTile.h"
 
-#include "IContentBrowserSingleton.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "MapTiles/MapTileData.h"
@@ -33,6 +32,22 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 
 	const FVector NewMeshLocation = FVector(0, 0, MapTileData->Elevation * 40);
 	TileMesh->SetRelativeLocation(NewMeshLocation);
+	for (int i = 0; i < (FMath::RoundToPositiveInfinity(MapTileData->Elevation/2.f)); i++)
+	{
+		// Create a bedrock static mesh component
+		const FName ComponentName = FName(FString("BedRockLayer") + FString::FromInt(i));
+		UStaticMeshComponent* BedrockStaticMeshComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), ComponentName);
+		
+		BedrockStaticMeshComp->SetupAttachment(this->RootComponent);
+
+		BedrockStaticMeshComp->SetRelativeLocationAndRotation(NewMeshLocation - (FVector(0,0,86) * i), FRotator::ZeroRotator);
+		BedrockStaticMeshComp->SetStaticMesh(CliffMesh);
+		
+		BedrockStaticMeshComp->RegisterComponent();
+		BedrockStaticMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+
+		BedrockMeshes.Push(BedrockStaticMeshComp);
+	}
 
 	if (!MapTileData->bIsPath)
 	{
@@ -54,8 +69,11 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 		}
 	} else
 	{
-		TileMesh->SetStaticMesh(PathMesh180);
+		//TileMesh->SetStaticMesh(PathMesh180);
+		TileMesh->SetStaticMesh(CliffMesh);
 	}
+
+	StructureLocation = TileCoord.ToWorldLocation() + NewMeshLocation + FVector(0,0,86);
 }
 
 // Called when the game starts or when spawned

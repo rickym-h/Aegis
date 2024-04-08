@@ -23,6 +23,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TileMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	TArray<UStaticMeshComponent*> BedrockMeshes;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
 	FTileCoord TileCoord;
@@ -46,6 +49,10 @@ public:
 	UMapTileData* MapTileData;
 
 	void SetMapTileData(UMapTileData* Data);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
+	FVector StructureLocation;
+	
 
 protected:
 	// Called when the game starts or when spawned

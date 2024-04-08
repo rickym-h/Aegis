@@ -77,8 +77,7 @@ bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* Str
 	// Create actor instance of tower class
 	// Set the data of the tower actor based on tower data
 	// Finish spawning tower actor
-	//UE_LOG(LogTemp, Warning, TEXT("Spawning tower at: %ls"), *Location.ToString())
-	AStructure* Structure = StructureData->SpawnStructureFromData(Location);
+	AStructure* Structure = StructureData->SpawnStructureFromData(Location, GetTile(Location)->StructureLocation);
 	
 	if (!Structure) { return false; }
 	//Tower->TowerData = TowerData;

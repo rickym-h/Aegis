@@ -303,9 +303,18 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	const float Grass3Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.95)];
 	const float Grass4Limit = NoiseDistribution[static_cast<int>((NoiseDistribution.Num()-1) * 0.98)];
 	const float CliffLimit = NoiseDistribution[static_cast<int>(NoiseDistribution.Num()-1 * 1)];
+
+	TMap<int, ETerrainType> ElevationTerrainMap;
+	ElevationTerrainMap.Add(0, Water);
+	ElevationTerrainMap.Add(1, Grass);
+	ElevationTerrainMap.Add(2, Grass);
+	ElevationTerrainMap.Add(3, Grass);
+	ElevationTerrainMap.Add(4, Grass);
+	ElevationTerrainMap.Add(5, Cliff);
 	
 	for (TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
 	{
+		// If the tile is part of the path, set some path default values
 		if (Path.Contains(Elem.Key))
 		{
 			Elem.Value->bIsPath = true;
@@ -316,29 +325,29 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		
 		if (Elem.Value->ElevationNoise < WaterLimit)
 		{
-			Elem.Value->TerrainType = Water;
 			Elem.Value->Elevation = 0;
 		} else if (Elem.Value->ElevationNoise < Grass1Limit)
 		{
-			Elem.Value->TerrainType = Grass;
 			Elem.Value->Elevation = 1;
 		} else if (Elem.Value->ElevationNoise < Grass2Limit)
 		{
-			Elem.Value->TerrainType = Grass;
 			Elem.Value->Elevation = 2;
 		} else if (Elem.Value->ElevationNoise < Grass3Limit)
 		{
-			Elem.Value->TerrainType = Grass;
 			Elem.Value->Elevation = 3;
 		} else if (Elem.Value->ElevationNoise < Grass4Limit)
 		{
-			Elem.Value->TerrainType = Grass;
 			Elem.Value->Elevation = 4;
 		} else
 		{
-			Elem.Value->TerrainType = Cliff;
 			Elem.Value->Elevation = 5;
 		}
+		
+		// Set max elevation (and adjust terrain type if necessary) based on distance to the start and end path tiles)
+		const int MaxElevation = FTileCoord::HexDistance(FTileCoord(), Elem.Key);
+		Elem.Value->Elevation = FMath::Min(Elem.Value->Elevation, MaxElevation);
+
+		Elem.Value->TerrainType = ElevationTerrainMap[Elem.Value->Elevation];
 	}
 	
 	return MapTilesData;

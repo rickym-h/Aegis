@@ -30,7 +30,7 @@ public:
 	TSubclassOf<AStructure> GetStructureBlueprintClass() const;
 
 	UFUNCTION(BlueprintCallable)
-	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure) const
+	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const
 	{
 		UE_LOG(LogTemp, Warning,
 		       TEXT("UStructureData::SpawnStructureFromData() - Base structure data function called - should be overridden by leaf classes."))

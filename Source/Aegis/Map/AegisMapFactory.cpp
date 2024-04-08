@@ -38,7 +38,6 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = UPathGenerationBlueprintLibrary::GenerateMapTilesData(Path, ElevationNoiseOffset, RandomStream);
 	
-	
 	// Add nexus building
 	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0,0,0), FRotator(0,0,0));
 

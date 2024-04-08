@@ -10,11 +10,11 @@ UProjectileTowerData::UProjectileTowerData()
 {
 }
 
-AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordToSpawnStructure) const
+AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const
 {
 	if (!StructureBlueprintClass) { return nullptr; }
 
-	const FTransform ActorTransform = FTransform(CoordToSpawnStructure.ToWorldLocation());
+	const FTransform ActorTransform = FTransform(BuildingLocation);
 	AProjectileTower* NewTower = GetWorld()->SpawnActorDeferred<AProjectileTower>(StructureBlueprintClass, ActorTransform);
 
 	NewTower->CurrentLocation = CoordToSpawnStructure;

@@ -54,9 +54,12 @@ FHitResult* APlayerPawn::UpdateHitResultUnderCursor()
 	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
 	if (!PlayerController) { return nullptr; }
 
-	TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel3));
-	PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResultUnderCursor);
+	// TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
+	// ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel3));
+	// PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResultUnderCursor);
+
+	PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
+	
 	return &HitResultUnderCursor;
 }
 
@@ -72,7 +75,7 @@ void APlayerPawn::Tick(float DeltaTime)
 
 		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 		{
-			StructureHologram->SetWorldLocation(MapTile->TileCoord.ToWorldLocation());
+			StructureHologram->SetWorldLocation(MapTile->StructureLocation);
 		}
 	}
 
