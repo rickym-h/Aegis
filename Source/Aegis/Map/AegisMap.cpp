@@ -14,6 +14,19 @@ UAegisMap::UAegisMap()
 {
 }
 
+void UAegisMap::DestroyMap()
+{
+	for (const TTuple<FTileCoord, AMapTile*> Element : MapTiles)
+	{
+		Element.Value->Destroy();
+	}
+	for (const TTuple<FTileCoord, AStructure*> Element : MapStructures)
+	{
+		Element.Value->Destroy();
+	}
+}
+
+
 void UAegisMap::PopulateMapData(
 	const TMap<FTileCoord, UMapTileData*>& InMapTileData,
 	const TMap<FTileCoord, FTileCoord>& InPathRoute,

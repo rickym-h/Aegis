@@ -6,6 +6,7 @@
 #include "Enemies/EnemyFactory.h"
 #include "Kismet/GameplayStatics.h"
 #include "Map/AegisMapFactory.h"
+#include "Map/MapTile.h"
 #include "SaveSystem/AegisSaveGame.h"
 #include "Structures/BuildingHealthComponent.h"
 #include "Structures/NexusBuilding.h"
@@ -18,7 +19,6 @@ void AAegisGameStateBase::BeginPlay()
 	if (MapFactoryClass)
 	{
 		MapFactory = NewObject<UAegisMapFactory>(GetWorld(), MapFactoryClass);
-		//GenerateTestMapFromMapFactory();
 	}
 
 	if (EnemyFactoryClass)
@@ -32,13 +32,18 @@ void AAegisGameStateBase::BeginPlay()
 		TowerDataFactory = NewObject<UTowerDataFactory>(GetWorld(), TowerDataFactoryClass);
 		TowerDataFactory->WorldReference = GetWorld();
 	}
+
+	GenerateTestMapFromMapFactory();
 }
 
 void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 {
-	//AegisMap = MapFactory->GenerateMap(18, 4);
-	//AegisMap = MapFactory->GenerateMap(12, 2, 1);
-	//AegisMap = MapFactory->GenerateMapWithNoise(25, 0, 0);
+	// Destroy AegisMap
+	if (AegisMap)
+	{
+		AegisMap->DestroyMap();
+	}
+	
 	AegisMap = MapFactory->GenerateMapWithNoise(40);
 }
 
