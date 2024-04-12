@@ -36,4 +36,7 @@ public:
 		       TEXT("UStructureData::SpawnStructureFromData() - Base structure data function called - should be overridden by leaf classes."))
 		return nullptr;
 	}
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
+	FString StructureName = "Default Name";
 };

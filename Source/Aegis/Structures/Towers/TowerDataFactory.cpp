@@ -7,7 +7,7 @@
 #include "TowerData.h"
 #include "ProjectileTower/ProjectileTowerData.h"
 
-UTowerData* UTowerDataFactory::GenerateTestTowerData() const
+UStructureData* UTowerDataFactory::GenerateTestTowerData() const
 {
 	if (!TestTowerDataClass) { return nullptr; }
 

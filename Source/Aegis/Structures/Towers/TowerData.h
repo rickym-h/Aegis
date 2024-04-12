@@ -19,6 +19,4 @@ class AEGIS_API UTowerData : public UStructureData
 protected:
 
 public:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
-	FString DefenderName = "Default Name";
 };

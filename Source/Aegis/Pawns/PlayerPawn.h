@@ -8,7 +8,6 @@
 #include "PlayerPawn.generated.h"
 
 class UStructureData;
-class UTowerData;
 class UFloatingPawnMovement;
 class AAegisGameStateBase;
 class USpringArmComponent;
@@ -62,7 +61,7 @@ protected:
 	UStaticMeshComponent* StructureHologram;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
-	TArray<UTowerData*> TowerCardsInHand;
+	TArray<UStructureData*> TowerCardsInHand;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
@@ -84,9 +83,9 @@ public:
 	FOnTowersInHandUpdated OnTowersInHandUpdatedDelegate;
 
 	UFUNCTION(BlueprintCallable)
-	bool AddTowerCardToHand(UTowerData* TowerData);
+	bool AddTowerCardToHand(UStructureData* TowerData);
 	UFUNCTION(BlueprintCallable)
-	bool RemoveTowerCardFromHand(UTowerData* TowerData);
+	bool RemoveTowerCardFromHand(UStructureData* TowerData);
 
 	UFUNCTION(BlueprintCallable)
 	void BeginPlacingStructure(UStructureData* StructureData);

@@ -3,10 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "TowerDataFactory.generated.h"
 
-class UTowerData;
+class UStructureData;
 class ATower;
 /**
  * 
@@ -18,12 +17,12 @@ class AEGIS_API UTowerDataFactory : public UObject
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Towers")
-	TSubclassOf<UTowerData> TestTowerDataClass;
+	TSubclassOf<UStructureData> TestTowerDataClass;
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="World")
 	UWorld* WorldReference;
 
 	UFUNCTION(BlueprintCallable)
-	UTowerData* GenerateTestTowerData() const;
+	UStructureData* GenerateTestTowerData() const;
 };

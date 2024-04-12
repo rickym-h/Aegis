@@ -100,14 +100,14 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	// Try to place tower if a tower is selected
 	if (PlayerActionState == Placing)
 	{
-		if (UTowerData* TowerData = Cast<UTowerData>(StructureToPlace))
+		if (UStructureData* StructureData = Cast<UStructureData>(StructureToPlace))
 		{
-			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, TowerData))
+			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData))
 			{
 				PlayerActionState = Default;
 				StructureToPlace = nullptr;
 				StructureHologram->SetVisibility(false);
-				RemoveTowerCardFromHand(TowerData);
+				RemoveTowerCardFromHand(StructureData);
 			}
 		}
 	}
@@ -147,14 +147,14 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
 }
 
-bool APlayerPawn::AddTowerCardToHand(UTowerData* TowerData)
+bool APlayerPawn::AddTowerCardToHand(UStructureData* TowerData)
 {
 	TowerCardsInHand.Add(TowerData);
 	OnTowersInHandUpdatedDelegate.Broadcast();
 	return true;
 }
 
-bool APlayerPawn::RemoveTowerCardFromHand(UTowerData* TowerData)
+bool APlayerPawn::RemoveTowerCardFromHand(UStructureData* TowerData)
 {
 	TowerCardsInHand.RemoveSingle(TowerData);
 	OnTowersInHandUpdatedDelegate.Broadcast();
