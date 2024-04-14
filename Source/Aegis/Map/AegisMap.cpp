@@ -5,6 +5,7 @@
 
 #include "MapTile.h"
 #include "Aegis/Structures/Structure.h"
+#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Aegis/Structures/Towers/TowerData.h"
 #include "MapTiles/MapTileData.h"
@@ -16,13 +17,23 @@ UAegisMap::UAegisMap()
 
 void UAegisMap::DestroyMap()
 {
+	if (NexusBuilding)
+	{
+		NexusBuilding->Destroy();
+	}
 	for (const TTuple<FTileCoord, AMapTile*> Element : MapTiles)
 	{
-		Element.Value->Destroy();
+		if (AMapTile* Tile = Element.Value)
+		{
+			Tile->Destroy();
+		}
 	}
 	for (const TTuple<FTileCoord, AStructure*> Element : MapStructures)
 	{
-		Element.Value->Destroy();
+		if (AStructure* Structure = Element.Value)
+		{
+			Structure->Destroy();
+		}
 	}
 }
 
