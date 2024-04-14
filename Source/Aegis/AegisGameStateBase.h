@@ -8,7 +8,7 @@
 
 class USaveGame;
 class UAegisSaveGame;
-class UTowerDataFactory;
+class UStructureDataFactory;
 class UEnemyFactory;
 class UAegisMapFactory;
 class UAegisMap;
@@ -40,7 +40,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UEnemyFactory* EnemyFactory;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
-	UTowerDataFactory* TowerDataFactory;
+	UStructureDataFactory* TowerDataFactory;
 	
 protected:
 	
@@ -51,7 +51,7 @@ protected:
 	TSubclassOf<UEnemyFactory> EnemyFactoryClass;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
-	TSubclassOf<UTowerDataFactory> TowerDataFactoryClass;
+	TSubclassOf<UStructureDataFactory> TowerDataFactoryClass;
 
 	UFUNCTION()
 	void SaveGameDelegateFunction(const FString& SlotName, const int32 UserIndex, bool bSuccess);

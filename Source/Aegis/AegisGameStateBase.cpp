@@ -8,9 +8,9 @@
 #include "Map/AegisMapFactory.h"
 #include "Map/MapTile.h"
 #include "SaveSystem/AegisSaveGame.h"
-#include "Structures/BuildingHealthComponent.h"
-#include "Structures/NexusBuilding.h"
-#include "Structures/Towers/TowerDataFactory.h"
+#include "Structures/StructureDataFactory.h"
+#include "Structures/NexusBuilding/BuildingHealthComponent.h"
+#include "Structures/NexusBuilding/NexusBuilding.h"
 
 void AAegisGameStateBase::BeginPlay()
 {
@@ -29,7 +29,7 @@ void AAegisGameStateBase::BeginPlay()
 
 	if (TowerDataFactoryClass)
 	{
-		TowerDataFactory = NewObject<UTowerDataFactory>(GetWorld(), TowerDataFactoryClass);
+		TowerDataFactory = NewObject<UStructureDataFactory>(GetWorld(), TowerDataFactoryClass);
 		TowerDataFactory->WorldReference = GetWorld();
 	}
 

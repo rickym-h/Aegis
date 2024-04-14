@@ -3,11 +3,9 @@
 
 #include "AegisMapFactory.h"
 
-#include "IContentBrowserSingleton.h"
 #include "MapTile.h"
 #include "PathGenerationBlueprintLibrary.h"
-#include "Aegis/Structures/NexusBuilding.h"
-#include "Kismet/BlueprintPathsLibrary.h"
+#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 
 void UAegisMapFactory::PostInitProperties()
 {

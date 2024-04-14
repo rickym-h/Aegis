@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "TowerDataFactory.generated.h"
+#include "StructureDataFactory.generated.h"
 
 class UStructureData;
 class ATower;
@@ -11,8 +11,8 @@ class ATower;
  * 
  */
 UCLASS(BlueprintType, Blueprintable)
-class AEGIS_API UTowerDataFactory : public UObject
-{
+class AEGIS_API UStructureDataFactory : public UObject
+{	
 	GENERATED_BODY()
 
 protected:

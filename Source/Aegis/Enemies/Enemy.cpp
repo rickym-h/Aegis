@@ -6,7 +6,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Map/MapTile.h"
-#include "Aegis/Structures/NexusBuilding.h"
+#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 

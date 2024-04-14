@@ -1,13 +1,11 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "TowerDataFactory.h"
+#include "StructureDataFactory.h"
 
-#include "Tower.h"
-#include "TowerData.h"
-#include "ProjectileTower/ProjectileTowerData.h"
+#include "Towers/ProjectileTower/ProjectileTowerData.h"
 
-UStructureData* UTowerDataFactory::GenerateTestTowerData() const
+UStructureData* UStructureDataFactory::GenerateTestTowerData() const
 {
 	if (!TestTowerDataClass) { return nullptr; }
 
