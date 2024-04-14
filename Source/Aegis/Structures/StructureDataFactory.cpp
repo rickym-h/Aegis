@@ -3,15 +3,25 @@
 
 #include "StructureDataFactory.h"
 
+#include "Buildings/ResourceCollector/ResourceCollectorData.h"
 #include "Towers/ProjectileTower/ProjectileTowerData.h"
 
 UStructureData* UStructureDataFactory::GenerateTestTowerData() const
 {
 	if (!TestTowerDataClass) { return nullptr; }
 
-	UProjectileTowerData* TowerData = NewObject<UProjectileTowerData>(WorldReference, TestTowerDataClass);
+	UProjectileTowerData* StructureData = NewObject<UProjectileTowerData>(WorldReference, TestTowerDataClass);
 
-	TowerData->TowerRange = 3;
+	StructureData->TowerRange = 3;
 
-	return TowerData;
+	return StructureData;
+}
+
+UStructureData* UStructureDataFactory::GenerateLumberYardData() const
+{
+	if (!LumberYardDataClass) { return nullptr; }
+	
+	UResourceCollectorData* StructureData = NewObject<UResourceCollectorData>(WorldReference, LumberYardDataClass);
+		
+	return StructureData;
 }

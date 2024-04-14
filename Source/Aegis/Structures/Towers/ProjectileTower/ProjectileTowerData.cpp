@@ -6,23 +6,17 @@
 #include "ProjectileTower.h"
 #include "Kismet/GameplayStatics.h"
 
-UProjectileTowerData::UProjectileTowerData()
-{
-}
-
 AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const
 {
 	if (!StructureBlueprintClass) { return nullptr; }
 
 	const FTransform ActorTransform = FTransform(BuildingLocation);
-	AProjectileTower* NewTower = GetWorld()->SpawnActorDeferred<AProjectileTower>(StructureBlueprintClass, ActorTransform);
+	AProjectileTower* NewStructure = GetWorld()->SpawnActorDeferred<AProjectileTower>(StructureBlueprintClass, ActorTransform);
 
-	NewTower->CurrentLocation = CoordToSpawnStructure;
-	NewTower->SetTowerRange(3);
+	NewStructure->CurrentLocation = CoordToSpawnStructure;
+	NewStructure->SetTowerRange(TowerRange);
 
-	NewTower->StructureMesh->SetStaticMesh(MeshRepresentation);
+	UGameplayStatics::FinishSpawningActor(NewStructure, ActorTransform);
 
-	UGameplayStatics::FinishSpawningActor(NewTower, ActorTransform);
-
-	return NewTower;
+	return NewStructure;
 }

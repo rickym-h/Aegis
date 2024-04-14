@@ -3,20 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Structures/Towers/TowerData.h"
-#include "ProjectileTowerData.generated.h"
+#include "Aegis/Structures/Buildings/BuildingData.h"
+#include "ResourceCollectorData.generated.h"
 
 /**
  * 
  */
 UCLASS(Blueprintable)
-class AEGIS_API UProjectileTowerData : public UTowerData
+class AEGIS_API UResourceCollectorData : public UBuildingData
 {
 	GENERATED_BODY()
 
 public:
+	
 	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
-	int TowerRange;
+	
 };

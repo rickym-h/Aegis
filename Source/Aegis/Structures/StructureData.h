@@ -19,6 +19,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
 	TSubclassOf<AStructure> StructureBlueprintClass;
 	
+	/**
+	 * This is the mesh shown when trying to place the structure. Ideally a hologram of some form
+	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
 	UStaticMesh* MeshRepresentation;
 
@@ -37,6 +40,6 @@ public:
 		return nullptr;
 	}
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
 	FString StructureName = "Default Name";
 };

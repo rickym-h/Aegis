@@ -4,15 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Structures/StructureData.h"
-#include "TowerData.generated.h"
+#include "BuildingData.generated.h"
 
-class ATower;
 /**
  * 
  */
-UCLASS(Blueprintable)
-class AEGIS_API UTowerData : public UStructureData
+UCLASS()
+class AEGIS_API UBuildingData : public UStructureData
 {
 	GENERATED_BODY()
-
+	
 };
