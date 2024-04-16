@@ -24,7 +24,7 @@ AMapTile::AMapTile()
 	TileMesh->SetupAttachment(RootComponent);
 	TileMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	TileMesh->SetCollisionResponseToChannel(ECC_Visibility, ECR_Block);
-	
+
 	ResourceMesh = CreateDefaultSubobject<UStaticMeshComponent>("Resource Mesh");
 	ResourceMesh->SetupAttachment(RootComponent);
 	ResourceMesh->SetCollisionResponseToAllChannels(ECR_Ignore);
@@ -37,17 +37,17 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 
 	const FVector NewMeshLocation = FVector(0, 0, MapTileData->Elevation * 40);
 	TileMesh->SetRelativeLocation(NewMeshLocation);
-	for (int i = 0; i < (FMath::RoundToPositiveInfinity(MapTileData->Elevation/2.f)); i++)
+	for (int i = 0; i < (FMath::RoundToPositiveInfinity(MapTileData->Elevation / 2.f)); i++)
 	{
 		// Create a bedrock static mesh component
 		const FName ComponentName = FName(FString("BedRockLayer") + FString::FromInt(i));
 		UStaticMeshComponent* BedrockStaticMeshComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass(), ComponentName);
-		
+
 		BedrockStaticMeshComp->SetupAttachment(this->RootComponent);
 
-		BedrockStaticMeshComp->SetRelativeLocationAndRotation(NewMeshLocation - (FVector(0,0,86) * i), FRotator::ZeroRotator);
+		BedrockStaticMeshComp->SetRelativeLocationAndRotation(NewMeshLocation - (FVector(0, 0, 86) * i), FRotator::ZeroRotator);
 		BedrockStaticMeshComp->SetStaticMesh(CliffMesh);
-		
+
 		BedrockStaticMeshComp->RegisterComponent();
 		BedrockStaticMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
@@ -72,13 +72,14 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 			TileMesh->SetStaticMesh(DefaultMesh);
 			break;
 		}
-	} else
+	}
+	else
 	{
 		//TileMesh->SetStaticMesh(PathMesh180);
 		TileMesh->SetStaticMesh(CliffMesh);
 	}
 
-	StructureLocation = TileCoord.ToWorldLocation() + NewMeshLocation + FVector(0,0,86);
+	StructureLocation = TileCoord.ToWorldLocation() + NewMeshLocation + FVector(0, 0, 86);
 
 	ResourceMesh->SetWorldLocation(StructureLocation);
 

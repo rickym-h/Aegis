@@ -14,5 +14,4 @@ UCLASS(Blueprintable)
 class AEGIS_API UTowerData : public UStructureData
 {
 	GENERATED_BODY()
-
 };

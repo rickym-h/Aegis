@@ -8,13 +8,13 @@
  * 
  */
 template <typename InElementType>
-struct TPriorityQueueNode {
+struct TPriorityQueueNode
+{
 	InElementType Element;
 	float Priority;
 
 	TPriorityQueueNode()
 	{
-		
 	}
 
 	TPriorityQueueNode(InElementType InElement, float InPriority)
@@ -37,7 +37,7 @@ public:
 	{
 		Array.Heapify();
 	}
-	
+
 	// Always check if IsEmpty() before Pop-ing!
 	InElementType Pop()
 	{

@@ -20,8 +20,8 @@ UStructureData* UStructureDataFactory::GenerateTestTowerData() const
 UStructureData* UStructureDataFactory::GenerateLumberYardData() const
 {
 	if (!LumberYardDataClass) { return nullptr; }
-	
+
 	UResourceCollectorData* StructureData = NewObject<UResourceCollectorData>(WorldReference, LumberYardDataClass);
-		
+
 	return StructureData;
 }

@@ -38,10 +38,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	TEnumAsByte<ETerrainType> TerrainType;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	bool bIsPath;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	TEnumAsByte<EResourceType> ResourceType;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
@@ -49,11 +49,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	float StoneNoise;
 
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	int32 Elevation;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
 	float ElevationNoise;
-
-	
 };

@@ -19,16 +19,16 @@ class AEGIS_API UAegisMapFactory : public UObject
 
 public:
 	virtual void PostInitProperties() override;
-	
+
 	static TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute);
-	
+
 	UFUNCTION()
 	UAegisMap* GenerateMapWithNoise(const int MainPathLength) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
 	TSubclassOf<UAegisMap> AegisMapClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, Category="Tiles")
 	TSubclassOf<AMapTile> GrassTileBP;
 	UPROPERTY(EditDefaultsOnly, Category="Tiles")
@@ -45,7 +45,7 @@ protected:
 	float VerticalSpacing;
 	UPROPERTY(BlueprintReadOnly, Category="Tiles")
 	float HorizontalSpacing;
-	
+
 	UPROPERTY(BlueprintReadOnly, Category="Tiles")
 	FVector OffsetQ;
 	UPROPERTY(BlueprintReadOnly, Category="Tiles")

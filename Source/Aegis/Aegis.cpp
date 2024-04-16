@@ -3,4 +3,4 @@
 #include "Aegis.h"
 #include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, Aegis, "Aegis" );
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, Aegis, "Aegis");

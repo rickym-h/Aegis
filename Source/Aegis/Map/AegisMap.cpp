@@ -43,7 +43,7 @@ void UAegisMap::PopulateMapData(
 	const TMap<FTileCoord, FTileCoord>& InPathRoute,
 	const TArray<FTileCoord>& InPathStartTiles,
 	ANexusBuilding* InNexusBuilding)
-{	
+{
 	this->MapTiles = GenerateMapTiles(InMapTileData);
 	this->PathRoute = InPathRoute;
 	this->PathStartTiles = InPathStartTiles;
@@ -78,8 +78,8 @@ TArray<AMapTile*> UAegisMap::GetTiles()
 FTileCoord UAegisMap::GetEnemySpawnCoord() const
 {
 	if (PathStartTiles.Num() == 1) { return PathStartTiles[0]; }
-	
-	const int RandomIndex = FMath::RandRange(0, PathStartTiles.Num()-1);
+
+	const int RandomIndex = FMath::RandRange(0, PathStartTiles.Num() - 1);
 	//UE_LOG(LogTemp, Warning, TEXT("Index: %i"), RandomIndex)
 	return PathStartTiles[RandomIndex];
 }
@@ -102,12 +102,12 @@ bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* Str
 	// Set the data of the tower actor based on tower data
 	// Finish spawning tower actor
 	AStructure* Structure = StructureData->SpawnStructureFromData(Location, GetTile(Location)->StructureLocation);
-	
+
 	if (!Structure) { return false; }
 	//Tower->TowerData = TowerData;
-	
-	MapStructures.Add(Location,	Structure);
-	
+
+	MapStructures.Add(Location, Structure);
+
 	// TODO Take any resources needed
 
 	return true;
@@ -132,25 +132,25 @@ AMapTile* UAegisMap::CreateMapTile(const FTileCoord Coord, UMapTileData* MapTile
 {
 	const FVector Location = Coord.ToWorldLocation();
 	const FRotator Rotation = FRotator::ZeroRotator;
-	
+
 	AMapTile* Tile = GetWorld()->SpawnActor<AMapTile>(MapTileBP, Location, Rotation);
 	Tile->TileCoord = Coord.Copy();
 
 	Tile->SetMapTileData(MapTileData);
-	
+
 	return Tile;
 }
 
 TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const
 {
 	TMap<FTileCoord, AMapTile*> OutMapTiles;
-	
+
 	for (TTuple<FTileCoord, UMapTileData*> Element : MapTileData)
 	{
 		AMapTile* MapTile = CreateMapTile(Element.Key, Element.Value);
-		OutMapTiles.Add(Element.Key, MapTile);		
+		OutMapTiles.Add(Element.Key, MapTile);
 	}
-	
+
 	return OutMapTiles;
 }
 
@@ -160,6 +160,6 @@ bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 	if (MapStructures.Contains(Location)) { return false; }
 
 	if (PathRoute.Contains(Location)) { return false; }
-	
+
 	return true;
 }

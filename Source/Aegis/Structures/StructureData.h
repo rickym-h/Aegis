@@ -18,7 +18,7 @@ class AEGIS_API UStructureData : public UObject
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
 	TSubclassOf<AStructure> StructureBlueprintClass;
-	
+
 	/**
 	 * This is the mesh shown when trying to place the structure. Ideally a hologram of some form
 	 */
@@ -39,7 +39,7 @@ public:
 		       TEXT("UStructureData::SpawnStructureFromData() - Base structure data function called - should be overridden by leaf classes."))
 		return nullptr;
 	}
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
 	FString StructureName = "Default Name";
 };

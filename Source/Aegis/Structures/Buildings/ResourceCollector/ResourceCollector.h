@@ -13,5 +13,4 @@ UCLASS()
 class AEGIS_API AResourceCollector : public AStructure
 {
 	GENERATED_BODY()
-	
 };

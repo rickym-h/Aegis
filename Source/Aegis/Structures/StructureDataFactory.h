@@ -12,13 +12,13 @@ class ATower;
  */
 UCLASS(BlueprintType, Blueprintable)
 class AEGIS_API UStructureDataFactory : public UObject
-{	
+{
 	GENERATED_BODY()
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Towers")
 	TSubclassOf<UStructureData> TestTowerDataClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Towers")
 	TSubclassOf<UStructureData> LumberYardDataClass;
 

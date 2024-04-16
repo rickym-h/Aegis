@@ -67,4 +67,3 @@ void UBuildingHealthComponent::SetCurrentHealth(int Health)
 {
 	CurrentHealth = Health;
 }
-

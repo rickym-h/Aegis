@@ -26,7 +26,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* ResourceMesh;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	TArray<UStaticMeshComponent*> BedrockMeshes;
 
@@ -47,7 +47,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
 	int TilesToEnd = 0;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
 	UMapTileData* MapTileData;
 
@@ -55,7 +55,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
 	FVector StructureLocation;
-	
 
 protected:
 	// Called when the game starts or when spawned
@@ -74,7 +73,7 @@ protected:
 	UStaticMesh* DefaultMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
 	UStaticMesh* PathMesh180;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
 	UStaticMesh* TreesMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")

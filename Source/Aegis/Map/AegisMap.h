@@ -29,7 +29,7 @@ public:
 	UFUNCTION()
 	void DestroyMap();
 
-	
+
 	UFUNCTION()
 	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPathRoute,
 	                     const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
@@ -63,7 +63,7 @@ protected:
 	// Map Tiles
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AMapTile*> MapTiles;
-	
+
 	AMapTile* CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const;
 	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const;
 

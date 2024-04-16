@@ -5,13 +5,14 @@
 #include "Aegis/Utilities/TPriorityQueue.h"
 
 
-TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount, FRandomStream RandomStream)
+TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount,
+                                                                        FRandomStream RandomStream)
 {
 	// ReSharper disable once CppTooWideScope
 	// ReSharper disable once CppUE4CodingStandardNamingViolationWarning
 	constexpr int MAX_TRIALS = 30;
 
-	// Shouldn't *really* use FTileCoord, but we basically just want to be able to compare pairs of ints, and FTileCoord has that functionality,
+	// Shouldn't *really* use FTileCoord, but we basically just want to be able to compare pairs of integers, and FTileCoord has that functionality,
 	// We just have to map X->Q, Y->R, and ignore S
 	TMap<FTileCoord, FVector2d> Grid;
 	TArray<FVector2d> List;
@@ -27,17 +28,17 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	while (List.Num() > 0)
 	{
 		// Pick a random point from List
-		const int K = RandomStream.RandRange(0, List.Num()-1);
+		const int K = RandomStream.RandRange(0, List.Num() - 1);
 		const float X0 = List[K].X;
 		const float Y0 = List[K].Y;
 
 		// Trials to place the next point
-        bool FoundTrialPoint =  false;
+		bool FoundTrialPoint = false;
 		for (int Trial = 0; Trial < MAX_TRIALS; Trial++)
 		{
-			// Generate a trial point int he annulus r->2*r around x0,y0
-			const float R = RandomStream.FRandRange(static_cast<float>(PoissonRadius), static_cast<float>(2*PoissonRadius));
-			const float Phi = RandomStream.FRandRange(0.f, static_cast<float>(2*PI));
+			// Generate a trial point in the annulus r->2*r around x0,y0
+			const float R = RandomStream.FRandRange(static_cast<float>(PoissonRadius), static_cast<float>(2 * PoissonRadius));
+			const float Phi = RandomStream.FRandRange(0.f, static_cast<float>(2 * PI));
 			const float TrialX = X0 + R * FMath::Cos(Phi);
 			const float TrialY = Y0 + R * FMath::Sin(Phi);
 
@@ -93,34 +94,35 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	{
 		OutputLocations.Add(Element.Value);
 	}
-	return OutputLocations;	
+	return OutputLocations;
 }
 
-float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bDistortNoise, const int32 PerlinScale)
+float UPathGenerationBlueprintLibrary::GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bDistortNoise,
+                                                     const int32 PerlinScale)
 {
 	// Larger Perlin Scale means more spread out and smoother (1000 is a good baseline)
 	// Smaller Perlin Scale means higher frequency and more random (e.g. 10 for pathfinding randomness)
 	//int PerlinScale = 1000;
 	const FVector Location = Tile.ToWorldLocation();
-	FVector2D NoiseSampleLoc = FVector2D(Location.X/PerlinScale, Location.Y/PerlinScale) + (NoiseOffset);
+	FVector2D NoiseSampleLoc = FVector2D(Location.X / PerlinScale, Location.Y / PerlinScale) + (NoiseOffset);
 	if (!bDistortNoise)
 	{
 		const float x = NoiseSampleLoc.X;
 		const float y = NoiseSampleLoc.Y;
 		// Distort the noise if not used for pathing
-		const float XDistortion = 0 * FMath::PerlinNoise2D(FVector2D(4.7*(x+2.3), 4.7*(y+2.9)));
-		const float YDistortion = 0 * FMath::PerlinNoise2D(FVector2D(4.7*(x-3.1), 4.7*(y-4.3)));
-		
-		NoiseSampleLoc = FVector2D(x+XDistortion, y+YDistortion);
+		const float XDistortion = 0 * FMath::PerlinNoise2D(FVector2D(4.7 * (x + 2.3), 4.7 * (y + 2.9)));
+		const float YDistortion = 0 * FMath::PerlinNoise2D(FVector2D(4.7 * (x - 3.1), 4.7 * (y - 4.3)));
+
+		NoiseSampleLoc = FVector2D(x + XDistortion, y + YDistortion);
 	}
 	const float x = (FMath::PerlinNoise2D(NoiseSampleLoc) + 1.f) / 2.f;
-	
+
 	// If used for pathing, the noise is multiplied exponentially to make high weights worth more, and clamped to above 0 to avoid negative weights 
 	if (bDistortNoise)
 	{
-		return 1+FMath::Pow(x + 0.5, 10.f);
+		return 1 + FMath::Pow(x + 0.5, 10.f);
 	}
-	
+
 	return x;
 }
 
@@ -139,7 +141,7 @@ bool UPathGenerationBlueprintLibrary::IsPathValid(const FTileCoord StartTile, co
 		CurrentTile = NextTile;
 
 		if (!Map.Contains(CurrentTile)) { return false; }
-		
+
 		NextTile = Map[CurrentTile];
 	}
 
@@ -171,7 +173,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				break;
 			}
 
-			for (FTileCoord Neighbour : FTileCoord::GetTilesInRadius(Current , 1))
+			for (FTileCoord Neighbour : FTileCoord::GetTilesInRadius(Current, 1))
 			{
 				TSet<FTileCoord> ExistingPathAndAdjacent;
 				for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
@@ -179,20 +181,20 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 					if (Element.Value == FTileCoord()) { continue; }
 					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
 				}
-				if (ExistingPathAndAdjacent.Contains(Neighbour) && (Neighbour!=GoalTile))
+				if (ExistingPathAndAdjacent.Contains(Neighbour) && (Neighbour != GoalTile))
 				{
 					continue;
 				}
 				// Find the weight of the neighbor tile. If the tile is in the exclusion list or is outside the boundary, returns -1
 				// If the neighbor tile is the goal tile, ignores the impassable weight
 				float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true, 10);
-			
+
 				float NewCost = CostSoFar[Current] + NextWeight;
 				if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])
 				{
 					CameFrom.Add(Neighbour, Current);
 					CostSoFar.Add(Neighbour, NewCost);
-					float Heuristic = FVector::Distance(GoalTileLocation, Neighbour.ToWorldLocation())/100.f;
+					float Heuristic = FVector::Distance(GoalTileLocation, Neighbour.ToWorldLocation()) / 100.f;
 					float Priority = NewCost + Heuristic;
 					Frontier.Push(Neighbour, Priority);
 				}
@@ -210,7 +212,8 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				Path.Add(CameFromTile, CurrentTile);
 				CurrentTile = CameFromTile;
 			}
-		} else
+		}
+		else
 		{
 			UE_LOG(LogTemp, Fatal, TEXT("UPathGenerationBlueprintLibrary::AStarPathFind() - No path found."))
 			break;
@@ -220,29 +223,32 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 	return Path;
 }
 
-TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, int Poisson_Radius, int SamplesCount, FRandomStream RandomStream)
+TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, int Poisson_Radius, int SamplesCount,
+                                                                            FRandomStream RandomStream)
 {
 	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(500, Poisson_Radius, 200, RandomStream);
 	TArray<FTileCoord> NodePoints;
 	for (const FVector2d PoissonCluster : PoissonClusters)
 	{
-		NodePoints.Emplace(FTileCoord::PixelToHex(FVector(PoissonCluster.X, PoissonCluster.Y, 0)*100));
+		NodePoints.Emplace(FTileCoord::PixelToHex(FVector(PoissonCluster.X, PoissonCluster.Y, 0) * 100));
 	}
 	return NodePoints;
 }
 
-TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int MainPathLength, const FVector2d ElevationNoiseOffset, FRandomStream RandomStream)
+TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int MainPathLength,
+                                                                                        const FVector2d ElevationNoiseOffset,
+                                                                                        FRandomStream RandomStream)
 {
 	constexpr int POISSON_RADIUS = 10;
-	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength)/static_cast<float>(POISSON_RADIUS));
-	
+	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));
+
 	TMap<FTileCoord, FTileCoord> Path;
 
 	TArray<FTileCoord> PoissonNodeCoords = GetPoissonClusterCoords(500, POISSON_RADIUS, 200, RandomStream);
 
 	// Get the Path Nodes using a Greedy closest Node search of the poisson clusters
 	TArray<FTileCoord> NodesInPathSoFar;
-	NodesInPathSoFar.Add(FTileCoord(0,0));
+	NodesInPathSoFar.Add(FTileCoord(0, 0));
 	for (int i = 0; i < NODE_LENGTH; i++)
 	{
 		FTileCoord Head = NodesInPathSoFar.Top();
@@ -261,48 +267,49 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
 		}
 		NodesInPathSoFar.Emplace(Closest);
 	}
-	
+
 	// For every node in the Path array, use A* to connect it to the previous node
 	// If no A* path is found (or if the path found is longer than the 2x the HexDistance), apply a softening function to reduce the number of impassable tiles
 	Path.Add(FTileCoord(), FTileCoord());
 	for (int StartTileIndex = 1; StartTileIndex < NodesInPathSoFar.Num(); StartTileIndex++)
 	{
 		const FTileCoord StartTile = NodesInPathSoFar[StartTileIndex];
-		const FTileCoord GoalTile = NodesInPathSoFar[StartTileIndex-1];
-		
+		const FTileCoord GoalTile = NodesInPathSoFar[StartTileIndex - 1];
+
 		TMap<FTileCoord, FTileCoord> PathFromGoalToStart = AStarPathFind(StartTile, GoalTile, ElevationNoiseOffset, Path);
 		Path.Append(PathFromGoalToStart);
 	}
 
 	// TODO trim path to MainPathLength length
-	
+
 	return Path;
 }
 
 TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTilesData(const TMap<FTileCoord, FTileCoord>& Path,
-                                                                                      const FVector2D ElevationNoiseOffset, FVector2D TreeNoiseOffset, FVector2D StoneNoiseOffset, FRandomStream RandomStream)
+                                                                                      const FVector2D ElevationNoiseOffset, FVector2D TreeNoiseOffset,
+                                                                                      FVector2D StoneNoiseOffset, FRandomStream RandomStream)
 {
 	TArray<float> ElevationNoiseDistribution;
 	TArray<float> TreeNoiseDistribution;
 	TArray<float> StoneNoiseDistribution;
 	TMap<FTileCoord, UMapTileData*> MapTilesData;
-	
+
 	TArray<FTileCoord> PathTiles;
 	Path.GenerateKeyArray(PathTiles);
-	
+
 	for (const FTileCoord Coord : FTileCoord::GetTilesInRadius(PathTiles, 10))
 	{
 		UMapTileData* MapTileData = NewObject<UMapTileData>();
-		
-		const float ElevationGradient = (GetNodeWeight(Coord, ElevationNoiseOffset, false, 1000) + 1.f)/2.f;
+
+		const float ElevationGradient = (GetNodeWeight(Coord, ElevationNoiseOffset, false, 1000) + 1.f) / 2.f;
 		MapTileData->ElevationNoise = ElevationGradient;
 		ElevationNoiseDistribution.Emplace(ElevationGradient);
-		
-		const float TreeGradient = (GetNodeWeight(Coord, TreeNoiseOffset, false, 700) + 1.f)/2.f;
+
+		const float TreeGradient = (GetNodeWeight(Coord, TreeNoiseOffset, false, 700) + 1.f) / 2.f;
 		MapTileData->TreeNoise = TreeGradient;
 		//TreeNoiseDistribution.Emplace(TreeGradient);
-		
-		const float StoneGradient = (GetNodeWeight(Coord, StoneNoiseOffset, false, 100) + 1.f)/2.f;
+
+		const float StoneGradient = (GetNodeWeight(Coord, StoneNoiseOffset, false, 100) + 1.f) / 2.f;
 		MapTileData->StoneNoise = StoneGradient;
 		//StoneNoiseDistribution.Emplace(StoneGradient);
 
@@ -310,13 +317,13 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	}
 
 	ElevationNoiseDistribution.Sort();
-	
-	const float WaterLimit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.1)];
-	const float Grass1Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.8)];
-	const float Grass2Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.9)];
-	const float Grass3Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.95)];
-	const float Grass4Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num()-1) * 0.98)];
-	const float CliffLimit = ElevationNoiseDistribution[static_cast<int>(ElevationNoiseDistribution.Num()-1 * 1)];
+
+	const float WaterLimit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.1)];
+	const float Grass1Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.8)];
+	const float Grass2Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.9)];
+	const float Grass3Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.95)];
+	const float Grass4Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.98)];
+	const float CliffLimit = ElevationNoiseDistribution[static_cast<int>(ElevationNoiseDistribution.Num() - 1 * 1)];
 
 	TMap<int, ETerrainType> ElevationTerrainMap;
 	ElevationTerrainMap.Add(0, Water);
@@ -334,31 +341,36 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		{
 			Elem.Value->bIsPath = true;
 			Elem.Value->Elevation = 0.5;
-			
+
 			continue;
 		}
-		
+
 		if (Elem.Value->ElevationNoise < WaterLimit)
 		{
 			Elem.Value->Elevation = 0;
-		} else if (Elem.Value->ElevationNoise < Grass1Limit)
+		}
+		else if (Elem.Value->ElevationNoise < Grass1Limit)
 		{
 			Elem.Value->Elevation = 1;
-		} else if (Elem.Value->ElevationNoise < Grass2Limit)
+		}
+		else if (Elem.Value->ElevationNoise < Grass2Limit)
 		{
 			Elem.Value->Elevation = 2;
-		} else if (Elem.Value->ElevationNoise < Grass3Limit)
+		}
+		else if (Elem.Value->ElevationNoise < Grass3Limit)
 		{
 			Elem.Value->Elevation = 3;
-		} else if (Elem.Value->ElevationNoise < Grass4Limit)
+		}
+		else if (Elem.Value->ElevationNoise < Grass4Limit)
 		{
 			Elem.Value->Elevation = 4;
-		} else
+		}
+		else
 		{
 			Elem.Value->Elevation = 5;
 		}
-		
-		// Set max elevation (and adjust terrain type if necessary) based on distance to the start and end path tiles)
+
+		// Set max elevation (and adjust terrain type if necessary) based on distance to the start and end path tiles
 		const int MaxElevation = FTileCoord::HexDistance(FTileCoord(), Elem.Key);
 		Elem.Value->Elevation = FMath::Min(Elem.Value->Elevation, MaxElevation);
 
@@ -378,9 +390,9 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	};
 
 	// Set Resources
-	for(TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
+	for (TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
 	{
-		// Only count towards tree noise distribution if the tile can have a tree on it (e.g trees cannot be on water)
+		// Only count towards tree noise distribution if the tile can have a tree on it (e.g. trees cannot be on water)
 		if (CanTileHaveTree(Elem.Value))
 		{
 			TreeNoiseDistribution.Emplace(Elem.Value->TreeNoise);
@@ -392,9 +404,9 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	}
 	TreeNoiseDistribution.Sort();
 	StoneNoiseDistribution.Sort();
-	const float TreeLimit = ElevationNoiseDistribution[static_cast<int>((TreeNoiseDistribution.Num()-1) * 0.2)];
-	const float StoneLimit = ElevationNoiseDistribution[static_cast<int>((TreeNoiseDistribution.Num()-1) * 0.1)];
-	for(TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
+	const float TreeLimit = ElevationNoiseDistribution[static_cast<int>((TreeNoiseDistribution.Num() - 1) * 0.2)];
+	const float StoneLimit = ElevationNoiseDistribution[static_cast<int>((TreeNoiseDistribution.Num() - 1) * 0.1)];
+	for (TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
 	{
 		if (CanTileHaveTree(Elem.Value) && Elem.Value->TreeNoise < TreeLimit)
 		{
@@ -409,28 +421,6 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 			Elem.Value->ResourceType = TreeStone;
 		}
 	}
-	
+
 	return MapTilesData;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

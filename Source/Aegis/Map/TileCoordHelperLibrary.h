@@ -58,7 +58,7 @@ struct FTileCoord
 
 	static FTileCoord AxialRound(const float InQ, const float InR)
 	{
-		const float InS = -InQ-InR;
+		const float InS = -InQ - InR;
 		int Q = FMath::RoundHalfToZero(InQ);
 		int R = FMath::RoundHalfToZero(InR);
 		int S = FMath::RoundHalfToZero(InS);
@@ -67,15 +67,17 @@ struct FTileCoord
 		float r_diff = abs(R - InR);
 		float s_diff = abs(S - InS);
 
-		if (q_diff > r_diff && q_diff > s_diff) 
+		if (q_diff > r_diff && q_diff > s_diff)
 		{
-			Q = -R-S;
-		} else if (r_diff > s_diff)
+			Q = -R - S;
+		}
+		else if (r_diff > s_diff)
 		{
-			R = -Q-S;
-		} else
+			R = -Q - S;
+		}
+		else
 		{
-			S = -Q-R;
+			S = -Q - R;
 		}
 
 		return FTileCoord(Q, R);
@@ -83,8 +85,8 @@ struct FTileCoord
 
 	static FTileCoord PixelToHex(const FVector& PixelPoint, const float TileRadius = 100)
 	{
-		const float q = (sqrt(3)/3 * PixelPoint.Y  -  1./3 * PixelPoint.X) / TileRadius;
-		const float r = (2./3 * PixelPoint.X) / TileRadius;
+		const float q = (sqrt(3) / 3 * PixelPoint.Y - 1. / 3 * PixelPoint.X) / TileRadius;
+		const float r = (2. / 3 * PixelPoint.X) / TileRadius;
 		return AxialRound(q, r);
 	}
 
@@ -107,6 +109,7 @@ struct FTileCoord
 		}
 		return TilesInRadius;
 	}
+
 	static TArray<FTileCoord> GetTilesInRadius(const TArray<FTileCoord>& Origins, const int Radius)
 	{
 		TSet<FTileCoord> Tiles;
@@ -124,7 +127,7 @@ struct FTileCoord
 	{
 		return (this->IsValid() && RHSTile.IsValid() && (this->Q == RHSTile.Q) && (this->R == RHSTile.R));
 	}
-	
+
 	bool operator!=(const FTileCoord& RHSTile) const
 	{
 		return (this->IsValid() && RHSTile.IsValid() && ((this->Q != RHSTile.Q) || (this->R != RHSTile.R)));

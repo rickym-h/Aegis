@@ -13,5 +13,4 @@ UCLASS()
 class AEGIS_API UBuildingData : public UStructureData
 {
 	GENERATED_BODY()
-	
 };

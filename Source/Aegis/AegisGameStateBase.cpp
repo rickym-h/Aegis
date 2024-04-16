@@ -43,7 +43,7 @@ void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 	{
 		AegisMap->DestroyMap();
 	}
-	
+
 	AegisMap = MapFactory->GenerateMapWithNoise(40);
 }
 
@@ -54,20 +54,20 @@ void AAegisGameStateBase::SaveGame()
 		UE_LOG(LogTemp, Warning, TEXT("AAegisGameStateBase::SaveGame() - No AegisMap, early return."))
 		return;
 	}
-	
+
 	if (UAegisSaveGame* SaveGameInstance = Cast<UAegisSaveGame>(UGameplayStatics::CreateSaveGameObject(UAegisSaveGame::StaticClass())))
-    {
-        // Set up the (optional) delegate.
-        FAsyncSaveGameToSlotDelegate SavedDelegate;
-        // USomeUObjectClass::SaveGameDelegateFunction is a void function that takes the following parameters: const FString& SlotName, const int32 UserIndex, bool bSuccess
-        SavedDelegate.BindUObject(this, &AAegisGameStateBase::SaveGameDelegateFunction);
+	{
+		// Set up the (optional) delegate.
+		FAsyncSaveGameToSlotDelegate SavedDelegate;
+		// USomeUObjectClass::SaveGameDelegateFunction is a void function that takes the following parameters: const FString& SlotName, const int32 UserIndex, bool bSuccess
+		SavedDelegate.BindUObject(this, &AAegisGameStateBase::SaveGameDelegateFunction);
 
-        // Set data on the savegame object.
-        SaveGameInstance->NexusHealth = AegisMap->NexusBuilding->HealthComponent->GetCurrentHealth();
+		// Set data on the savegame object.
+		SaveGameInstance->NexusHealth = AegisMap->NexusBuilding->HealthComponent->GetCurrentHealth();
 
-        // Start async save process.
-        UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex, SavedDelegate);
-    }
+		// Start async save process.
+		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, SaveGameInstance->SaveSlotName, SaveGameInstance->UserIndex, SavedDelegate);
+	}
 }
 
 void AAegisGameStateBase::LoadGame()

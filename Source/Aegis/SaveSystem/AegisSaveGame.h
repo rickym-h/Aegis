@@ -15,7 +15,6 @@ class AEGIS_API UAegisSaveGame : public USaveGame
 	GENERATED_BODY()
 
 public:
-	
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	uint32 NexusHealth;
 
@@ -24,6 +23,6 @@ public:
 
 	UPROPERTY(VisibleAnywhere, Category = Basic)
 	uint32 UserIndex;
-	
+
 	UAegisSaveGame();
 };

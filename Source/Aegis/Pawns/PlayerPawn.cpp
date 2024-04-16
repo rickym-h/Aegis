@@ -59,7 +59,7 @@ FHitResult* APlayerPawn::UpdateHitResultUnderCursor()
 	// PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResultUnderCursor);
 
 	PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
-	
+
 	return &HitResultUnderCursor;
 }
 
@@ -79,20 +79,20 @@ void APlayerPawn::Tick(float DeltaTime)
 		}
 	}
 
-	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
+	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000),
+	                                              GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 {
 	UpdateHitResultUnderCursor();
-	
+
 	const FVector Location = HitResultUnderCursor.Location;
 	//DrawDebugSphere(GetWorld(), Location, 200, 13, FColor::Green, false, 3, 0, 3);
 	UE_LOG(LogTemp, Warning, TEXT("Round the FVector: %ls"), *Location.ToString())
 	const FTileCoord RoundedCoord = FTileCoord::PixelToHex(Location);
 	//DrawDebugSphere(GetWorld(), RoundedCoord.ToWorldLocation(), 200, 12, FColor::Red, false, 3, 0, 3);
 
-	
 
 	const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor());
 	if (!Tile) { return; }

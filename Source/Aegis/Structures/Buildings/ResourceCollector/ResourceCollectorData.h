@@ -15,7 +15,5 @@ class AEGIS_API UResourceCollectorData : public UBuildingData
 	GENERATED_BODY()
 
 public:
-	
 	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const override;
-	
 };

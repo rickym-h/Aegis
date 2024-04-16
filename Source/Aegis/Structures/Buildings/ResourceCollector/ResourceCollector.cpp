@@ -2,4 +2,3 @@
 
 
 #include "ResourceCollector.h"
-

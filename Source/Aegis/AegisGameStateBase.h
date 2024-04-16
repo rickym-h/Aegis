@@ -24,32 +24,31 @@ class AEGIS_API AAegisGameStateBase : public AGameStateBase
 
 	UFUNCTION(BlueprintCallable)
 	void GenerateTestMapFromMapFactory();
-	
+
 	UFUNCTION(BlueprintCallable)
 	void SaveGame();
-	
+
 	UFUNCTION(BlueprintCallable)
 	void LoadGame();
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
 	UAegisMap* AegisMap;
-	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UAegisMapFactory* MapFactory;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UEnemyFactory* EnemyFactory;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UStructureDataFactory* TowerDataFactory;
-	
+
 protected:
-	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UAegisMapFactory> MapFactoryClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UEnemyFactory> EnemyFactoryClass;
-	
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UStructureDataFactory> TowerDataFactoryClass;
 

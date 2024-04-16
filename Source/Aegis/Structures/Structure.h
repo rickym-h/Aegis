@@ -24,7 +24,7 @@ protected:
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	UStaticMeshComponent* StructureMesh;
-	
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	FTileCoord CurrentLocation;
 };
