@@ -6,7 +6,7 @@
 
 
 TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const int GenerationRadius, const int PoissonRadius, const int SamplesCount,
-                                                                        FRandomStream RandomStream)
+                                                                        const FRandomStream RandomStream)
 {
 	// ReSharper disable once CppTooWideScope
 	// ReSharper disable once CppUE4CodingStandardNamingViolationWarning
@@ -223,8 +223,8 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 	return Path;
 }
 
-TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, int Poisson_Radius, int SamplesCount,
-                                                                            FRandomStream RandomStream)
+TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, const int Poisson_Radius, int SamplesCount,
+                                                                            const FRandomStream RandomStream)
 {
 	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(500, Poisson_Radius, 200, RandomStream);
 	TArray<FTileCoord> NodePoints;
@@ -237,7 +237,7 @@ TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int 
 
 TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int MainPathLength,
                                                                                         const FVector2d ElevationNoiseOffset,
-                                                                                        FRandomStream RandomStream)
+                                                                                        const FRandomStream RandomStream)
 {
 	constexpr int POISSON_RADIUS = 10;
 	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));

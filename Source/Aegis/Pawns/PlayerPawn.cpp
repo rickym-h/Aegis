@@ -90,7 +90,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	const FVector Location = HitResultUnderCursor.Location;
 	//DrawDebugSphere(GetWorld(), Location, 200, 13, FColor::Green, false, 3, 0, 3);
 	UE_LOG(LogTemp, Warning, TEXT("Round the FVector: %ls"), *Location.ToString())
-	const FTileCoord RoundedCoord = FTileCoord::PixelToHex(Location);
+	//const FTileCoord RoundedCoord = FTileCoord::PixelToHex(Location);
 	//DrawDebugSphere(GetWorld(), RoundedCoord.ToWorldLocation(), 200, 12, FColor::Red, false, 3, 0, 3);
 
 
