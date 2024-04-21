@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
+#include "Aegis/Structures/StructureDataFactory.h"
 #include "Aegis/Structures/Towers/TowerData.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
@@ -47,6 +48,14 @@ void APlayerPawn::BeginPlay()
 	}
 
 	StructureHologram->SetWorldLocation(FTileCoord().ToWorldLocation());
+
+	if (GameState)
+	{
+		TowerCardsInHand.Append(GameState->StructureDataFactory->GenerateStarterTowers());
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::BeginPlay()"))
+	OnTowersInHandUpdatedDelegate.Broadcast();
 }
 
 FHitResult* APlayerPawn::UpdateHitResultUnderCursor()

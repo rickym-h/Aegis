@@ -27,6 +27,9 @@ public:
 	UWorld* WorldReference;
 
 	UFUNCTION(BlueprintCallable)
+	TArray<UStructureData*> GenerateStarterTowers() const;
+
+	UFUNCTION(BlueprintCallable)
 	UStructureData* GenerateTestTowerData() const;
 
 	UFUNCTION(BlueprintCallable)

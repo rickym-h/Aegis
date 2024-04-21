@@ -40,7 +40,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UEnemyFactory* EnemyFactory;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
-	UStructureDataFactory* TowerDataFactory;
+	UStructureDataFactory* StructureDataFactory;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")

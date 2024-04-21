@@ -29,8 +29,8 @@ void AAegisGameStateBase::BeginPlay()
 
 	if (TowerDataFactoryClass)
 	{
-		TowerDataFactory = NewObject<UStructureDataFactory>(GetWorld(), TowerDataFactoryClass);
-		TowerDataFactory->WorldReference = GetWorld();
+		StructureDataFactory = NewObject<UStructureDataFactory>(GetWorld(), TowerDataFactoryClass);
+		StructureDataFactory->WorldReference = GetWorld();
 	}
 
 	GenerateTestMapFromMapFactory();
