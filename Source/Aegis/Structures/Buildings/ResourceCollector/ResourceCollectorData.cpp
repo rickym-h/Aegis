@@ -16,8 +16,6 @@ AStructure* UResourceCollectorData::SpawnStructureFromData(const FTileCoord Coor
 
 	NewStructure->CurrentLocation = CoordToSpawnStructure;
 
-	NewStructure->StructureMesh->SetStaticMesh(MeshRepresentation);
-
 	UGameplayStatics::FinishSpawningActor(NewStructure, ActorTransform);
 
 	return NewStructure;
