@@ -44,5 +44,5 @@ public:
 	FString StructureName = "Default Name";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
-	bool bIsFinite = false;
+	bool bRemoveInstanceOnPlacement = false;
 };
