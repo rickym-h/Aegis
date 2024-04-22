@@ -42,4 +42,7 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
 	FString StructureName = "Default Name";
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	bool bIsFinite = false;
 };

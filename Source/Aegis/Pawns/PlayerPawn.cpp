@@ -116,7 +116,10 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 				PlayerActionState = Default;
 				StructureToPlace = nullptr;
 				StructureHologram->SetVisibility(false);
-				RemoveTowerCardFromHand(StructureData);
+				if (StructureData->bIsFinite)
+				{
+					RemoveTowerCardFromHand(StructureData);
+				}
 			}
 		}
 	}
