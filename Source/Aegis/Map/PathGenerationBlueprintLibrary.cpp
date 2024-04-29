@@ -239,7 +239,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
                                                                                         const FVector2d ElevationNoiseOffset,
                                                                                         const FRandomStream RandomStream)
 {
-	constexpr int POISSON_RADIUS = 10;
+	constexpr int POISSON_RADIUS = 5;
 	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));
 
 	TMap<FTileCoord, FTileCoord> Path;
@@ -297,7 +297,15 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	TArray<FTileCoord> PathTiles;
 	Path.GenerateKeyArray(PathTiles);
 
-	for (const FTileCoord Coord : FTileCoord::GetTilesInRadius(PathTiles, 10))
+	int TargetRadius = 1;
+	int TilesInTargetRadius = FTileCoord::GetTilesInRadius(PathTiles, TargetRadius).Num();
+	while (TilesInTargetRadius < (Path.Num() * 20))
+	{
+		TargetRadius++;
+		TilesInTargetRadius = FTileCoord::GetTilesInRadius(PathTiles, TargetRadius).Num();
+	}
+
+	for (const FTileCoord Coord : FTileCoord::GetTilesInRadius(PathTiles, TargetRadius))
 	{
 		UMapTileData* MapTileData = NewObject<UMapTileData>();
 
