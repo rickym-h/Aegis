@@ -15,6 +15,8 @@ AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordT
 
 	NewStructure->CurrentLocation = CoordToSpawnStructure;
 	NewStructure->SetTowerRange(TowerRange);
+	NewStructure->ProjectileMesh = ProjectileMesh;
+	NewStructure->ProjectileSpeed = ProjectileSpeed;
 
 	UGameplayStatics::FinishSpawningActor(NewStructure, ActorTransform);
 

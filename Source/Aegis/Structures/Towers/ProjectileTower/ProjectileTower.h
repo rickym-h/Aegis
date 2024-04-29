@@ -26,6 +26,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UDefenderRangeComponent* RangeComponent;
 
+
 	UFUNCTION(BlueprintCallable)
 	void TryFireAtEnemy(AEnemy* Enemy);
 
@@ -43,4 +44,9 @@ protected:
 
 public:
 	void SetTowerRange(const int NewRange);
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	UStaticMesh* ProjectileMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	float ProjectileSpeed;
 };

@@ -11,10 +11,14 @@
 #include "Structures/StructureDataFactory.h"
 #include "Structures/NexusBuilding/BuildingHealthComponent.h"
 #include "Structures/NexusBuilding/NexusBuilding.h"
+#include "Utilities/ProjectileManager.h"
+
 
 void AAegisGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
+
+	ProjectileManager = GetWorld()->SpawnActor<AProjectileManager>(FVector::ZeroVector, FRotator::ZeroRotator, FActorSpawnParameters());
 
 	if (MapFactoryClass)
 	{
@@ -27,12 +31,12 @@ void AAegisGameStateBase::BeginPlay()
 		EnemyFactory->SetOwningGameState(this);
 	}
 
-	if (TowerDataFactoryClass)
+	if (StructureDataFactoryClass)
 	{
-		StructureDataFactory = NewObject<UStructureDataFactory>(GetWorld(), TowerDataFactoryClass);
+		StructureDataFactory = NewObject<UStructureDataFactory>(GetWorld(), StructureDataFactoryClass);
 		StructureDataFactory->WorldReference = GetWorld();
 	}
-
+	
 	GenerateTestMapFromMapFactory();
 }
 

@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "AegisGameStateBase.generated.h"
 
+class AProjectileManager;
 class USaveGame;
 class UAegisSaveGame;
 class UStructureDataFactory;
@@ -18,6 +19,7 @@ class UAegisMap;
 UCLASS()
 class AEGIS_API AAegisGameStateBase : public AGameStateBase
 {
+private:
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
@@ -41,16 +43,17 @@ public:
 	UEnemyFactory* EnemyFactory;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UStructureDataFactory* StructureDataFactory;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Projectile Pool")
+	AProjectileManager* ProjectileManager;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UAegisMapFactory> MapFactoryClass;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UEnemyFactory> EnemyFactoryClass;
-
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
-	TSubclassOf<UStructureDataFactory> TowerDataFactoryClass;
+	TSubclassOf<UStructureDataFactory> StructureDataFactoryClass;
 
 	UFUNCTION()
 	void SaveGameDelegateFunction(const FString& SlotName, const int32 UserIndex, bool bSuccess);

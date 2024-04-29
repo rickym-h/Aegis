@@ -3,8 +3,10 @@
 
 #include "ProjectileTower.h"
 
+#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Structures/StructureComponents/DefenderRangeComponent.h"
+#include "Aegis/Utilities/ProjectileManager.h"
 
 AProjectileTower::AProjectileTower()
 {
@@ -26,17 +28,24 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 			ReloadTimerHandle, // handle to cancel timer at a later time
 			this, // the owning object
 			&AProjectileTower::ReloadShot, // function to call on elapsed
-			1.0f, // float delay until elapsed
+			1.0f, // float delay until elapsed // TODO should get fire speed from tower data
 			false); // looping?
 	}
 }
 
 void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
 {
-	// TODO actually fire projectile
 	const FVector Start = GetActorLocation() + FVector(0, 0, 100);
 	const FVector End = Enemy->GetActorLocation() + FVector(0, 0, 100);
-	DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1, 0, 5);
+	//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1, 0, 5);
+
+	if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
+	{
+		FProjectileDamagePackage DamagePackage;
+		DamagePackage.PhysicalDamage = 10;
+		// TODO set damage based on a tower DamagePackage
+		GameState->ProjectileManager->FireProjectile(DamagePackage, Start, End, ProjectileSpeed, ProjectileMesh);
+	}
 }
 
 void AProjectileTower::ReloadShot()

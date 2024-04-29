@@ -19,4 +19,10 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
 	int TowerRange;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
+	UStaticMesh* ProjectileMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
+	float ProjectileSpeed;
 };

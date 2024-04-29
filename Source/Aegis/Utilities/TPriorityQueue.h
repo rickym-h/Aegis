@@ -13,11 +13,11 @@ struct TPriorityQueueNode
 	InElementType Element;
 	float Priority;
 
-	TPriorityQueueNode()
+	TPriorityQueueNode(): Priority(0)
 	{
 	}
 
-	TPriorityQueueNode(InElementType InElement, float InPriority)
+	TPriorityQueueNode(InElementType InElement, const float InPriority)
 	{
 		Element = InElement;
 		Priority = InPriority;
