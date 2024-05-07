@@ -28,7 +28,7 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 			ReloadTimerHandle, // handle to cancel timer at a later time
 			this, // the owning object
 			&AProjectileTower::ReloadShot, // function to call on elapsed
-			1.0f, // float delay until elapsed // TODO should get fire speed from tower data
+			1/AttackSpeed, // float delay until elapsed
 			false); // looping?
 	}
 }

@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
 
+class UCapsuleComponent;
 class USphereComponent;
 class AAegisGameStateBase;
 
@@ -23,8 +24,8 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mesh")
-	USphereComponent* CollisionSphere;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mesh")
+	UCapsuleComponent* CollisionCapsuleComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mesh")
 	UStaticMeshComponent* Mesh;
 

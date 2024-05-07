@@ -3,7 +3,10 @@
 
 #include "ProjectileManager.h"
 
+#include "Aegis/Enemies/Enemy.h"
+#include "Chaos/GeometryParticlesfwd.h"
 #include "Components/CapsuleComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 AProjectileManager::AProjectileManager()
 {
@@ -28,11 +31,31 @@ void AProjectileManager::Tick(float DeltaSeconds)
 
 		Element.Key->SetWorldLocation(TargetLoc, false);
 	}
+
+	while (ProjectilesToRelease.Num() > 0)
+	{
+		ReleaseProjectile(ProjectilesToRelease.Pop());
+	}
 }
 
 void AProjectileManager::BeginPlay()
 {
 	Super::BeginPlay();
+}
+
+void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	UStaticMeshComponent* ProjectileMesh = Cast<UStaticMeshComponent>(OverlappedComponent);
+	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
+	if (!ProjectileMesh || !Enemy) { return; }
+	
+	UGameplayStatics::ApplyDamage(Enemy, 10, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+
+	// Mark projectile to be cleaned
+	// This must be done at the end of the frame instead of as soon as the overlap event is made,
+	// to ensure that it does not break the tick loop
+	ProjectilesToRelease.Add(ProjectileMesh);
 }
 
 UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const FVector& End, const float Speed, UStaticMesh* ProjectileMesh)
@@ -49,6 +72,7 @@ UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamage
 	ProjectileMeshComponent->SetStaticMesh(ProjectileMesh);
 	
 	// TODO add overlap events
+	ProjectileMeshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectileManager::OverlapBegin);
 	
 	return ProjectileMeshComponent;
 	
@@ -66,6 +90,9 @@ UStaticMeshComponent* AProjectileManager::AcquireProjectile(const FProjectilePac
 		Projectile = Cast<UStaticMeshComponent>(AddComponentByClass(UStaticMeshComponent::StaticClass(), true, GetTransform(), false));
 		Projectile->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
 		Projectile->SetMobility(EComponentMobility::Movable);
+		Projectile->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Projectile->SetCollisionObjectType(ECC_GameTraceChannel4);
+		Projectile->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 		Projectile->bHiddenInGame = false;
 	}
 	
@@ -83,6 +110,7 @@ void AProjectileManager::ReleaseProjectile(UStaticMeshComponent* Projectile)
 
 void AProjectileManager::CleanProjectile(UStaticMeshComponent* Projectile)
 {
-	// TODO remove overlap events
 	Projectile->SetStaticMesh(nullptr);
+	Projectile->OnComponentBeginOverlap.RemoveAll(this);
+	Projectile->SetRelativeLocation(FVector::ZeroVector);
 }

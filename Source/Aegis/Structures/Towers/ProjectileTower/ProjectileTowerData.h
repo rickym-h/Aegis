@@ -16,13 +16,16 @@ class AEGIS_API UProjectileTowerData : public UTowerData
 
 public:
 	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const override;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
-	int TowerRange;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
 	UStaticMesh* ProjectileMesh;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	int TowerRange;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
 	float ProjectileSpeed;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
+	float AttackSpeed;
 };

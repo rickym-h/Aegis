@@ -45,6 +45,9 @@ protected:
 public:
 	void SetTowerRange(const int NewRange);
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
+	float AttackSpeed;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	UStaticMesh* ProjectileMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")

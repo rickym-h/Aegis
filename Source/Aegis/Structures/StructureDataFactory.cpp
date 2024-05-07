@@ -24,8 +24,6 @@ UStructureData* UStructureDataFactory::GenerateTestTowerData() const
 
 	UProjectileTowerData* StructureData = NewObject<UProjectileTowerData>(WorldReference, TestTowerDataClass);
 
-	StructureData->TowerRange = 3;
-
 	return StructureData;
 }
 

@@ -7,6 +7,7 @@
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
+#include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -16,18 +17,19 @@ AEnemy::AEnemy()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	CollisionSphere = CreateDefaultSubobject<USphereComponent>("Collision Sphere");
-	RootComponent = CollisionSphere;
+	CollisionCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
+	RootComponent = CollisionCapsuleComponent;
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(RootComponent);
 
 	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
-	CollisionSphere->SetCollisionResponseToAllChannels(ECR_Ignore);
+	CollisionCapsuleComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 
-	CollisionSphere->SetCollisionObjectType(ECC_GameTraceChannel2);
-	CollisionSphere->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
-	CollisionSphere->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
+	CollisionCapsuleComponent->SetCollisionObjectType(ECC_GameTraceChannel2);
+	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
+	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
+	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Overlap);
 }
 
 // Called when the game starts or when spawned
@@ -57,7 +59,7 @@ void AEnemy::BeginPlay()
 	// Set start location
 	SetActorLocation(FromTile.ToWorldLocation());
 
-	CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
+	CollisionCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
 }
 
 float AEnemy::DistanceToGoalTile() const

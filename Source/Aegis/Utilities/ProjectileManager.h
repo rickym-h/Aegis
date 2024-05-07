@@ -68,7 +68,9 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
-	
+
+	UFUNCTION()
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 	UStaticMeshComponent* FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const FVector& End, const float Speed, UStaticMesh* ProjectileMesh);
 
 protected:
@@ -83,6 +85,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectiles")
 	TMap<UStaticMeshComponent*, FProjectilePackage> ActiveProjectiles;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectiles")
+	TArray<UStaticMeshComponent*> ProjectilesToRelease;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Root")
 	USceneComponent* SceneRootComponent;
