@@ -62,6 +62,16 @@ void AEnemy::BeginPlay()
 	CollisionCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
 }
 
+float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	Health -= DamageAmount;
+	if (Health <= 0)
+	{
+		Destroy();
+	}
+	return DamageAmount;
+}
+
 float AEnemy::DistanceToGoalTile() const
 {
 	return FVector::Dist2D(GetActorLocation(), GoalTile.ToWorldLocation());

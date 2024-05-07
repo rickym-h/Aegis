@@ -34,10 +34,17 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTileCoord GoalTile;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	float MovementSpeed = 500.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float MovementSpeed = 200.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float DamageToNexus = 1.f;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float MaxHealth = 100.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float Health = MaxHealth;
+
+	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	const AAegisGameStateBase* GameState;

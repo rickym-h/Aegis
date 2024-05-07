@@ -30,6 +30,11 @@ void AProjectileManager::Tick(float DeltaSeconds)
 		const FVector TargetLoc = Element.Key->GetComponentLocation() + (ForwardVector * DistanceToTravel);
 
 		Element.Key->SetWorldLocation(TargetLoc, false);
+
+		if (Element.Key->GetComponentLocation().Z < -100)
+		{
+			ProjectilesToRelease.Push(Element.Key);
+		}
 	}
 
 	while (ProjectilesToRelease.Num() > 0)
@@ -49,8 +54,9 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	UStaticMeshComponent* ProjectileMesh = Cast<UStaticMeshComponent>(OverlappedComponent);
 	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!ProjectileMesh || !Enemy) { return; }
-	
-	UGameplayStatics::ApplyDamage(Enemy, 10, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+
+	// TODO different damage for physical and magic
+	UGameplayStatics::ApplyDamage(Enemy, ActiveProjectiles[ProjectileMesh].DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
 
 	// Mark projectile to be cleaned
 	// This must be done at the end of the frame instead of as soon as the overlap event is made,
@@ -71,7 +77,6 @@ UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamage
 	// Set the projectile mesh
 	ProjectileMeshComponent->SetStaticMesh(ProjectileMesh);
 	
-	// TODO add overlap events
 	ProjectileMeshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectileManager::OverlapBegin);
 	
 	return ProjectileMeshComponent;

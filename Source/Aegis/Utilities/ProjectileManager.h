@@ -9,16 +9,10 @@
 USTRUCT(Blueprintable)
 struct FProjectileDamagePackage
 {
-	FProjectileDamagePackage()
-	{
-		PhysicalDamage = 0.f;
-	}
-
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Damage")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float PhysicalDamage;
-	
 };
 
 USTRUCT(Blueprintable)

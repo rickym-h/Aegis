@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Structures/Towers/Tower.h"
+#include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTower.generated.h"
 
 class AEnemy;
@@ -52,4 +53,6 @@ public:
 	UStaticMesh* ProjectileMesh;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	float ProjectileSpeed;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
+	FProjectileDamagePackage DamagePackage;
 };

@@ -41,9 +41,6 @@ void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
 
 	if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{
-		FProjectileDamagePackage DamagePackage;
-		DamagePackage.PhysicalDamage = 10;
-		// TODO set damage based on a tower DamagePackage
 		GameState->ProjectileManager->FireProjectile(DamagePackage, Start, End, ProjectileSpeed, ProjectileMesh);
 	}
 }

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Structures/Towers/TowerData.h"
+#include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTowerData.generated.h"
 
 /**
@@ -28,4 +29,7 @@ public:
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
 	float AttackSpeed;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
+	FProjectileDamagePackage DamagePackage;
 };
