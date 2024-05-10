@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class UResourcesData;
 class UStructureData;
 class UFloatingPawnMovement;
 class AAegisGameStateBase;
@@ -14,6 +15,7 @@ class USpringArmComponent;
 class UCameraComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTowersInHandUpdated);
+
 
 UENUM()
 enum EPlayerState
@@ -30,6 +32,10 @@ class AEGIS_API APlayerPawn : public APawn
 public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
+
+	
+	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
+	// UResourcesData* Resources;
 
 protected:
 	// Called when the game starts or when spawned
@@ -81,6 +87,9 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnTowersInHandUpdated OnTowersInHandUpdatedDelegate;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Resources")
+	UResourcesData* Resources;
 
 	UFUNCTION(BlueprintCallable)
 	bool AddTowerCardToHand(UStructureData* TowerData);

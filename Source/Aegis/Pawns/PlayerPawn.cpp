@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "ResourcesData.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/StructureDataFactory.h"
@@ -33,6 +34,8 @@ APlayerPawn::APlayerPawn()
 	StructureHologram->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("Floating Movement Component");
+
+	Resources = CreateDefaultSubobject<UResourcesData>("Resources");
 
 	PlayerActionState = Default;
 }
