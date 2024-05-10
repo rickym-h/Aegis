@@ -41,6 +41,8 @@ public:
 	AMapTile* GetTile(FTileCoord Coord);
 	UFUNCTION()
 	TArray<AMapTile*> GetTiles();
+	UFUNCTION()
+	UMapTileData* GetTileData(FTileCoord Coord);
 
 	UFUNCTION()
 	FTileCoord GetEnemySpawnCoord() const;
@@ -58,11 +60,16 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Blueprints")
 	TSubclassOf<AMapTile> MapTileBP;
+	
+	UFUNCTION(BlueprintCallable)
+	bool IsTileAvailable(const FTileCoord Location) const;
 
 protected:
 	// Map Tiles
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AMapTile*> MapTiles;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
+	TMap<FTileCoord, UMapTileData*> MapTileDataMap;
 
 	AMapTile* CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const;
 	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const;
@@ -77,6 +84,4 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AStructure*> MapStructures;
 
-	UFUNCTION(BlueprintCallable)
-	bool IsTileAvailable(const FTileCoord Location) const;
 };

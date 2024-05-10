@@ -45,6 +45,7 @@ void UAegisMap::PopulateMapData(
 	ANexusBuilding* InNexusBuilding)
 {
 	this->MapTiles = GenerateMapTiles(InMapTileData);
+	this->MapTileDataMap = InMapTileData;
 	this->PathRoute = InPathRoute;
 	this->PathStartTiles = InPathStartTiles;
 	this->NexusBuilding = InNexusBuilding;
@@ -73,6 +74,15 @@ TArray<AMapTile*> UAegisMap::GetTiles()
 		Tiles.Add(Entry.Value);
 	}
 	return Tiles;
+}
+
+UMapTileData* UAegisMap::GetTileData(FTileCoord Coord)
+{
+	if (MapTileDataMap.Contains(Coord))
+	{
+		return MapTileDataMap[Coord];
+	}
+	return nullptr;
 }
 
 FTileCoord UAegisMap::GetEnemySpawnCoord() const

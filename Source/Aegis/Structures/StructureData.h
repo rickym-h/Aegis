@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
+#include "Aegis/Map/MapTiles/MapTileData.h"
 #include "StructureData.generated.h"
 
 class AStructure;
@@ -25,6 +26,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
 	UStaticMesh* MeshRepresentation;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="MetaData")
+	UAegisMap* MapReference;
+
 public:
 	UFUNCTION()
 	UStaticMesh* GetMeshRepresentation() const;
@@ -35,7 +39,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const
 	{
-		UE_LOG(LogTemp, Warning,
+		UE_LOG(LogTemp, Fatal,
 		       TEXT("UStructureData::SpawnStructureFromData() - Base structure data function called - should be overridden by leaf classes."))
 		return nullptr;
 	}
@@ -45,4 +49,17 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
 	bool bRemoveInstanceOnPlacement = false;
+
+	// A list of terrain types this structure can be placed on
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	TArray<TEnumAsByte<ETerrainType>> AllowedTerrains;
+	// A list of resource types this structure can be placed on
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	TArray<TEnumAsByte<EResourceType>> AllowedResources;
+
+	UFUNCTION()
+	bool IsTileTypeValid(FTileCoord Location);
+	
+	UFUNCTION(BlueprintCallable)
+	virtual bool CanStructureBePlaced(FTileCoord Location);
 };
