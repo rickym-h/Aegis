@@ -103,7 +103,8 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* StructureData)
 {
 	// Check the location is valid And resources are valid
-	if (!IsTileAvailable(Location)) { return false; }
+	if (!IsTileAvailable(Location)) { return false; } // Checks the tile is not a path
+	if (!StructureData->CanStructureBePlaced(Location)) { return false; } // Check location and resources are valid
 
 	// Get the tower class needed
 	if (!StructureData->GetStructureBlueprintClass()) { return false; }
