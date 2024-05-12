@@ -88,6 +88,9 @@ void APlayerPawn::Tick(float DeltaTime)
 		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 		{
 			StructureHologram->SetWorldLocation(MapTile->StructureLocation);
+
+			// Update StructureHologram
+			UpdateStructureHologramMesh(StructureToPlace->CanStructureBePlaced(MapTile->TileCoord));
 		}
 	}
 
@@ -182,10 +185,10 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 	PlayerActionState = Placing;
 	StructureToPlace = StructureData;
 
-	if (UStaticMesh* Mesh = StructureToPlace->GetMeshRepresentation())
-	{
-		StructureHologram->SetStaticMesh(Mesh);
-	}
+	// if (UStaticMesh* Mesh = StructureToPlace->GetMeshRepresentation())
+	// {
+	// 	StructureHologram->SetStaticMesh(Mesh);
+	// }
 
 	StructureHologram->SetVisibility(true);
 }

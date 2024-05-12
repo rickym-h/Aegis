@@ -66,6 +66,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	UStaticMeshComponent* StructureHologram;
 
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateStructureHologramMesh(bool IsValid);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
 	TArray<UStructureData*> TowerCardsInHand;
 
