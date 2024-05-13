@@ -5,12 +5,6 @@
 
 #include "Enemy.h"
 
-
-void UEnemyFactory::SetOwningGameState(AAegisGameStateBase* GameState)
-{
-	OwningGameState = GameState;
-}
-
 void UEnemyFactory::SpawnTestEnemy()
 {
 	const FVector Location = FVector::ZeroVector;

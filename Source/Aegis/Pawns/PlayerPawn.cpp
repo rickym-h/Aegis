@@ -54,7 +54,7 @@ void APlayerPawn::BeginPlay()
 
 	if (GameState)
 	{
-		TowerCardsInHand.Append(GameState->StructureDataFactory->GenerateStarterTowers());
+		TowerCardsInHand.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::BeginPlay()"))

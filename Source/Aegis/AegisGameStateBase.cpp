@@ -19,25 +19,28 @@ void AAegisGameStateBase::BeginPlay()
 	Super::BeginPlay();
 
 	ProjectileManager = GetWorld()->SpawnActor<AProjectileManager>(FVector::ZeroVector, FRotator::ZeroRotator, FActorSpawnParameters());
+	
+	GenerateTestMapFromMapFactory();
+}
 
+void AAegisGameStateBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	
 	if (MapFactoryClass)
 	{
 		MapFactory = NewObject<UAegisMapFactory>(GetWorld(), MapFactoryClass);
 	}
-
+	
 	if (EnemyFactoryClass)
 	{
 		EnemyFactory = NewObject<UEnemyFactory>(GetWorld(), EnemyFactoryClass);
-		EnemyFactory->SetOwningGameState(this);
 	}
-
+	
 	if (StructureDataFactoryClass)
 	{
 		StructureDataFactory = NewObject<UStructureDataFactory>(GetWorld(), StructureDataFactoryClass);
-		StructureDataFactory->WorldReference = GetWorld();
 	}
-	
-	GenerateTestMapFromMapFactory();
 }
 
 void AAegisGameStateBase::GenerateTestMapFromMapFactory()

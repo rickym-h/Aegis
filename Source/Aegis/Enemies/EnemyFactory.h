@@ -16,11 +16,8 @@ class AEGIS_API UEnemyFactory : public UObject
 	GENERATED_BODY()
 
 protected:
-	UPROPERTY(VisibleAnywhere)
-	AAegisGameStateBase* OwningGameState;
 
 public:
-	void SetOwningGameState(AAegisGameStateBase* GameState);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
 	TSubclassOf<AEnemy> TestEnemyClass;

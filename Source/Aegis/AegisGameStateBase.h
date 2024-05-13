@@ -23,6 +23,7 @@ private:
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
+	virtual void PostInitializeComponents() override;
 
 	UFUNCTION(BlueprintCallable)
 	void GenerateTestMapFromMapFactory();
