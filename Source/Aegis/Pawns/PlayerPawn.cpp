@@ -117,7 +117,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	{
 		if (UStructureData* StructureData = Cast<UStructureData>(StructureToPlace))
 		{
-			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData))
+			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData, this))
 			{
 				PlayerActionState = Default;
 				StructureToPlace = nullptr;

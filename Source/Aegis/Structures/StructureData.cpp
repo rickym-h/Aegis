@@ -5,6 +5,8 @@
 
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
+#include "Aegis/Pawns/PlayerPawn.h"
+#include "Kismet/GameplayStatics.h"
 
 UStaticMesh* UStructureData::GetMeshRepresentation() const
 {
@@ -18,8 +20,7 @@ TSubclassOf<AStructure> UStructureData::GetStructureBlueprintClass() const
 
 bool UStructureData::CanStructureBePlaced(const FTileCoord Location)
 {
-	// TODO add check for player resources too
-	return IsTileTypeValid(Location);
+	return IsTileTypeValid(Location) && Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->Resources->IsResourcesEnough(StructureCost);
 }
 
 bool UStructureData::IsTileTypeValid(const FTileCoord Location)

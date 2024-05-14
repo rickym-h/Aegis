@@ -50,7 +50,7 @@ public:
 	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
 
 	UFUNCTION(BlueprintCallable)
-	bool AddStructureToMap(const FTileCoord Location, UStructureData* StructureData);
+	bool AddStructureToMap(const FTileCoord Location, UStructureData* StructureData, APlayerPawn* PlayerPawn);
 
 	UFUNCTION(BlueprintCallable)
 	int GetNumOfTilesToEnd(const FTileCoord StartCoord);

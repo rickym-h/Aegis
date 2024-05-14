@@ -20,7 +20,7 @@ UENUM()
 enum EResourceType
 {
 	None UMETA(DisplayName = "None"),
-	Tree UMETA(DisplayName = "Stone"),
+	Tree UMETA(DisplayName = "Tree"),
 	Stone UMETA(DisplayName = "Stone"),
 	TreeStone UMETA(DisplayName = "Tree & Stone"),
 };

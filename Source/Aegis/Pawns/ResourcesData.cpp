@@ -3,37 +3,60 @@
 
 #include "ResourcesData.h"
 
+#include "Aegis/Structures/StructureData.h"
+
 void UResourcesData::AddResources(const int32 InWood, const int32 InStone, const int32 InGold, const int32 InRunes, const int32 InManaCrystals)
 {
-	Wood+=InWood;
-	Stone+=InStone;
-	Gold+=InGold;
-	Runes+=InRunes;
-	ManaCrystals+=InManaCrystals;
+	Resources.Wood+=InWood;
+	Resources.Stone+=InStone;
+	Resources.Gold+=InGold;
+	Resources.Runes+=InRunes;
+	Resources.ManaCrystals+=InManaCrystals;
+	OnResourcesUpdatedDelegate.Broadcast();
+}
+
+bool UResourcesData::IsResourcesEnough(const FResources& ResourcesCost) const
+{
+	return (
+		Resources.Wood >= ResourcesCost.Wood &&
+		Resources.Stone >= ResourcesCost.Stone &&
+		Resources.Gold >= ResourcesCost.Gold &&
+		Resources.Runes >= ResourcesCost.Runes &&
+		Resources.ManaCrystals >= ResourcesCost.ManaCrystals
+		);
+}
+
+void UResourcesData::SpendResources(const FResources& Cost)
+{
+	Resources.Wood -= Cost.Wood;
+	Resources.Stone -= Cost.Stone;
+	Resources.Gold -= Cost.Gold;
+	Resources.Runes -= Cost.Runes;
+	Resources.ManaCrystals -= Cost.ManaCrystals;
 	OnResourcesUpdatedDelegate.Broadcast();
 }
 
 int32 UResourcesData::GetWood() const
 {
-	return Wood;
+	return Resources.Wood;
 }
 
 int32 UResourcesData::GetStone() const
 {
-	return Stone;
+	return Resources.Stone;
 }
 
 int32 UResourcesData::GetGold() const
 {
-	return Gold;
+	return Resources.Gold;
 }
 
 int32 UResourcesData::GetRunes() const
 {
-	return Runes;
+	return Resources.Runes;
 }
 
 int32 UResourcesData::GetManaCrystals() const
 {
-	return ManaCrystals;
+	return Resources.ManaCrystals;
 }

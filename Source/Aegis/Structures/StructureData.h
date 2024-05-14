@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "Aegis/Map/MapTiles/MapTileData.h"
+#include "Aegis/Pawns/ResourcesData.h"
 #include "StructureData.generated.h"
 
 
@@ -26,7 +27,7 @@ class AStructure;
 /**
  * 
  */
-UCLASS()
+UCLASS(BlueprintType)
 class AEGIS_API UStructureData : public UObject
 {
 	GENERATED_BODY()
@@ -40,11 +41,15 @@ protected:
 	 */
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
 	UStaticMesh* MeshRepresentation;
+	
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="MetaData")
+	UPROPERTY(BlueprintReadOnly, Category="MetaData")
 	UAegisMap* MapReference;
 
 public:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
+	FResources StructureCost;
+	
 	UFUNCTION()
 	UStaticMesh* GetMeshRepresentation() const;
 
@@ -59,17 +64,17 @@ public:
 		return nullptr;
 	}
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	FString StructureName = "Default Name";
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	bool bRemoveInstanceOnPlacement = false;
 
 	// A list of terrain types this structure can be placed on
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	TArray<TEnumAsByte<ETerrainType>> AllowedTerrains;
 	// A list of resource types this structure can be placed on
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	TArray<TEnumAsByte<EResourceType>> AllowedResources;
 
 	UFUNCTION()

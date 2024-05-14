@@ -3,12 +3,27 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/NoExportTypes.h"
 #include "ResourcesData.generated.h"
 
 /**
  * 
 */
+USTRUCT(BlueprintType)
+struct FResources
+{
+	GENERATED_BODY()
+	
+	UPROPERTY(EditAnywhere, Category="Resources")
+	int32 Wood = 0;
+	UPROPERTY(EditAnywhere, Category="Resources")
+	int32 Stone = 0;
+	UPROPERTY(EditAnywhere, Category="Resources")
+	int32 Gold = 0;
+	UPROPERTY(EditAnywhere, Category="Resources")
+	int32 Runes = 0;
+	UPROPERTY(EditAnywhere, Category="Resources")
+	int32 ManaCrystals = 0;
+};
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResourcesUpdatedSignature);
 
@@ -23,6 +38,10 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void AddResources(const int32 InWood, const int32 InStone, const int32 InGold, const int32 InRunes, const int32 InManaCrystals);
+	UFUNCTION(BlueprintCallable)
+	bool IsResourcesEnough(const FResources& ResourcesCost) const;
+	UFUNCTION(BlueprintCallable)
+	void SpendResources(const FResources& Cost);
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetWood() const;
@@ -34,16 +53,9 @@ public:
 	int32 GetRunes() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetManaCrystals() const;
+	
 
 protected:
 	UPROPERTY(VisibleAnywhere, Category="Resources")
-	int32 Wood = 0;
-	UPROPERTY(VisibleAnywhere, Category="Resources")
-	int32 Stone = 0;
-	UPROPERTY(VisibleAnywhere, Category="Resources")
-	int32 Gold = 0;
-	UPROPERTY(VisibleAnywhere, Category="Resources")
-	int32 Runes = 0;
-	UPROPERTY(VisibleAnywhere, Category="Resources")
-	int32 ManaCrystals = 0;
+	FResources Resources;
 };

@@ -4,10 +4,12 @@
 #include "AegisMap.h"
 
 #include "MapTile.h"
+#include "Aegis/Pawns/PlayerPawn.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Aegis/Structures/Towers/TowerData.h"
+#include "Kismet/GameplayStatics.h"
 #include "MapTiles/MapTileData.h"
 
 
@@ -100,7 +102,7 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 	return PathRoute[CurrentCoord];
 }
 
-bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* StructureData)
+bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* StructureData, APlayerPawn* PlayerPawn)
 {
 	// Check the location is valid And resources are valid
 	if (!IsTileAvailable(Location)) { return false; } // Checks the tile is not a path
@@ -115,11 +117,11 @@ bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* Str
 	AStructure* Structure = StructureData->SpawnStructureFromData(Location, GetTile(Location)->StructureLocation);
 
 	if (!Structure) { return false; }
-	//Tower->TowerData = TowerData;
 
 	MapStructures.Add(Location, Structure);
 
-	// TODO Take any resources needed
+	// Take any resources needed
+	PlayerPawn->Resources->SpendResources(StructureData->StructureCost);
 
 	return true;
 }
