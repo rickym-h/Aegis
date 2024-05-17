@@ -5,18 +5,51 @@
 
 #include "Enemy.h"
 
-void UEnemyFactory::SpawnTestEnemy()
+
+void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
+{
+	if (AEnemy* Enemy = Cast<AEnemy>(DestroyedActor))
+	{		
+		EnemiesInWorld.Remove(Enemy);
+	}
+}
+
+void UEnemyFactory::BeginWave(const int32 Night, const int32 Wave)
+{
+	// TODO make sure no enemies are still alive
+	if (EnemiesInWorld.Num() != 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies in world."))
+		return;
+	}
+
+	// TODO logic for deciding enemies to spawn
+	int32 EnemiesToSpawn = Night * Wave;
+
+	
+
+	
+}
+
+AEnemy* UEnemyFactory::SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass)
 {
 	const FVector Location = FVector::ZeroVector;
 	const FRotator Rotation = FRotator::ZeroRotator;
 
-	if (TestEnemyClass)
+	if (!EnemyClass)
 	{
-		AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(TestEnemyClass, Location, Rotation);
-		EnemiesInWorld.Add(Enemy);
+		if (!TestEnemyClass)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::SpawnTestEnemy() - No TestEnemyClass"))
+			return nullptr;
+		}
+		EnemyClass = TestEnemyClass;
 	}
-	else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::SpawnTestEnemy() - No TestEnemyClass"))
-	}
+
+	AEnemy* Enemy = GetWorld()->SpawnActor<AEnemy>(EnemyClass, Location, Rotation);
+	EnemiesInWorld.Add(Enemy);
+
+	Enemy->OnDestroyed.AddUniqueDynamic(this, &UEnemyFactory::RemoveEnemyFromWorld);
+
+	return Enemy;
 }

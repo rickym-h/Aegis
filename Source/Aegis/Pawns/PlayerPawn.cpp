@@ -134,7 +134,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
 	// Get the target zoom location
-	BoomArmTargetLength += (InputActionValue.Get<FVector>().Z * 1000);
+	BoomArmTargetLength += InputActionValue.Get<FVector>().Z * 1000;
 	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
 
 	MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
@@ -150,7 +150,7 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 	// Get the player controller
-	APlayerController* PC = Cast<APlayerController>(GetController());
+	const APlayerController* PC = Cast<APlayerController>(GetController());
 
 	// Get the local player subsystem
 	UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PC->GetLocalPlayer());

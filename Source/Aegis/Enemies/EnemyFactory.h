@@ -16,14 +16,19 @@ class AEGIS_API UEnemyFactory : public UObject
 	GENERATED_BODY()
 
 protected:
-
-public:
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
-	TSubclassOf<AEnemy> TestEnemyClass;
-
 	TArray<AEnemy*> EnemiesInWorld;
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnTestEnemy();
+	void RemoveEnemyFromWorld(AActor* DestroyedActor);
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
+	TSubclassOf<AEnemy> TestEnemyClass;
+
+public:
+
+	UFUNCTION(BlueprintCallable)
+	void BeginWave(const int32 Night, const int32 Wave);
+
+	UFUNCTION(BlueprintCallable)
+	AEnemy* SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass);
 };
