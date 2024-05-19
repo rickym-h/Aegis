@@ -2,9 +2,7 @@
 
 
 #include "EnemyFactory.h"
-
 #include "Enemy.h"
-
 
 void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
 {
@@ -14,21 +12,69 @@ void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
 	}
 }
 
+TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 Night, const int32 Wave) const
+{
+	TArray<FEnemySpawnData> WaveEnemies = TArray<FEnemySpawnData>();
+	if (EnemiesToSpawnInWave.Num() != 0)
+	{
+		UE_LOG(LogTemp, Fatal, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies to spawn in current wave."))
+		return TArray<FEnemySpawnData>();
+	}
+	// const int32 EnemiesToSpawnCount = Night * Wave;
+	const int32 EnemiesToSpawnCount = 5;
+
+	for (int i = 0; i < EnemiesToSpawnCount; i++)
+	{
+		FEnemySpawnData SpawnData = FEnemySpawnData(
+			TestEnemyClass,
+			0.4,
+			0.1);
+
+		WaveEnemies.Add(SpawnData);
+	}
+
+	return WaveEnemies;
+}
+
+void UEnemyFactory::SpawnEnemyFromWave()
+{
+	// Spawn the enemy at the top of the wave list
+	const FEnemySpawnData CurrentEnemySpawnData = EnemiesToSpawnInWave.Pop();
+	SpawnTestEnemy(CurrentEnemySpawnData.EnemyClass);
+	
+	// Start the timer for the next enemy to spawn
+	if(EnemiesToSpawnInWave.Num() != 0)
+	{
+		const FEnemySpawnData NextEnemySpawnData = EnemiesToSpawnInWave.Top();
+
+		GetWorld()->GetTimerManager().SetTimer(
+			SpawnEnemyWithDelayTimerHandle,
+			this,
+			&UEnemyFactory::SpawnEnemyFromWave,
+			NextEnemySpawnData.PreSpawnDelay + CurrentEnemySpawnData.PostSpawnDelay,
+			false);
+	}
+}
+
 void UEnemyFactory::BeginWave(const int32 Night, const int32 Wave)
 {
-	// TODO make sure no enemies are still alive
-	if (EnemiesInWorld.Num() != 0)
+	// Ensure wave is able to begin (no enemies in world, no enemies still to be spawned from previous wave
+	if (EnemiesInWorld.Num() != 0 || EnemiesToSpawnInWave.Num() != 0)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies in world."))
+		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies in world, or there are still enemies to spawn in current wave."))
 		return;
 	}
 
-	// TODO logic for deciding enemies to spawn
-	int32 EnemiesToSpawn = Night * Wave;
+	// Decide which enemies to be spawned
+	EnemiesToSpawnInWave = GenerateWaveEnemies(Night, Wave);
 
-	
-
-	
+	// Start Spawn of first enemy in wave
+	GetWorld()->GetTimerManager().SetTimer(
+		SpawnEnemyWithDelayTimerHandle,
+		this,
+		&UEnemyFactory::SpawnEnemyFromWave,
+		EnemiesToSpawnInWave.Top().PreSpawnDelay,
+		false);
 }
 
 AEnemy* UEnemyFactory::SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass)
