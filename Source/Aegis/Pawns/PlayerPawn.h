@@ -33,10 +33,6 @@ public:
 	// Sets default values for this pawn's properties
 	APlayerPawn();
 
-	
-	// UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
-	// UResourcesData* Resources;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
