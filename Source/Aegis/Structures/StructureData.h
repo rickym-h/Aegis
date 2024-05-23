@@ -35,23 +35,13 @@ class AEGIS_API UStructureData : public UObject
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
 	TSubclassOf<AStructure> StructureBlueprintClass;
-
-	/**
-	 * This is the mesh shown when trying to place the structure. Ideally a hologram of some form
-	 */
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
-	UStaticMesh* MeshRepresentation;
 	
-
 	UPROPERTY(BlueprintReadOnly, Category="MetaData")
 	UAegisMap* MapReference;
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
 	FResources StructureCost;
-	
-	UFUNCTION()
-	UStaticMesh* GetMeshRepresentation() const;
 
 	UFUNCTION()
 	TSubclassOf<AStructure> GetStructureBlueprintClass() const;

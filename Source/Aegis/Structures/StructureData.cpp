@@ -8,10 +8,6 @@
 #include "Aegis/Pawns/PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 
-UStaticMesh* UStructureData::GetMeshRepresentation() const
-{
-	return MeshRepresentation;
-}
 
 TSubclassOf<AStructure> UStructureData::GetStructureBlueprintClass() const
 {

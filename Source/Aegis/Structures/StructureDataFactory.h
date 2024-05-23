@@ -17,16 +17,7 @@ class AEGIS_API UStructureDataFactory : public UObject
 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Towers")
-	TSubclassOf<UStructureData> TestTowerDataClass;
-	UFUNCTION(BlueprintCallable)
-	UStructureData* GenerateTestTowerData(UWorld* WorldRef) const;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Towers")
-	TSubclassOf<UStructureData> LumberYardDataClass;
-	UFUNCTION(BlueprintCallable)
-	UStructureData* GenerateLumberYardData(UWorld* WorldRef) const;
-
-
+	TArray<TSubclassOf<UStructureData>> StarterTowersData;
 
 public:
 	UFUNCTION(BlueprintCallable)

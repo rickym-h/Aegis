@@ -22,13 +22,13 @@ public:
 	UStaticMesh* ProjectileMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
-	int TowerRange;
+	int TowerRange = 2;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
-	float ProjectileSpeed;
+	float ProjectileSpeed = 20;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
-	float AttackSpeed;
+	float AttackSpeed = 2;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
 	FProjectileDamagePackage DamagePackage;
