@@ -99,6 +99,7 @@ void AEnemy::MoveTowardsGoal(float DeltaTime)
 			ForwardVector.Normalize();
 			TargetPos += ForwardVector * DistanceToTravel;
 			DistanceToTravel = 0;
+			SetActorRotation(ForwardVector.Rotation());
 		}
 		else
 		// Otherwise take distance off movement distance, set new goal tiles, and recurse
