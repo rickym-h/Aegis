@@ -226,7 +226,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, const int Poisson_Radius, int SamplesCount,
                                                                             const FRandomStream RandomStream)
 {
-	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(500, Poisson_Radius, 200, RandomStream);
+	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(GenerationRadius, Poisson_Radius, SamplesCount, RandomStream);
 	TArray<FTileCoord> NodePoints;
 	for (const FVector2d PoissonCluster : PoissonClusters)
 	{
@@ -236,20 +236,17 @@ TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int 
 }
 
 TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int MainPathLength,
+																						const TArray<FTileCoord>& PoissonNodeCoords,
+																						const int NodeLength,
                                                                                         const FVector2d ElevationNoiseOffset,
                                                                                         const FRandomStream RandomStream)
 {
-	constexpr int POISSON_RADIUS = 5;
-	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));
-
 	TMap<FTileCoord, FTileCoord> Path;
-
-	TArray<FTileCoord> PoissonNodeCoords = GetPoissonClusterCoords(500, POISSON_RADIUS, 200, RandomStream);
 
 	// Get the Path Nodes using a Greedy closest Node search of the poisson clusters
 	TArray<FTileCoord> NodesInPathSoFar;
 	NodesInPathSoFar.Add(FTileCoord(0, 0));
-	for (int i = 0; i < NODE_LENGTH; i++)
+	for (int i = 0; i < NodeLength; i++)
 	{
 		FTileCoord Head = NodesInPathSoFar.Top();
 

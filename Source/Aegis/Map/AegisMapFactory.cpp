@@ -32,8 +32,11 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 	const FVector2D StoneNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 
 	// Generate a Path - this is done using a Greedy search through some Poisson Blue Noise
-	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(
-		MainPathLength, PathingNoiseOffset, RandomStream);
+	
+	constexpr int POISSON_RADIUS = 6;
+	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));
+	const TArray<FTileCoord> PoissonNodeCoords = UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(100, POISSON_RADIUS, 1000, RandomStream);
+	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, PoissonNodeCoords, NODE_LENGTH, PathingNoiseOffset, RandomStream);
 
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = UPathGenerationBlueprintLibrary::GenerateMapTilesData(
 		Path, ElevationNoiseOffset, TreeNoiseOffset, StoneNoiseOffset, RandomStream);
@@ -43,8 +46,6 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 
 	// Set path start tile coords
 	const TArray<FTileCoord> PathStartTileCoords = GetPathStartCoords(Path);
-
-	// Generate tiles - setting tile heights, and tile types
 
 	// Create Map instance
 	UAegisMap* Map = NewObject<UAegisMap>(GetWorld(), AegisMapClass);
@@ -56,6 +57,12 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 	{
 		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
 	}
+
+	for (FTileCoord Node : PoissonNodeCoords)
+	{
+		GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, Node.ToWorldLocation(), FRotator(0, 0, 0));
+	}
+	UE_LOG(LogTemp, Warning, TEXT("Node count: %i"), PoissonNodeCoords.Num())
 
 	return Map;
 }
