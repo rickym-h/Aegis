@@ -53,8 +53,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Game")
 	AAegisGameStateBase* GameState;
-
-
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TEnumAsByte<EPlayerState> PlayerActionState;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
@@ -67,8 +66,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
 	TArray<UStructureData*> TowerCardsInHand;
-
-
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
 	FHitResult HitResultUnderCursor;
 	FHitResult* UpdateHitResultUnderCursor();

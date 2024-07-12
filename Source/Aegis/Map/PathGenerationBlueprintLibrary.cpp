@@ -12,7 +12,7 @@ TArray<FVector2d> UPathGenerationBlueprintLibrary::GetBlueNoiseClusters(const in
 	// ReSharper disable once CppUE4CodingStandardNamingViolationWarning
 	constexpr int MAX_TRIALS = 30;
 
-	// Shouldn't *really* use FTileCoord, but we basically just want to be able to compare pairs of integers, and FTileCoord has that functionality,
+	// Shouldn't *really* use FTileCoord, but we basically just want to be able to compare pairs of integers, and FTileCoord already has that functionality,
 	// We just have to map X->Q, Y->R, and ignore S
 	TMap<FTileCoord, FVector2d> Grid;
 	TArray<FVector2d> List;

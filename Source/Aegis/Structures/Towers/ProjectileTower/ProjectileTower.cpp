@@ -14,7 +14,6 @@ AProjectileTower::AProjectileTower()
 	ShotAvailable = true;
 }
 
-
 void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 {
 	if (!Enemy) { return; }

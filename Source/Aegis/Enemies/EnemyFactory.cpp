@@ -6,9 +6,19 @@
 
 void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
 {
-	if (AEnemy* Enemy = Cast<AEnemy>(DestroyedActor))
-	{		
-		EnemiesInWorld.Remove(Enemy);
+	AEnemy* Enemy = Cast<AEnemy>(DestroyedActor);
+	if (!Enemy)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::RemoveEnemyFromWorld() - Attempted to remove an AActor that is not an enemy."))
+		return;
+	}
+	
+	EnemiesInWorld.Remove(Enemy);
+
+	if (EnemiesInWorld.Num() == 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::RemoveEnemyFromWorld() - Wave complete!"))
+		OnWaveEndDelegate.Broadcast();
 	}
 }
 
@@ -27,8 +37,8 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 Night, co
 	{
 		FEnemySpawnData SpawnData = FEnemySpawnData(
 			TestEnemyClass,
-			0.4,
-			0.1);
+			0.9f,
+			0.1f);
 
 		WaveEnemies.Add(SpawnData);
 	}
@@ -52,7 +62,7 @@ void UEnemyFactory::SpawnEnemyFromWave()
 			this,
 			&UEnemyFactory::SpawnEnemyFromWave,
 			NextEnemySpawnData.PreSpawnDelay + CurrentEnemySpawnData.PostSpawnDelay,
-			false);
+			false); 
 	}
 }
 

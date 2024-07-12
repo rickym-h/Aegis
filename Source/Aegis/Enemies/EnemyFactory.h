@@ -6,6 +6,8 @@
 #include "EnemyFactory.generated.h"
 
 class AEnemy;
+class AAegisGameStateBase;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWaveEndSignature);
 
 USTRUCT(BlueprintType)
 struct FEnemySpawnData
@@ -35,8 +37,6 @@ struct FEnemySpawnData
 	float PostSpawnDelay = 0.f;
 };
 
-class AEnemy;
-class AAegisGameStateBase;
 /**
  * 
  */
@@ -69,4 +69,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	AEnemy* SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWaveEndSignature OnWaveEndDelegate;
 };

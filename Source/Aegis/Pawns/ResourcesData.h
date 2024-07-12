@@ -38,6 +38,7 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	void AddResources(const int32 InWood, const int32 InStone, const int32 InGold, const int32 InRunes, const int32 InManaCrystals);
+	void AddResources(const UResourcesData* ResourcesToAdd);
 	UFUNCTION(BlueprintCallable)
 	bool IsResourcesEnough(const FResources& ResourcesCost) const;
 	UFUNCTION(BlueprintCallable)

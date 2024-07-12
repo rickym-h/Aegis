@@ -3,8 +3,6 @@
 
 #include "ResourcesData.h"
 
-#include "Aegis/Structures/StructureData.h"
-
 void UResourcesData::AddResources(const int32 InWood, const int32 InStone, const int32 InGold, const int32 InRunes, const int32 InManaCrystals)
 {
 	Resources.Wood+=InWood;
@@ -13,6 +11,16 @@ void UResourcesData::AddResources(const int32 InWood, const int32 InStone, const
 	Resources.Runes+=InRunes;
 	Resources.ManaCrystals+=InManaCrystals;
 	OnResourcesUpdatedDelegate.Broadcast();
+}
+
+void UResourcesData::AddResources(const UResourcesData* ResourcesToAdd)
+{
+	AddResources(
+		ResourcesToAdd->GetWood(),
+		ResourcesToAdd->GetStone(),
+		ResourcesToAdd->GetGold(),
+		ResourcesToAdd->GetRunes(),
+		ResourcesToAdd->GetManaCrystals());
 }
 
 bool UResourcesData::IsResourcesEnough(const FResources& ResourcesCost) const
