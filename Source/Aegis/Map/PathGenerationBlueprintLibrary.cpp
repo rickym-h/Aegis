@@ -179,7 +179,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
 				{
 					if (Element.Value == FTileCoord()) { continue; }
-					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
+					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 0));
 				}
 				if (ExistingPathAndAdjacent.Contains(Neighbour) && (Neighbour != GoalTile))
 				{
@@ -223,10 +223,10 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 	return Path;
 }
 
-TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(int GenerationRadius, const int Poisson_Radius, int SamplesCount,
+TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(const int GenerationRadius, const int Poisson_Radius, const int MaxSamplesCount,
                                                                             const FRandomStream RandomStream)
 {
-	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(GenerationRadius, Poisson_Radius, SamplesCount, RandomStream);
+	TArray<FVector2d> PoissonClusters = GetBlueNoiseClusters(GenerationRadius, Poisson_Radius, MaxSamplesCount, RandomStream);
 	TArray<FTileCoord> NodePoints;
 	for (const FVector2d PoissonCluster : PoissonClusters)
 	{

@@ -33,9 +33,9 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 
 	// Generate a Path - this is done using a Greedy search through some Poisson Blue Noise
 	
-	constexpr int POISSON_RADIUS = 6;
+	constexpr int POISSON_RADIUS = 4;
 	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));
-	const TArray<FTileCoord> PoissonNodeCoords = UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(100, POISSON_RADIUS, 1000, RandomStream);
+	const TArray<FTileCoord> PoissonNodeCoords = UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(100, POISSON_RADIUS, 5000, RandomStream);
 	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, PoissonNodeCoords, NODE_LENGTH, PathingNoiseOffset, RandomStream);
 
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = UPathGenerationBlueprintLibrary::GenerateMapTilesData(
