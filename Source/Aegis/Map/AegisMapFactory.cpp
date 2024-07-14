@@ -31,11 +31,15 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 	const FVector2D TreeNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 	const FVector2D StoneNoiseOffset = FVector2D(RandomStream.FRandRange(-100000.f, 100000.f), RandomStream.FRandRange(-100000.f, 100000.f));
 
+
 	// Generate a Path - this is done using a Greedy search through some Poisson Blue Noise
-	
-	constexpr int POISSON_RADIUS = 4;
+	constexpr int POISSON_RADIUS = 8;
+	constexpr int GENERATION_RADIUS = 100;
 	const int NODE_LENGTH = FMath::RoundToPositiveInfinity(static_cast<float>(MainPathLength) / static_cast<float>(POISSON_RADIUS));
-	const TArray<FTileCoord> PoissonNodeCoords = UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(100, POISSON_RADIUS, 5000, RandomStream);
+	const TArray<FTileCoord> PoissonNodeCoords = UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(GENERATION_RADIUS, POISSON_RADIUS, 5000, RandomStream);
+
+	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = UPathGenerationBlueprintLibrary::GeneratePoissonNodeGraph(PoissonNodeCoords, POISSON_RADIUS, GENERATION_RADIUS, GetWorld());
+	
 	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, PoissonNodeCoords, NODE_LENGTH, PathingNoiseOffset, RandomStream);
 
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = UPathGenerationBlueprintLibrary::GenerateMapTilesData(

@@ -31,4 +31,5 @@ public:
 
 	static TMap<FTileCoord, UMapTileData*> GenerateMapTilesData(const TMap<FTileCoord, FTileCoord>& Path, FVector2D ElevationNoiseOffset,
 	                                                            FVector2D TreeNoiseOffset, FVector2D StoneNoiseOffset, FRandomStream RandomStream);
+	static TMap<FTileCoord, TSet<FTileCoord>> GeneratePoissonNodeGraph(const TArray<FTileCoord>& PoissonNodeCoords, const int PoissonRadius, const int GenerationRadius, UWorld* World);
 };

@@ -232,6 +232,13 @@ TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(cons
 	{
 		NodePoints.Emplace(FTileCoord::PixelToHex(FVector(PoissonCluster.X, PoissonCluster.Y, 0) * 100));
 	}
+	
+	NodePoints.Sort([](const FTileCoord& A, const FTileCoord& B)
+		{
+			//return FVector::Dist(A.ToWorldLocation(), FVector::ZeroVector) < FVector::Dist(B.ToWorldLocation(), FVector::ZeroVector);
+			return FTileCoord::HexDistance(A, FTileCoord()) <  FTileCoord::HexDistance(B, FTileCoord());
+		});
+	
 	return NodePoints;
 }
 
@@ -428,4 +435,116 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	}
 
 	return MapTilesData;
+}
+
+bool AreAllBlobsComplete(const TMap<FTileCoord, bool>& Map)
+{
+	for (const TPair<FTileCoord, bool> Pair : Map)
+	{
+		if (Pair.Value == false)
+		{
+			return false;
+		}
+	}
+	return true;
+}
+
+TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePoissonNodeGraph(const TArray<FTileCoord>& PoissonNodeCoords, const int PoissonRadius, const int GenerationRadius, UWorld* World)
+{
+	TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph;
+
+	// Populate the graph with empty values
+	for (FTileCoord PoissonNode : PoissonNodeCoords)
+	{
+		PoissonNodeGraph.Add(PoissonNode, TSet<FTileCoord>());
+	}
+
+	// For each node, create a blob containing all the tiles adjacent to the blob
+	TMap<FTileCoord, TSet<FTileCoord>> Blobs;
+	TMap<FTileCoord, bool> IsBlobComplete;
+	for (FTileCoord Node : PoissonNodeCoords)
+	{
+		//TSet<FTileCoord> InitialBlob = TSet(FTileCoord::GetTilesInRadius(Node, FMath::RoundToNegativeInfinity(static_cast<float>(PoissonRadius-1)/2.f)));
+		TSet<FTileCoord> InitialBlob = TSet(FTileCoord::GetTilesInRadius(Node, 1));
+		Blobs.Add(Node, InitialBlob);
+		IsBlobComplete.Add(Node, false);
+	}
+	TSet<FTileCoord> BlobbedTiles;
+	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+	{
+		BlobbedTiles.Append(Pair.Value);
+	}
+	
+	// For each un-complete blob, add the closest adjacent un-blobbed tile.
+		// If no such adjacent tile exists, mark node/blob as complete
+		// If the closest adjacent tile is beyond 2xPoissonRadius in distance, mark node as complete
+	while (!AreAllBlobsComplete(IsBlobComplete))
+	{
+		for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+		{
+			if (IsBlobComplete[Pair.Key]) { continue; }
+
+			// Find all adjacent tiles to the blob
+			TSet<FTileCoord> Blob = Pair.Value;
+			TSet<FTileCoord> BlobAdjacent = TSet(FTileCoord::GetTilesInRadius(Blob.Array(), 1));
+			for (FTileCoord BlobTile : Blob) { BlobAdjacent.Remove(BlobTile); }
+
+			// Remove any tiles that exist in another blob
+			TSet<FTileCoord> CleanedBlobAdjacent; 
+			for (FTileCoord AdjacentTile : BlobAdjacent)
+			{
+				if (!BlobbedTiles.Contains(AdjacentTile))
+				{
+					CleanedBlobAdjacent.Add(AdjacentTile);
+				}
+			}
+
+			if (CleanedBlobAdjacent.Num() == 0)
+			{
+				IsBlobComplete[Pair.Key] = true;
+				continue;
+			}
+			
+			TArray<FTileCoord> AdjacentTiles = CleanedBlobAdjacent.Array();
+			AdjacentTiles.Sort([Pair](const FTileCoord& A, const FTileCoord& B)
+				{
+					return FVector::Dist(A.ToWorldLocation(), Pair.Key.ToWorldLocation()) < FVector::Dist(B.ToWorldLocation(), Pair.Key.ToWorldLocation());
+					return FTileCoord::HexDistance(A, Pair.Key) <  FTileCoord::HexDistance(B, Pair.Key);
+				});
+
+			
+			// Add to blob
+			Blobs[Pair.Key].Add(AdjacentTiles[0]);
+			BlobbedTiles.Add(AdjacentTiles[0]);
+			
+			if (FVector::Dist(FVector::ZeroVector, AdjacentTiles[0].ToWorldLocation()) > GenerationRadius*100)
+			//if (FTileCoord::HexDistance(AdjacentTiles[0], Pair.Key) > 2*PoissonRadius)
+			{
+				IsBlobComplete[Pair.Key] = true;
+			}
+		}
+	}
+	
+	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+	{
+		for (FTileCoord AdjacentBlob : Pair.Value)
+		{
+			FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
+			FVector End = AdjacentBlob.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+
+			FColor Color = FColor::White; // Line color
+
+			// Draw the debug line
+			DrawDebugLine(World, Start, End, Color, true, -1, 0, 5);
+		}
+	}
+	// When every tile is part of a blob, continue
+	
+	// For each blob
+		// Find all adjacent tiles to the blob not in the blob
+		// For each of these adjacent tiles, get the blob / node it is part of, and add it to the set for this blob
+		// Add the set to the PoissonNodeGraph
+
+	// return complete set of connected nodes
+	return PoissonNodeGraph;
 }
