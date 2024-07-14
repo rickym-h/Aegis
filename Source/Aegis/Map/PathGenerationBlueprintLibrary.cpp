@@ -453,12 +453,6 @@ TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePois
 {
 	TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph;
 
-	// Populate the graph with empty values
-	for (FTileCoord PoissonNode : PoissonNodeCoords)
-	{
-		PoissonNodeGraph.Add(PoissonNode, TSet<FTileCoord>());
-	}
-
 	// For each node, create a blob containing all the tiles adjacent to the blob
 	TMap<FTileCoord, TSet<FTileCoord>> Blobs;
 	TMap<FTileCoord, bool> IsBlobComplete;
@@ -514,26 +508,50 @@ TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePois
 		}
 	}
 	
-	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
-	{
-		for (FTileCoord AdjacentBlob : Pair.Value)
-		{
-			FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
-			FVector End = AdjacentBlob.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
-
-			FColor Color = FColor::White; // Line color
-
-			// Draw the debug line
-			DrawDebugLine(World, Start, End, Color, true, -1, 0, 5);
-		}
-	}
-	// When every tile is part of a blob, continue
+	// for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+	// {
+	// 	for (FTileCoord AdjacentBlob : Pair.Value)
+	// 	{
+	// 		FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
+	// 		FVector End = AdjacentBlob.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+	//
+	// 		FColor Color = FColor::White; // Line color
+	//
+	// 		// Draw the debug line
+	// 		DrawDebugLine(World, Start, End, Color, true, -1, 0, 5);
+	// 	}
+	// }
 	
 	// For each blob
 		// Find all adjacent tiles to the blob not in the blob
 		// For each of these adjacent tiles, get the blob / node it is part of, and add it to the set for this blob
 		// Add the set to the PoissonNodeGraph
+	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+	{
+		TSet<FTileCoord> AdjacentNodes;
+		
+		TSet<FTileCoord> AdjacentToBlob = TSet(FTileCoord::GetTilesInRadius(Pair.Value.Array(), 1));
+		for (FTileCoord BlobTile : Pair.Value)
+		{
+			AdjacentToBlob.Remove(BlobTile);
+		}
 
+		for (FTileCoord AdjacentTile : AdjacentToBlob)
+		{
+			// Find which blob this tile is part of, and add the parent node to the adjacent nodes
+			for (TPair<FTileCoord, TSet<FTileCoord>> PossibleAdjacentBlob : Blobs)
+			{
+				if (PossibleAdjacentBlob.Value.Contains(AdjacentTile))
+				{
+					AdjacentNodes.Add(PossibleAdjacentBlob.Key);
+					break;
+				}
+			}
+		}
+		
+		PoissonNodeGraph.Add(Pair.Key, AdjacentNodes);
+	}
+	
 	// return complete set of connected nodes
 	return PoissonNodeGraph;
 }

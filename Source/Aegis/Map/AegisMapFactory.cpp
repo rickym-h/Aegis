@@ -39,6 +39,20 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 	const TArray<FTileCoord> PoissonNodeCoords = UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(GENERATION_RADIUS, POISSON_RADIUS, 5000, RandomStream);
 
 	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = UPathGenerationBlueprintLibrary::GeneratePoissonNodeGraph(PoissonNodeCoords, POISSON_RADIUS, GENERATION_RADIUS, GetWorld());
+
+	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : PoissonNodeGraph)
+	{
+		for (FTileCoord AdjacentNode : Pair.Value)
+		{
+			FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
+			FVector End = AdjacentNode.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+
+			FColor Color = FColor::Red; // Line color
+
+			// Draw the debug line
+			DrawDebugLine(GetWorld(), Start, End, Color, true, -1, 0, 5);
+		}
+	}
 	
 	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, PoissonNodeCoords, NODE_LENGTH, PathingNoiseOffset, RandomStream);
 
