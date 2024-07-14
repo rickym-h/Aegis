@@ -478,7 +478,7 @@ TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePois
 	// For each un-complete blob, add the closest adjacent un-blobbed tile.
 		// If no such adjacent tile exists, mark node/blob as complete
 		// If the closest adjacent tile is beyond 2xPoissonRadius in distance, mark node as complete
-	while (!AreAllBlobsComplete(IsBlobComplete))
+	for (int RangeToClaim = 1; RangeToClaim < PoissonRadius/2; RangeToClaim++)
 	{
 		for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
 		{
@@ -486,7 +486,7 @@ TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePois
 
 			// Find all adjacent tiles to the blob
 			TSet<FTileCoord> Blob = Pair.Value;
-			TSet<FTileCoord> BlobAdjacent = TSet(FTileCoord::GetTilesInRadius(Blob.Array(), 1));
+			TSet<FTileCoord> BlobAdjacent = TSet(FTileCoord::GetTilesInRadius(Blob.Array(), RangeToClaim));
 			for (FTileCoord BlobTile : Blob) { BlobAdjacent.Remove(BlobTile); }
 
 			// Remove any tiles that exist in another blob
@@ -505,22 +505,11 @@ TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePois
 				continue;
 			}
 			
-			TArray<FTileCoord> AdjacentTiles = CleanedBlobAdjacent.Array();
-			AdjacentTiles.Sort([Pair](const FTileCoord& A, const FTileCoord& B)
-				{
-					return FVector::Dist(A.ToWorldLocation(), Pair.Key.ToWorldLocation()) < FVector::Dist(B.ToWorldLocation(), Pair.Key.ToWorldLocation());
-					return FTileCoord::HexDistance(A, Pair.Key) <  FTileCoord::HexDistance(B, Pair.Key);
-				});
-
-			
 			// Add to blob
-			Blobs[Pair.Key].Add(AdjacentTiles[0]);
-			BlobbedTiles.Add(AdjacentTiles[0]);
-			
-			if (FVector::Dist(FVector::ZeroVector, AdjacentTiles[0].ToWorldLocation()) > GenerationRadius*100)
-			//if (FTileCoord::HexDistance(AdjacentTiles[0], Pair.Key) > 2*PoissonRadius)
+			for (FTileCoord AdjacentTile : CleanedBlobAdjacent)
 			{
-				IsBlobComplete[Pair.Key] = true;
+				Blobs[Pair.Key].Add(AdjacentTile);
+				BlobbedTiles.Add(AdjacentTile);
 			}
 		}
 	}
