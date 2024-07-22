@@ -40,19 +40,20 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 
 	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = UPathGenerationBlueprintLibrary::GeneratePoissonNodeGraph(PoissonNodeCoords, POISSON_RADIUS, GENERATION_RADIUS, GetWorld());
 
-	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : PoissonNodeGraph)
-	{
-		for (FTileCoord AdjacentNode : Pair.Value)
-		{
-			FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
-			FVector End = AdjacentNode.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
-
-			FColor Color = FColor::Red; // Line color
-
-			// Draw the debug line
-			DrawDebugLine(GetWorld(), Start, End, Color, true, -1, 0, 5);
-		}
-	}
+	// Draw lines between each connected node
+	// for (TPair<FTileCoord, TSet<FTileCoord>> Pair : PoissonNodeGraph)
+	// {
+	// 	for (FTileCoord AdjacentNode : Pair.Value)
+	// 	{
+	// 		FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
+	// 		FVector End = AdjacentNode.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+	//
+	// 		FColor Color = FColor::Red; // Line color
+	//
+	// 		// Draw the debug line
+	// 		DrawDebugLine(GetWorld(), Start, End, Color, true, -1, 0, 5);
+	// 	}
+	// }
 	
 	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, PoissonNodeCoords, NODE_LENGTH, PathingNoiseOffset, RandomStream);
 
@@ -76,11 +77,7 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int MainPathLength) cons
 		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
 	}
 
-	for (FTileCoord Node : PoissonNodeCoords)
-	{
-		GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, Node.ToWorldLocation(), FRotator(0, 0, 0));
-	}
-	UE_LOG(LogTemp, Warning, TEXT("Node count: %i"), PoissonNodeCoords.Num())
+	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateMapWithNoise - Node count: %i"), PoissonNodeCoords.Num())
 
 	return Map;
 }

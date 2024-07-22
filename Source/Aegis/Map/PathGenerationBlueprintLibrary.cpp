@@ -179,7 +179,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::AStarPathFind(cons
 				for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
 				{
 					if (Element.Value == FTileCoord()) { continue; }
-					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 0));
+					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
 				}
 				if (ExistingPathAndAdjacent.Contains(Neighbour) && (Neighbour != GoalTile))
 				{
@@ -507,20 +507,6 @@ TMap<FTileCoord, TSet<FTileCoord>> UPathGenerationBlueprintLibrary::GeneratePois
 			}
 		}
 	}
-	
-	// for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
-	// {
-	// 	for (FTileCoord AdjacentBlob : Pair.Value)
-	// 	{
-	// 		FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
-	// 		FVector End = AdjacentBlob.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
-	//
-	// 		FColor Color = FColor::White; // Line color
-	//
-	// 		// Draw the debug line
-	// 		DrawDebugLine(World, Start, End, Color, true, -1, 0, 5);
-	// 	}
-	// }
 	
 	// For each blob
 		// Find all adjacent tiles to the blob not in the blob
