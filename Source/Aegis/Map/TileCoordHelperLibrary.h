@@ -97,6 +97,16 @@ struct FTileCoord
 		return FMath::Max3(FMath::Abs(DistanceVector.Q), FMath::Abs(DistanceVector.R), FMath::Abs(DistanceVector.S));
 	}
 
+	static int HexDistanceToTiles(const TArray<FTileCoord>& Array, const FTileCoord Key){
+		int MinHexDistance = INT_MAX;
+		for (const FTileCoord Element : Array)
+		{
+			int Distance = HexDistance(Element, Key);
+			MinHexDistance = FMath::Min(Distance, MinHexDistance);
+		}
+		return MinHexDistance;
+	}
+
 	static TArray<FTileCoord> GetTilesInRadius(const FTileCoord Origin, const int Radius)
 	{
 		TArray<FTileCoord> TilesInRadius;

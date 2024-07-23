@@ -383,7 +383,8 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		}
 
 		// Set max elevation (and adjust terrain type if necessary) based on distance to the start and end path tiles
-		const int MaxElevation = FTileCoord::HexDistance(FTileCoord(), Elem.Key);
+		//const int MaxElevation = FTileCoord::HexDistance(FTileCoord(), Elem.Key);
+		const int MaxElevation = FTileCoord::HexDistanceToTiles(PathTiles, Elem.Key);
 		Elem.Value->Elevation = FMath::Min(Elem.Value->Elevation, MaxElevation);
 
 		Elem.Value->TerrainType = ElevationTerrainMap[Elem.Value->Elevation];
