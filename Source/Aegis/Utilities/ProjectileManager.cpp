@@ -23,16 +23,27 @@ void AProjectileManager::Tick(float DeltaSeconds)
 
 	for (TTuple<UStaticMeshComponent*, FProjectilePackage> Element : ActiveProjectiles)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Speed: %f"), Element.Value.Speed)
-		const float DistanceToTravel = DeltaSeconds * Element.Value.Speed * 100;
-		FVector ForwardVector = Element.Value.EndPoint - Element.Value.StartPoint;
-		ForwardVector.Normalize();
+		UStaticMeshComponent* ProjectileMeshComponent = Element.Key;
+		FProjectilePackage* ProjectileData = &Element.Value;
+		const float DistanceToTravel = DeltaSeconds * ProjectileData->Speed * 100;
 
-		const FVector TargetLoc = Element.Key->GetComponentLocation() + (ForwardVector * DistanceToTravel);
+		if (ProjectileData->TargetEnemy)
+		{
+			FVector ForwardVector = ProjectileData->TargetEnemy->GetActorLocation() - ProjectileMeshComponent->GetComponentLocation();
+			ForwardVector.Z = 0;
+			ForwardVector.Normalize();
+			ProjectileData->ForwardVector = ForwardVector;
+			
+			// ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->GetActorLocation()-ProjectileMeshComponent->GetComponentLocation()).Rotation());
+		}
 
-		Element.Key->SetWorldLocation(TargetLoc, false);
+		FVector TargetLoc = ProjectileMeshComponent->GetComponentLocation() + (ProjectileData->ForwardVector * DistanceToTravel);
+		TargetLoc.Z = 200.f;
 
-		if (Element.Key->GetComponentLocation().Z < -100)
+		ProjectileMeshComponent->SetWorldLocation(TargetLoc, false);
+
+		// todo set lifetime and check every second and push to ProjectilesToRelease on that separate thread
+		if (Element.Key->GetComponentLocation().Z < -100 || Element.Key->GetComponentLocation().Z > 1000)
 		{
 			ProjectilesToRelease.Push(Element.Key);
 		}
@@ -76,15 +87,15 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	ProjectilesToRelease.Add(ProjectileMesh);
 }
 
-UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const FVector& End, const float Speed, UStaticMesh* ProjectileMesh)
+UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh)
 {
-	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, End, Speed);
+	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, TargetEnemy, Speed);
 
 	// Get a MeshComponent to use from the pool
 	UStaticMeshComponent* ProjectileMeshComponent = AcquireProjectile(ProjectilePackage);
 
 	ProjectileMeshComponent->SetWorldLocation(Start);
-	ProjectileMeshComponent->SetWorldRotation((End-Start).Rotation());
+	ProjectileMeshComponent->SetWorldRotation((TargetEnemy->GetActorLocation()-Start).Rotation());
 	
 	// Set the projectile mesh
 	ProjectileMeshComponent->SetStaticMesh(ProjectileMesh);
