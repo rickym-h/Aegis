@@ -13,6 +13,9 @@ struct FProjectileDamagePackage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float PhysicalDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
+	float ExplosionRadius;
 };
 
 USTRUCT(Blueprintable)

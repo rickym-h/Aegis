@@ -3,9 +3,10 @@
 
 #include "ProjectileManager.h"
 
+#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
-#include "Chaos/GeometryParticlesfwd.h"
-#include "Components/CapsuleComponent.h"
+#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
+#include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
 AProjectileManager::AProjectileManager()
@@ -55,9 +56,20 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!ProjectileMesh || !Enemy) { return; }
 
-	// TODO different damage for physical and magic
-	UGameplayStatics::ApplyDamage(Enemy, ActiveProjectiles[ProjectileMesh].DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
-
+	FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
+	if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
+	{
+		UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+	} else
+	{
+		DrawDebugSphere(GetWorld(), OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, 12, FColor::Red, false, -1, 0, 1);
+		const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+		TArray<AActor*> IgnoredActors;
+		IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
+		
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
+	}
+	
 	// Mark projectile to be cleaned
 	// This must be done at the end of the frame instead of as soon as the overlap event is made,
 	// to ensure that it does not break the tick loop

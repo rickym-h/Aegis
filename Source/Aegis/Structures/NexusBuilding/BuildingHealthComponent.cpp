@@ -54,7 +54,7 @@ void UBuildingHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, co
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Taking Damage! CurrentHealth: %f"), CurrentHealth)
+		UE_LOG(LogTemp, Warning, TEXT("%ls: Taking Damage! CurrentHealth: %f"), *DamagedActor->GetName() , CurrentHealth)
 	}
 }
 
