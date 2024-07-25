@@ -8,6 +8,9 @@ ATower::ATower()
 {
 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = false;
+
+	SourcePoint = CreateDefaultSubobject<USceneComponent>("Source Point");
+	SourcePoint->SetupAttachment(MeshOrigin);
 }
 
 // Called when the game starts or when spawned

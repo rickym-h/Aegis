@@ -34,12 +34,9 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 
 void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
 {
-	const FVector Start = GetActorLocation() + FVector(0, 0, 100);
-	//const FVector End = Enemy->GetActorLocation() + FVector(0, 0, 100);
-	//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 1, 0, 5);
-
 	if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{
+		const FVector Start = SourcePoint->GetComponentLocation();
 		GameState->ProjectileManager->FireProjectile(DamagePackage, Start, Enemy, ProjectileSpeed, ProjectileMesh);
 	}
 }

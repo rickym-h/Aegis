@@ -10,6 +10,7 @@ AStructure::AStructure()
 	PrimaryActorTick.bCanEverTick = false;
 
 	MeshOrigin = CreateDefaultSubobject<USceneComponent>("Mesh Origin");
+	SetRootComponent(MeshOrigin);
 }
 
 // Called when the game starts or when spawned

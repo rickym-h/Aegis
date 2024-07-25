@@ -16,19 +16,23 @@ AEnemy::AEnemy()
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	RootComponent = CreateDefaultSubobject<USceneComponent>("Root Scene Component");
+	
 	CollisionCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
-	RootComponent = CollisionCapsuleComponent;
+	CollisionCapsuleComponent->SetupAttachment(RootComponent);
 
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
 	Mesh->SetupAttachment(RootComponent);
 
 	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionCapsuleComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
-
 	CollisionCapsuleComponent->SetCollisionObjectType(ECC_GameTraceChannel2);
 	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
 	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel3, ECR_Overlap);
 	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel4, ECR_Overlap);
+
+	TargetPoint = CreateDefaultSubobject<USceneComponent>("Target Point");
+	TargetPoint->SetupAttachment(RootComponent);
 }
 
 // Called when the game starts or when spawned

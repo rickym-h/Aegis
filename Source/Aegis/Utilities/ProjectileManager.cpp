@@ -27,18 +27,18 @@ void AProjectileManager::Tick(float DeltaSeconds)
 		FProjectilePackage* ProjectileData = &Element.Value;
 		const float DistanceToTravel = DeltaSeconds * ProjectileData->Speed * 100;
 
-		if (ProjectileData->TargetEnemy)
+		if (IsValid(ProjectileData->TargetEnemy))
 		{
-			FVector ForwardVector = ProjectileData->TargetEnemy->GetActorLocation() - ProjectileMeshComponent->GetComponentLocation();
-			ForwardVector.Z = 0;
-			ForwardVector.Normalize();
-			ProjectileData->ForwardVector = ForwardVector;
+			FVector ForwardVector = ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation();
+			ProjectileData->ForwardVector = ForwardVector.GetSafeNormal();
 			
-			ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->GetActorLocation()-ProjectileMeshComponent->GetComponentLocation()).Rotation());
+			ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation()).Rotation());
+		} else
+		{
+			ProjectileData->ForwardVector = ProjectileMeshComponent->GetComponentRotation().Vector();
 		}
 
-		FVector TargetLoc = ProjectileMeshComponent->GetComponentLocation() + (ProjectileData->ForwardVector * DistanceToTravel);
-		TargetLoc.Z = 200.f;
+		const FVector TargetLoc = ProjectileMeshComponent->GetComponentLocation() + (ProjectileData->ForwardVector * DistanceToTravel);
 
 		ProjectileMeshComponent->SetWorldLocation(TargetLoc, false);
 
