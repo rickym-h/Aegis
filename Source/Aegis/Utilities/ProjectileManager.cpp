@@ -34,7 +34,7 @@ void AProjectileManager::Tick(float DeltaSeconds)
 			ForwardVector.Normalize();
 			ProjectileData->ForwardVector = ForwardVector;
 			
-			// ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->GetActorLocation()-ProjectileMeshComponent->GetComponentLocation()).Rotation());
+			ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->GetActorLocation()-ProjectileMeshComponent->GetComponentLocation()).Rotation());
 		}
 
 		FVector TargetLoc = ProjectileMeshComponent->GetComponentLocation() + (ProjectileData->ForwardVector * DistanceToTravel);
@@ -67,7 +67,7 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!ProjectileMesh || !Enemy) { return; }
 
-	FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
+	const FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
 	if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
 	{
 		UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
