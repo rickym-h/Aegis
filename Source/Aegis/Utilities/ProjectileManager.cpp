@@ -21,6 +21,8 @@ void AProjectileManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	int32 CurrentWorldSeconds = GetWorld()->GetTimeSeconds();
+
 	for (TTuple<UStaticMeshComponent*, FProjectilePackage> Element : ActiveProjectiles)
 	{
 		UStaticMeshComponent* ProjectileMeshComponent = Element.Key;
@@ -42,8 +44,8 @@ void AProjectileManager::Tick(float DeltaSeconds)
 
 		ProjectileMeshComponent->SetWorldLocation(TargetLoc, false);
 
-		// todo set lifetime and check every second and push to ProjectilesToRelease on that separate thread
-		if (Element.Key->GetComponentLocation().Z < -100 || Element.Key->GetComponentLocation().Z > 1000)
+		// Despawn projectile if the elapsed time has passed
+		if (CurrentWorldSeconds - ProjectileData->WorldTimeSeconds > 10)
 		{
 			ProjectilesToRelease.Push(Element.Key);
 		}
@@ -89,7 +91,7 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 
 UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh)
 {
-	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, TargetEnemy, Speed);
+	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, TargetEnemy, Speed, GetWorld()->GetTimeSeconds());
 
 	// Get a MeshComponent to use from the pool
 	UStaticMeshComponent* ProjectileMeshComponent = AcquireProjectile(ProjectilePackage);

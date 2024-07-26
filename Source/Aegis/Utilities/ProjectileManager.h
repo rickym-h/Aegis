@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Kismet/GameplayStatics.h"
 #include "ProjectileManager.generated.h"
 
 class AEnemy;
@@ -28,14 +29,16 @@ struct FProjectilePackage
 		StartPoint = FVector::ZeroVector;
 		TargetEnemy = nullptr;
 		Speed = 0;
+		WorldTimeSeconds = 0;
 	}
 	
-	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, const FVector& InStartPoint, const AEnemy* InTargetEnemy, const float InSpeed)
+	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, const FVector& InStartPoint, const AEnemy* InTargetEnemy, const float InSpeed, const int InWorldTimeSeconds)
 	{
 		DamagePackage = InDamagePackage;
 		StartPoint = InStartPoint;
 		TargetEnemy = InTargetEnemy;
 		Speed = InSpeed;
+		WorldTimeSeconds = InWorldTimeSeconds;
 	}
 
 	GENERATED_BODY()
@@ -52,6 +55,9 @@ struct FProjectilePackage
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	FVector ForwardVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	int32 WorldTimeSeconds;
 };
 
 /**
