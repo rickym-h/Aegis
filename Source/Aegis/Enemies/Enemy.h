@@ -64,4 +64,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	float GetDistanceToNexus() const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
+	USceneComponent* TargetPoint;
 };

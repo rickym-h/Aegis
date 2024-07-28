@@ -3,9 +3,11 @@
 
 #include "ProjectileManager.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
-#include "Chaos/GeometryParticlesfwd.h"
-#include "Components/CapsuleComponent.h"
+#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
+#include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
 
 AProjectileManager::AProjectileManager()
@@ -20,18 +22,31 @@ void AProjectileManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
+	int32 CurrentWorldSeconds = GetWorld()->GetTimeSeconds();
+
 	for (TTuple<UStaticMeshComponent*, FProjectilePackage> Element : ActiveProjectiles)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Speed: %f"), Element.Value.Speed)
-		const float DistanceToTravel = DeltaSeconds * Element.Value.Speed * 100;
-		FVector ForwardVector = Element.Value.EndPoint - Element.Value.StartPoint;
-		ForwardVector.Normalize();
+		UStaticMeshComponent* ProjectileMeshComponent = Element.Key;
+		FProjectilePackage* ProjectileData = &Element.Value;
+		const float DistanceToTravel = DeltaSeconds * ProjectileData->Speed * 100;
 
-		const FVector TargetLoc = Element.Key->GetComponentLocation() + (ForwardVector * DistanceToTravel);
+		if (IsValid(ProjectileData->TargetEnemy))
+		{
+			FVector ForwardVector = ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation();
+			ProjectileData->ForwardVector = ForwardVector.GetSafeNormal();
+			
+			ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation()).Rotation());
+		} else
+		{
+			ProjectileData->ForwardVector = ProjectileMeshComponent->GetComponentRotation().Vector();
+		}
 
-		Element.Key->SetWorldLocation(TargetLoc, false);
+		const FVector TargetLoc = ProjectileMeshComponent->GetComponentLocation() + (ProjectileData->ForwardVector * DistanceToTravel);
 
-		if (Element.Key->GetComponentLocation().Z < -100)
+		ProjectileMeshComponent->SetWorldLocation(TargetLoc, false);
+
+		// Despawn projectile if the elapsed time has passed
+		if (CurrentWorldSeconds - ProjectileData->WorldTimeSeconds > 10)
 		{
 			ProjectilesToRelease.Push(Element.Key);
 		}
@@ -55,24 +70,39 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!ProjectileMesh || !Enemy) { return; }
 
-	// TODO different damage for physical and magic
-	UGameplayStatics::ApplyDamage(Enemy, ActiveProjectiles[ProjectileMesh].DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+	const FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
+	if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
+	{
+		UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+	} else
+	{
+		DrawDebugSphere(GetWorld(), OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, 12, FColor::Red, false, -1, 0, 1);
+		const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+		TArray<AActor*> IgnoredActors;
+		IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
+		
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
+	}
 
+	if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->DamagePackage.OnHitParticleSystem)
+	{
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
+	}
 	// Mark projectile to be cleaned
 	// This must be done at the end of the frame instead of as soon as the overlap event is made,
 	// to ensure that it does not break the tick loop
 	ProjectilesToRelease.Add(ProjectileMesh);
 }
 
-UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const FVector& End, const float Speed, UStaticMesh* ProjectileMesh)
+UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh)
 {
-	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, End, Speed);
+	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, TargetEnemy, Speed, GetWorld()->GetTimeSeconds());
 
 	// Get a MeshComponent to use from the pool
 	UStaticMeshComponent* ProjectileMeshComponent = AcquireProjectile(ProjectilePackage);
 
 	ProjectileMeshComponent->SetWorldLocation(Start);
-	ProjectileMeshComponent->SetWorldRotation((End-Start).Rotation());
+	ProjectileMeshComponent->SetWorldRotation((TargetEnemy->GetActorLocation()-Start).Rotation());
 	
 	// Set the projectile mesh
 	ProjectileMeshComponent->SetStaticMesh(ProjectileMesh);

@@ -3,8 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "UObject/Object.h"
+#include "NiagaraSystem.h"
 #include "ProjectileManager.generated.h"
+
+class AEnemy;
 
 USTRUCT(Blueprintable)
 struct FProjectileDamagePackage
@@ -13,6 +15,12 @@ struct FProjectileDamagePackage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float PhysicalDamage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
+	float ExplosionRadius;
+
+	UPROPERTY(EditAnywhere, Category = "Firing")
+	UNiagaraSystem* OnHitParticleSystem;
 };
 
 USTRUCT(Blueprintable)
@@ -22,16 +30,18 @@ struct FProjectilePackage
 	{
 		DamagePackage = FProjectileDamagePackage();
 		StartPoint = FVector::ZeroVector;
-		EndPoint =  FVector::ZeroVector;
+		TargetEnemy = nullptr;
 		Speed = 0;
+		WorldTimeSeconds = 0;
 	}
 	
-	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, const FVector& InStartPoint, const FVector& InEndPoint, const float InSpeed)
+	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, const FVector& InStartPoint, const AEnemy* InTargetEnemy, const float InSpeed, const int InWorldTimeSeconds)
 	{
 		DamagePackage = InDamagePackage;
 		StartPoint = InStartPoint;
-		EndPoint = InEndPoint;
+		TargetEnemy = InTargetEnemy;
 		Speed = InSpeed;
+		WorldTimeSeconds = InWorldTimeSeconds;
 	}
 
 	GENERATED_BODY()
@@ -42,10 +52,15 @@ struct FProjectilePackage
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	FVector StartPoint;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	FVector EndPoint;
+	const AEnemy* TargetEnemy;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	float Speed;
-	// TODO float ArcHeight;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	FVector ForwardVector;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	int32 WorldTimeSeconds;
 };
 
 /**
@@ -65,7 +80,7 @@ public:
 
 	UFUNCTION()
 	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UStaticMeshComponent* FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const FVector& End, const float Speed, UStaticMesh* ProjectileMesh);
+	UStaticMeshComponent* FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh);
 
 protected:
 	UStaticMeshComponent* AcquireProjectile(const FProjectilePackage& ProjectilePackage);
