@@ -51,7 +51,7 @@ void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 		AegisMap->DestroyMap();
 	}
 
-	AegisMap = MapFactory->GenerateMapWithNoise(20);
+	AegisMap = MapFactory->GenerateMapWithNoise(3);
 }
 
 void AAegisGameStateBase::SaveGame()

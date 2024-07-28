@@ -23,7 +23,7 @@ public:
 	static TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute);
 
 	UFUNCTION()
-	UAegisMap* GenerateMapWithNoise(const int MainPathLength) const;
+	UAegisMap* GenerateMapWithNoise(const int PathNodeLength) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")

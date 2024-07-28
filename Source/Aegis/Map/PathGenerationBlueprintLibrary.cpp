@@ -242,9 +242,8 @@ TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(cons
 	return NodePoints;
 }
 
-TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int MainPathLength,
-																						const TArray<FTileCoord>& PoissonNodeCoords,
-																						const int NodeLength,
+TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(const int PathNodeLength,
+                                                                                        const TArray<FTileCoord>& PoissonNodeCoords,
                                                                                         const FVector2d ElevationNoiseOffset,
                                                                                         const FRandomStream RandomStream)
 {
@@ -253,7 +252,7 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
 	// Get the Path Nodes using a Greedy closest Node search of the poisson clusters
 	TArray<FTileCoord> NodesInPathSoFar;
 	NodesInPathSoFar.Add(FTileCoord(0, 0));
-	for (int i = 0; i < NodeLength; i++)
+	for (int i = 0; i < PathNodeLength; i++)
 	{
 		FTileCoord Head = NodesInPathSoFar.Top();
 
@@ -273,7 +272,6 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
 	}
 
 	// For every node in the Path array, use A* to connect it to the previous node
-	// If no A* path is found (or if the path found is longer than the 2x the HexDistance), apply a softening function to reduce the number of impassable tiles
 	Path.Add(FTileCoord(), FTileCoord());
 	for (int StartTileIndex = 1; StartTileIndex < NodesInPathSoFar.Num(); StartTileIndex++)
 	{
@@ -283,8 +281,6 @@ TMap<FTileCoord, FTileCoord> UPathGenerationBlueprintLibrary::GenerateGreedyPois
 		TMap<FTileCoord, FTileCoord> PathFromGoalToStart = AStarPathFind(StartTile, GoalTile, ElevationNoiseOffset, Path);
 		Path.Append(PathFromGoalToStart);
 	}
-
-	// TODO trim path to MainPathLength length
 
 	return Path;
 }

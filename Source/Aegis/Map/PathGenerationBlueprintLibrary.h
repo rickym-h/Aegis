@@ -26,8 +26,8 @@ public:
 	static TMap<FTileCoord, FTileCoord> AStarPathFind(FTileCoord StartTile, FTileCoord GoalTile, FVector2D PathingNoiseOffset,
 	                                                  TMap<FTileCoord, FTileCoord> ExistingPath);
 	static TArray<FTileCoord> GetPoissonClusterCoords(const int GenerationRadius, int Poisson_Radius, const int MaxSamplesCount, FRandomStream RandomStream);
-	static TMap<FTileCoord, FTileCoord> GenerateGreedyPoissonPath(const int MainPathLength, const TArray<FTileCoord>& PoissonNodeCoords,
-	                                                              const int NodeLength, const FVector2d ElevationNoiseOffset, const FRandomStream RandomStream);
+	static TMap<FTileCoord, FTileCoord> GenerateGreedyPoissonPath(const int PathNodeLength, const TArray<FTileCoord>& PoissonNodeCoords,
+	                                                              const FVector2d ElevationNoiseOffset, const FRandomStream RandomStream);
 
 	static TMap<FTileCoord, UMapTileData*> GenerateMapTilesData(const TMap<FTileCoord, FTileCoord>& Path, FVector2D ElevationNoiseOffset,
 	                                                            FVector2D TreeNoiseOffset, FVector2D StoneNoiseOffset, FRandomStream RandomStream);
