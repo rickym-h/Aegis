@@ -3,6 +3,7 @@
 
 #include "ProjectileManager.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
@@ -82,7 +83,11 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 		
 		UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
 	}
-	
+
+	if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->DamagePackage.OnHitParticleSystem)
+	{
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
+	}
 	// Mark projectile to be cleaned
 	// This must be done at the end of the frame instead of as soon as the overlap event is made,
 	// to ensure that it does not break the tick loop

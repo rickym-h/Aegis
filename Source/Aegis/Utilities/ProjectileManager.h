@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Kismet/GameplayStatics.h"
+#include "NiagaraSystem.h"
 #include "ProjectileManager.generated.h"
 
 class AEnemy;
@@ -18,6 +18,9 @@ struct FProjectileDamagePackage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float ExplosionRadius;
+
+	UPROPERTY(EditAnywhere, Category = "Firing")
+	UNiagaraSystem* OnHitParticleSystem;
 };
 
 USTRUCT(Blueprintable)
