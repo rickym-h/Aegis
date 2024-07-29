@@ -38,6 +38,9 @@ protected:
 	
 	UPROPERTY(BlueprintReadOnly, Category="MetaData")
 	UAegisMap* MapReference;
+	
+	UFUNCTION()
+	bool IsTileTypeValid(FTileCoord Location) const;
 
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
@@ -47,7 +50,7 @@ public:
 	TSubclassOf<AStructure> GetStructureBlueprintClass() const;
 
 	UFUNCTION(BlueprintCallable)
-	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const
+	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation, UStructureData* StructureData) const
 	{
 		UE_LOG(LogTemp, Fatal,
 		       TEXT("UStructureData::SpawnStructureFromData() - Base structure data function called - should be overridden by leaf classes."))
@@ -66,10 +69,11 @@ public:
 	// A list of resource types this structure can be placed on
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	TArray<TEnumAsByte<EResourceType>> AllowedResources;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
+	TArray<FTileCoord> StructureOffsets;
 
-	UFUNCTION()
-	bool IsTileTypeValid(FTileCoord Location);
 	
 	UFUNCTION(BlueprintCallable)
-	virtual bool CanStructureBePlaced(FTileCoord Location);
+	virtual bool CanStructureBePlaced(const FTileCoord Location, const bool bCheckSingleTile = false);
 };

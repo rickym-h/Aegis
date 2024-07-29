@@ -3,6 +3,8 @@
 
 #include "Structure.h"
 
+#include "StructureData.h"
+
 // Sets default values
 AStructure::AStructure()
 {

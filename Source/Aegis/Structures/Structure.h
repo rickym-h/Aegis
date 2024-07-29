@@ -22,9 +22,14 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
+	UStructureData* StructureData;
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data", meta=(ToolTip="Origin point for the mesh, so any visible meshes part of this structure should be attached to this"))
 	USceneComponent* MeshOrigin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	FTileCoord CurrentLocation;
+
+	
 };

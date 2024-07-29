@@ -5,6 +5,7 @@
 
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
+#include "Aegis/Map/MapTile.h"
 #include "Aegis/Pawns/PlayerPawn.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -14,18 +15,48 @@ TSubclassOf<AStructure> UStructureData::GetStructureBlueprintClass() const
 	return StructureBlueprintClass;
 }
 
-bool UStructureData::CanStructureBePlaced(const FTileCoord Location)
+bool UStructureData::CanStructureBePlaced(const FTileCoord Location, const bool bCheckSingleTile)
 {
-	return IsTileTypeValid(Location) && Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->Resources->IsResourcesEnough(StructureCost);
-}
-
-bool UStructureData::IsTileTypeValid(const FTileCoord Location)
-{
+	if (!Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->Resources->IsResourcesEnough(StructureCost))
+	{
+		return false;
+	}
+	
 	if (!MapReference)
 	{
 		MapReference = Cast<AAegisGameStateBase>(GetWorld()->GetGameState())->AegisMap;
+	}	
+
+	// Check that all the offset tiles are valid and at same elevation as origin tile
+	const int32 OriginTileElevation = MapReference->GetTile(Location)->MapTileData->Elevation;
+	if (!bCheckSingleTile)
+	{
+		for(FTileCoord Offset : StructureOffsets)
+		{
+			const AMapTile* OffsetTile = MapReference->GetTile(Location + Offset);
+			if (!OffsetTile || OffsetTile->MapTileData->Elevation != OriginTileElevation)
+			{
+				return false;
+			}
+			
+			if (!IsTileTypeValid(Location + Offset))
+			{
+				return false;
+			}
+		}
+	}
+	// Check origin tile is valid because the offset tiles do not include the origin tile
+	if (!IsTileTypeValid(Location))
+	{
+		return false;
 	}
 
+	
+	return true;
+}
+
+bool UStructureData::IsTileTypeValid(const FTileCoord Location) const
+{
 	// Check there are no other structures there
 	if (!MapReference->IsTileAvailable(Location)) { return false; }
 

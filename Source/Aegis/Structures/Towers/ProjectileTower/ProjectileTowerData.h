@@ -16,7 +16,7 @@ class AEGIS_API UProjectileTowerData : public UTowerData
 	GENERATED_BODY()
 
 public:
-	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const override;
+	virtual AStructure* SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation, UStructureData* StructureData) const override;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
 	UStaticMesh* ProjectileMesh;

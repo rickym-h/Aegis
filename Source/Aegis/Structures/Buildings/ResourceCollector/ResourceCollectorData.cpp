@@ -7,13 +7,14 @@
 #include "Aegis/Structures/Structure.h"
 #include "Kismet/GameplayStatics.h"
 
-AStructure* UResourceCollectorData::SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation) const
+AStructure* UResourceCollectorData::SpawnStructureFromData(const FTileCoord CoordToSpawnStructure, const FVector BuildingLocation, UStructureData* StructureData) const
 {
 	if (!StructureBlueprintClass) { return nullptr; }
 
 	const FTransform ActorTransform = FTransform(BuildingLocation);
 	AResourceCollector* NewStructure = GetWorld()->SpawnActorDeferred<AResourceCollector>(StructureBlueprintClass, ActorTransform);
 
+	NewStructure->StructureData = StructureData;
 	NewStructure->CurrentLocation = CoordToSpawnStructure;
 
 	UGameplayStatics::FinishSpawningActor(NewStructure, ActorTransform);

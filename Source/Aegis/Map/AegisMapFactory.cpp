@@ -54,7 +54,7 @@ UAegisMap* UAegisMapFactory::GenerateMapWithNoise(const int PathNodeLength) cons
 	// 	}
 	// }
 	
-	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(MainPathLength, PoissonNodeCoords, NODE_LENGTH, PathingNoiseOffset, RandomStream);
+	const TMap<FTileCoord, FTileCoord> Path = UPathGenerationBlueprintLibrary::GenerateGreedyPoissonPath(PathNodeLength, PoissonNodeCoords, PathingNoiseOffset, RandomStream);
 
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = UPathGenerationBlueprintLibrary::GenerateMapTilesData(
 		Path, ElevationNoiseOffset, TreeNoiseOffset, StoneNoiseOffset, RandomStream);

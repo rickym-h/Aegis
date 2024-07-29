@@ -28,11 +28,6 @@ APlayerPawn::APlayerPawn()
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
-	StructureHologram = CreateDefaultSubobject<UStaticMeshComponent>("Hologram Structure");
-	StructureHologram->SetupAttachment(RootComponent);
-	StructureHologram->SetVisibility(false);
-	StructureHologram->SetCollisionResponseToAllChannels(ECR_Ignore);
-
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("Floating Movement Component");
 
 	Resources = CreateDefaultSubobject<UResourcesData>("Resources");
@@ -50,8 +45,6 @@ void APlayerPawn::BeginPlay()
 		GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	}
 
-	StructureHologram->SetWorldLocation(FTileCoord().ToWorldLocation());
-
 	if (GameState)
 	{
 		TowerCardsInHand.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
@@ -59,6 +52,15 @@ void APlayerPawn::BeginPlay()
 
 	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::BeginPlay()"))
 	OnTowersInHandUpdatedDelegate.Broadcast();
+}
+
+void APlayerPawn::ClearStructureHolograms()
+{
+	for(UStaticMeshComponent* Component : StructureHolograms)
+	{
+		Component->DestroyComponent();
+	}
+	StructureHolograms = TArray<UStaticMeshComponent*>();
 }
 
 FHitResult* APlayerPawn::UpdateHitResultUnderCursor()
@@ -87,10 +89,29 @@ void APlayerPawn::Tick(float DeltaTime)
 
 		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 		{
-			StructureHologram->SetWorldLocation(MapTile->StructureLocation);
+			StructureHolograms[0]->SetWorldLocation(MapTile->StructureLocation);
+			bool bIsPlacementPossible = StructureToPlace->CanStructureBePlaced(MapTile->TileCoord);
+			UpdateStructureHologramMesh(StructureHolograms[0], bIsPlacementPossible);
 
-			// Update StructureHologram
-			UpdateStructureHologramMesh(StructureToPlace->CanStructureBePlaced(MapTile->TileCoord));
+
+			for (int i = 0; i < StructureToPlace->StructureOffsets.Num(); i++)
+			{
+				const AMapTile* OffsetTile = GameState->AegisMap->GetTile(MapTile->TileCoord + StructureToPlace->StructureOffsets[i]);
+				if (!OffsetTile)
+				{
+					StructureHolograms[1+i]->SetVisibility(false);
+					continue;
+				}
+				
+				const FVector StructureOffsetVector = OffsetTile->StructureLocation;
+				 
+				StructureHolograms[1+i]->SetWorldLocation(StructureOffsetVector);
+				StructureHolograms[1+i]->SetVisibility(true);
+				
+				// Update StructureHologram.
+				UpdateStructureHologramMesh(StructureHolograms[1+i], bIsPlacementPossible);
+			}
+
 		}
 	}
 
@@ -103,10 +124,6 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	UpdateHitResultUnderCursor();
 
 	const FVector Location = HitResultUnderCursor.Location;
-	//DrawDebugSphere(GetWorld(), Location, 200, 13, FColor::Green, false, 3, 0, 3);
-	UE_LOG(LogTemp, Warning, TEXT("Round the FVector: %ls"), *Location.ToString())
-	//const FTileCoord RoundedCoord = FTileCoord::PixelToHex(Location);
-	//DrawDebugSphere(GetWorld(), RoundedCoord.ToWorldLocation(), 200, 12, FColor::Red, false, 3, 0, 3);
 
 
 	const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor());
@@ -121,7 +138,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 			{
 				PlayerActionState = Default;
 				StructureToPlace = nullptr;
-				StructureHologram->SetVisibility(false);
+				ClearStructureHolograms();
 				if (StructureData->bRemoveInstanceOnPlacement)
 				{
 					RemoveTowerCardFromHand(StructureData);
@@ -185,10 +202,20 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 	PlayerActionState = Placing;
 	StructureToPlace = StructureData;
 
-	// if (UStaticMesh* Mesh = StructureToPlace->GetMeshRepresentation())
-	// {
-	// 	StructureHologram->SetStaticMesh(Mesh);
-	// }
-
-	StructureHologram->SetVisibility(true);
+	// Ensure there are enough structure holograms
+	ClearStructureHolograms();
+	
+	for (int i = 0; i < StructureData->StructureOffsets.Num()+1; i++)
+	{
+		//UStaticMeshComponent* StructureHologramComp = CreateDefaultSubobject<UStaticMeshComponent>("Hologram Structure" + i);
+		UStaticMeshComponent* StructureHologramComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass());
+		StructureHologramComp->RegisterComponent();
+		
+		StructureHologramComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		StructureHologramComp->SetVisibility(false);
+		StructureHologramComp->SetCollisionResponseToAllChannels(ECR_Ignore);
+		StructureHologramComp->SetWorldLocation(FTileCoord().ToWorldLocation());
+		StructureHolograms.Add(StructureHologramComp);
+		StructureHologramComp->SetVisibility(true);
+	}
 }

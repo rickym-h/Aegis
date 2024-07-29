@@ -114,7 +114,7 @@ bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* Str
 	// Create actor instance of tower class
 	// Set the data of the tower actor based on tower data
 	// Finish spawning tower actor
-	AStructure* Structure = StructureData->SpawnStructureFromData(Location, GetTile(Location)->StructureLocation);
+	AStructure* Structure = StructureData->SpawnStructureFromData(Location, GetTile(Location)->StructureLocation, StructureData);
 
 	if (!Structure) { return false; }
 
@@ -170,9 +170,21 @@ TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTiles(const TMap<FTileCoord, U
 
 bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 {
+	// Check the location is not part of the path
+	if (PathRoute.Contains(Location)) { return false; }
+
+	// Check the location is not used for an existing structure
 	if (MapStructures.Contains(Location)) { return false; }
 
-	if (PathRoute.Contains(Location)) { return false; }
+	// Check the location is not used by an offset of an existing structure
+	for (TTuple<FTileCoord, AStructure*> MapStructure : MapStructures)
+	{
+		for (FTileCoord Offset : MapStructure.Value->StructureData->StructureOffsets)
+		{
+			const FTileCoord UsedWorldCoord = MapStructure.Key + Offset;
+			if (UsedWorldCoord == Location) { return false; }
+		}
+	}
 
 	return true;
 }
