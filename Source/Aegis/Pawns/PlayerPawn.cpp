@@ -90,7 +90,7 @@ void APlayerPawn::Tick(float DeltaTime)
 		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 		{
 			StructureHolograms[0]->SetWorldLocation(MapTile->StructureLocation);
-			bool bIsPlacementPossible = StructureToPlace->CanStructureBePlaced(MapTile->TileCoord);
+			const bool bIsPlacementPossible = StructureToPlace->CanStructureBePlaced(MapTile->TileCoord);
 			UpdateStructureHologramMesh(StructureHolograms[0], bIsPlacementPossible);
 
 
@@ -211,7 +211,7 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 		UStaticMeshComponent* StructureHologramComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass());
 		StructureHologramComp->RegisterComponent();
 		
-		StructureHologramComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepRelativeTransform);
+		//StructureHologramComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
 		StructureHologramComp->SetVisibility(false);
 		StructureHologramComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 		StructureHologramComp->SetWorldLocation(FTileCoord().ToWorldLocation());
