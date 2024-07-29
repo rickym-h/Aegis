@@ -143,6 +143,7 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 				{
 					RemoveTowerCardFromHand(StructureData);
 				}
+				OnStopPlacingDelegate.Broadcast();
 			}
 		}
 	}

@@ -15,7 +15,7 @@ class USpringArmComponent;
 class UCameraComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTowersInHandUpdated);
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlacingSignature);
 
 UENUM()
 enum EPlayerState
@@ -61,6 +61,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
 	void ClearStructureHolograms();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnStopPlacingSignature OnStopPlacingDelegate;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateStructureHologramMesh(UStaticMeshComponent* HologramMeshComponent, bool IsValid);
