@@ -3,9 +3,7 @@
 
 #include "DefenderRangeComponent.h"
 
-#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
-#include "Aegis/Map/MapTile.h"
 #include "Aegis/Enemies/Enemy.h"
 
 // Sets default values for this component's properties
@@ -16,6 +14,10 @@ UDefenderRangeComponent::UDefenderRangeComponent()
 	PrimaryComponentTick.bCanEverTick = false;
 
 	// ...
+	SetVisibility(false);
+	UPrimitiveComponent::SetCollisionObjectType(ECC_GameTraceChannel3);
+	UPrimitiveComponent::SetCollisionResponseToAllChannels(ECR_Ignore);
+	UPrimitiveComponent::SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 }
 
 
@@ -23,13 +25,9 @@ UDefenderRangeComponent::UDefenderRangeComponent()
 void UDefenderRangeComponent::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	SetCapsuleSize(86.60254038, 86.60254038+300);
 
-	// Check if enemies are around as soon as the tower is spawned
-	const TSet<AEnemy*> Enemies = GetAllEnemiesInRange();
-	if (AEnemy* Enemy = GetFrontEnemy(Enemies))
-	{
-		OnEnemyEnterRangeDelegate.Broadcast(Enemy);
-	}
 }
 
 void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -46,29 +44,35 @@ void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedC
 
 void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const int Range)
 {
-	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-	if (!GameState) { return; }
-
-	for (const FTileCoord TileInRange : FTileCoord::GetTilesInRadius(DefenderCoord, Range))
+	// Set the range capsule
+	const int Scale = 1+(Range*2);
+	SetWorldScale3D(FVector(1, Scale, Scale));
+	OnComponentBeginOverlap.AddUniqueDynamic(this, &UDefenderRangeComponent::OnEnemyEnterRange);
+	
+	// Check if enemies are around as soon as the tower is spawned
+	const TSet<AEnemy*> Enemies = GetAllEnemiesInRange();
+	if (AEnemy* Enemy = GetFrontEnemy(Enemies))
 	{
-		if (AMapTile* Tile = GameState->AegisMap->GetTile(TileInRange))
-		{
-			// Add tile to our TilesInRange TArray
-			TilesInRange.Add(Tile);
-
-			// Subscribe Enemy Entered range function to Overlap delegate in Tile Collision Mesh
-			Tile->CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &UDefenderRangeComponent::OnEnemyEnterRange);
-		}
+		OnEnemyEnterRangeDelegate.Broadcast(Enemy);
 	}
+	
 }
 
 TSet<AEnemy*> UDefenderRangeComponent::GetAllEnemiesInRange()
 {
 	TSet<AEnemy*> Enemies;
-	for (const AMapTile* Tile : TilesInRange)
+
+	TArray<AActor*> OverlappingActors;
+	GetOverlappingActors(OverlappingActors, AEnemy::StaticClass());
+
+	for (AActor* Actor : OverlappingActors)
 	{
-		Enemies.Append(Tile->EnemiesOnTile);
+		if (AEnemy* Enemy = Cast<AEnemy>(Actor))
+		{
+			Enemies.Add(Enemy);
+		}
 	}
+	
 	return Enemies;
 }
 

@@ -12,6 +12,7 @@
 AProjectileTower::AProjectileTower()
 {
 	RangeComponent = CreateDefaultSubobject<UDefenderRangeComponent>("Range Component");
+	RangeComponent->SetupAttachment(SourcePoint);
 	ShotAvailable = true;
 }
 
@@ -57,8 +58,8 @@ void AProjectileTower::SetTowerRange(const int NewRange)
 	if (NewRange <= 0) { return; }
 
 	TowerRange = NewRange;
-	RangeComponent->InitRange(CurrentLocation, NewRange);
 	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
+	RangeComponent->InitRange(CurrentLocation, NewRange);
 
 	const int DecalScale = 1+(TowerRange*2);
 	RangeIndicatorDecal->SetWorldScale3D(FVector(1, DecalScale, DecalScale));

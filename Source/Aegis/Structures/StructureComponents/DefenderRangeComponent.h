@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Components/ActorComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "DefenderRangeComponent.generated.h"
 
 
@@ -14,7 +15,7 @@ class AMapTile;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterRangeSignature, AEnemy*, OutEnemy);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class AEGIS_API UDefenderRangeComponent : public UActorComponent
+class AEGIS_API UDefenderRangeComponent : public UCapsuleComponent
 {
 	GENERATED_BODY()
 
@@ -25,8 +26,6 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
-	TArray<AMapTile*> TilesInRange;
 
 	UFUNCTION()
 	void OnEnemyEnterRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
