@@ -7,6 +7,7 @@
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Structures/StructureComponents/DefenderRangeComponent.h"
 #include "Aegis/Utilities/ProjectileManager.h"
+#include "Components/DecalComponent.h"
 
 AProjectileTower::AProjectileTower()
 {
@@ -57,6 +58,8 @@ void AProjectileTower::SetTowerRange(const int NewRange)
 
 	TowerRange = NewRange;
 	RangeComponent->InitRange(CurrentLocation, NewRange);
-
 	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
+
+	const int DecalScale = 1+(TowerRange*2);
+	RangeIndicatorDecal->SetWorldScale3D(FVector(1, DecalScale, DecalScale));
 }

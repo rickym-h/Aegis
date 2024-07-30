@@ -8,9 +8,13 @@
 #include "ResourcesData.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
+#include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/StructureDataFactory.h"
 #include "Aegis/Structures/Towers/TowerData.h"
+#include "Aegis/Structures/Towers/ProjectileTower/ProjectileTower.h"
+#include "Aegis/Structures/Towers/ProjectileTower/ProjectileTowerData.h"
 #include "Camera/CameraComponent.h"
+#include "Components/DecalComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
@@ -31,6 +35,16 @@ APlayerPawn::APlayerPawn()
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("Floating Movement Component");
 
 	Resources = CreateDefaultSubobject<UResourcesData>("Resources");
+
+	RangeIndicatorDecal = CreateDefaultSubobject<UDecalComponent>("Range Indicator Decal");
+	RangeIndicatorDecal->SetVisibility(false);
+	RangeIndicatorDecal->SetWorldLocation(FVector::ZeroVector);
+	RangeIndicatorDecal->SetWorldRotation(FRotator(90, 0, 0));
+	RangeIndicatorDecal->DecalSize = FVector(500, 86.60254038, 86.60254038);
+	RangeIndicatorDecal->SetWorldScale3D(FVector(1,1,1));
+	//UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Rotating.M_RangeDecal_Rotating'")).Object;
+	UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Static.M_RangeDecal_Static'")).Object;
+	RangeIndicatorDecal->SetMaterial(0, DecalMat);
 
 	PlayerActionState = Default;
 }
@@ -63,6 +77,22 @@ void APlayerPawn::ClearStructureHolograms()
 	StructureHolograms = TArray<UStaticMeshComponent*>();
 }
 
+void APlayerPawn::SelectStructure(AStructure* StructureToSelect)
+{
+	// What to do to unselect the old tower
+	if (const AProjectileTower* ProjectileTower = Cast<AProjectileTower>(SelectedStructure))
+	{
+		ProjectileTower->RangeIndicatorDecal->SetVisibility(false);
+	}
+	
+	SelectedStructure = StructureToSelect;
+	
+	if (const AProjectileTower* ProjectileTower = Cast<AProjectileTower>(SelectedStructure))
+	{
+		ProjectileTower->RangeIndicatorDecal->SetVisibility(true);
+	}
+}
+
 FHitResult* APlayerPawn::UpdateHitResultUnderCursor()
 {
 	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
@@ -89,11 +119,11 @@ void APlayerPawn::Tick(float DeltaTime)
 
 		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 		{
+			RangeIndicatorDecal->SetWorldLocation(MapTile->StructureLocation);
+			RangeIndicatorDecal->SetVisibility(true);
 			StructureHolograms[0]->SetWorldLocation(MapTile->StructureLocation);
 			const bool bIsPlacementPossible = StructureToPlace->CanStructureBePlaced(MapTile->TileCoord);
 			UpdateStructureHologramMesh(StructureHolograms[0], bIsPlacementPossible);
-
-
 			for (int i = 0; i < StructureToPlace->StructureOffsets.Num(); i++)
 			{
 				const AMapTile* OffsetTile = GameState->AegisMap->GetTile(MapTile->TileCoord + StructureToPlace->StructureOffsets[i]);
@@ -122,31 +152,39 @@ void APlayerPawn::Tick(float DeltaTime)
 void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 {
 	UpdateHitResultUnderCursor();
-
-	const FVector Location = HitResultUnderCursor.Location;
-
-
-	const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor());
-	if (!Tile) { return; }
-
-	// Try to place tower if a tower is selected
-	if (PlayerActionState == Placing)
+	
+	if (const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 	{
-		if (UStructureData* StructureData = Cast<UStructureData>(StructureToPlace))
+		// Try to place tower if a tower is selected
+		if (PlayerActionState == Placing)
 		{
-			if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData, this))
+			if (UStructureData* StructureData = Cast<UStructureData>(StructureToPlace))
 			{
-				PlayerActionState = Default;
-				StructureToPlace = nullptr;
-				ClearStructureHolograms();
-				if (StructureData->bRemoveInstanceOnPlacement)
+				if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData, this))
 				{
-					RemoveTowerCardFromHand(StructureData);
+					PlayerActionState = Default;
+					StructureToPlace = nullptr;
+					ClearStructureHolograms();
+					RangeIndicatorDecal->SetVisibility(false);
+					if (StructureData->bRemoveInstanceOnPlacement)
+					{
+						RemoveTowerCardFromHand(StructureData);
+					}
+					OnStopPlacingDelegate.Broadcast();
 				}
-				OnStopPlacingDelegate.Broadcast();
 			}
 		}
 	}
+	
+	if (AStructure* Structure = Cast<AStructure>(HitResultUnderCursor.GetActor()))
+	{
+		SelectStructure(Structure);
+	} else
+	{
+		SelectStructure(nullptr);
+	}
+
+	
 }
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
@@ -205,7 +243,6 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 
 	// Ensure there are enough structure holograms
 	ClearStructureHolograms();
-	
 	for (int i = 0; i < StructureData->StructureOffsets.Num()+1; i++)
 	{
 		//UStaticMeshComponent* StructureHologramComp = CreateDefaultSubobject<UStaticMeshComponent>("Hologram Structure" + i);
@@ -218,5 +255,11 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 		StructureHologramComp->SetWorldLocation(FTileCoord().ToWorldLocation());
 		StructureHolograms.Add(StructureHologramComp);
 		StructureHologramComp->SetVisibility(true);
+	}
+
+	if (const UProjectileTowerData* ProjectileTowerData = Cast<UProjectileTowerData>(StructureData))
+	{
+		const int DecalScale = 1+(ProjectileTowerData->TowerRange*2);
+		RangeIndicatorDecal->SetWorldScale3D(FVector(1, DecalScale, DecalScale));
 	}
 }

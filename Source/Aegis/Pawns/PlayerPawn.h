@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
 
+class AStructure;
 class UResourcesData;
 class UStructureData;
 class UFloatingPawnMovement;
@@ -61,12 +62,21 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
 	void ClearStructureHolograms();
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Decals")
+	UDecalComponent* RangeIndicatorDecal;
 
 	UPROPERTY(BlueprintAssignable)
 	FOnStopPlacingSignature OnStopPlacingDelegate;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateStructureHologramMesh(UStaticMeshComponent* HologramMeshComponent, bool IsValid);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Selection")
+	AStructure* SelectedStructure;
+
+	UFUNCTION()
+	void SelectStructure(AStructure* StructureToSelect);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
 	TArray<UStructureData*> TowerCardsInHand;

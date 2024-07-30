@@ -21,7 +21,7 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
 	UStaticMesh* ProjectileMesh;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tower Data")
 	int TowerRange = 2;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Data")
