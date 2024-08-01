@@ -17,6 +17,7 @@ class UCameraComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTowersInHandUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlacingSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginPlacingSignature, UStructureData*, StructureData);
 
 UENUM()
 enum EPlayerState
@@ -57,6 +58,7 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TEnumAsByte<EPlayerState> PlayerActionState;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	UStructureData* StructureToPlace;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
@@ -68,13 +70,14 @@ protected:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnStopPlacingSignature OnStopPlacingDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnBeginPlacingSignature OnStartPlacingDelegate;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateStructureHologramMesh(UStaticMeshComponent* HologramMeshComponent, bool IsValid);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Selection")
 	AStructure* SelectedStructure;
-
 	UFUNCTION()
 	void SelectStructure(AStructure* StructureToSelect);
 
@@ -91,7 +94,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Click(const FInputActionValue& InputActionValue);
+	UFUNCTION(BlueprintCallable)
+	void ClickGround();
+
 	void Move(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;

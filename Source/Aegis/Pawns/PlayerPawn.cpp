@@ -149,10 +149,10 @@ void APlayerPawn::Tick(float DeltaTime)
 	                                              GetWorld()->DeltaRealTimeSeconds, 10);
 }
 
-void APlayerPawn::Click(const FInputActionValue& InputActionValue)
+void APlayerPawn::ClickGround()
 {
+	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::ClickGround()"))
 	UpdateHitResultUnderCursor();
-	
 	if (const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 	{
 		// Try to place tower if a tower is selected
@@ -183,8 +183,6 @@ void APlayerPawn::Click(const FInputActionValue& InputActionValue)
 	{
 		SelectStructure(nullptr);
 	}
-
-	
 }
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
@@ -217,7 +215,6 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	// Get the EnhancedInputComponent
 	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	// Bind the actions
-	PEI->BindAction(InputActions->InputClick, ETriggerEvent::Triggered, this, &APlayerPawn::Click);
 	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
 }
 
@@ -240,6 +237,7 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 {
 	PlayerActionState = Placing;
 	StructureToPlace = StructureData;
+	OnStartPlacingDelegate.Broadcast(StructureData);
 
 	// Ensure there are enough structure holograms
 	ClearStructureHolograms();
