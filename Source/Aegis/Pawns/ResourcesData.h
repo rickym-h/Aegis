@@ -8,20 +8,20 @@
 /**
  * 
 */
-USTRUCT(BlueprintType)
+USTRUCT(BlueprintType, Blueprintable)
 struct FResources
 {
 	GENERATED_BODY()
 	
-	UPROPERTY(EditAnywhere, Category="Resources")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
 	int32 Wood = 0;
-	UPROPERTY(EditAnywhere, Category="Resources")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
 	int32 Stone = 0;
-	UPROPERTY(EditAnywhere, Category="Resources")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
 	int32 Gold = 0;
-	UPROPERTY(EditAnywhere, Category="Resources")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
 	int32 Runes = 0;
-	UPROPERTY(EditAnywhere, Category="Resources")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
 	int32 ManaCrystals = 0;
 };
 
