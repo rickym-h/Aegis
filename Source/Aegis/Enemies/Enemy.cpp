@@ -147,3 +147,10 @@ float AEnemy::GetDistanceToNexus() const
 
 	return DistanceToNexus;
 }
+
+float AEnemy::GetHealthAsPercentage() const
+{
+	//const float Percentage = FMath::Clamp(0, 1, Health / MaxHealth);
+	//UE_LOG(LogTemp, Warning, TEXT("%f"), Percentage)
+	return Health / MaxHealth;
+}

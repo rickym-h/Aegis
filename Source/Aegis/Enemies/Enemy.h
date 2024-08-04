@@ -67,4 +67,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
 	USceneComponent* TargetPoint;
+	
+	UFUNCTION(BlueprintCallable)
+	float GetHealthAsPercentage() const;
 };
