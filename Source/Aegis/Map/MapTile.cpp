@@ -109,6 +109,8 @@ void AMapTile::BeginPlay()
 
 	CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentBeginOverlap);
 	CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &AMapTile::OnComponentEndOverlap);
+	
+	ResourceMesh->SetRelativeRotation(FRotator(0, FMath::RandRange(0, 360),0));
 }
 
 void AMapTile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -116,7 +118,6 @@ void AMapTile::OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent,
 {
 	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Enemy on Tile"))
 		EnemiesOnTile.Add(Enemy);
 	}
 }
