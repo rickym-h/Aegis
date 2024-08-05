@@ -15,7 +15,6 @@ class AAegisGameStateBase;
 class USpringArmComponent;
 class UCameraComponent;
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTowersInHandUpdated);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlacingSignature);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginPlacingSignature, UStructureData*, StructureData);
 
@@ -80,9 +79,6 @@ protected:
 	AStructure* SelectedStructure;
 	UFUNCTION()
 	void SelectStructure(AStructure* StructureToSelect);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Cards Held")
-	TArray<UStructureData*> TowerCardsInHand;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
 	FHitResult HitResultUnderCursor;
@@ -100,17 +96,6 @@ public:
 	void Move(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnTowersInHandUpdated OnTowersInHandUpdatedDelegate;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Resources")
-	UResourcesData* Resources;
-
-	UFUNCTION(BlueprintCallable)
-	bool AddTowerCardToHand(UStructureData* TowerData);
-	UFUNCTION(BlueprintCallable)
-	bool RemoveTowerCardFromHand(UStructureData* TowerData);
 
 	UFUNCTION(BlueprintCallable)
 	void BeginPlacingStructure(UStructureData* StructureData);

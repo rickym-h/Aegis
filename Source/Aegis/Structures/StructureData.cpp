@@ -6,7 +6,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Map/MapTile.h"
-#include "Aegis/Pawns/PlayerPawn.h"
+#include "Aegis/Pawns/AegisPlayerController.h"
 #include "Kismet/GameplayStatics.h"
 
 
@@ -17,7 +17,7 @@ TSubclassOf<AStructure> UStructureData::GetStructureBlueprintClass() const
 
 bool UStructureData::CanStructureBePlaced(const FTileCoord Location, const bool bCheckSingleTile)
 {
-	if (!Cast<APlayerPawn>(UGameplayStatics::GetPlayerPawn(GetWorld(), 0))->Resources->IsResourcesEnough(StructureCost))
+	if (!Cast<AAegisPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0))->Resources->IsResourcesEnough(StructureCost))
 	{
 		return false;
 	}

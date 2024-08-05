@@ -3,6 +3,7 @@
 
 #include "PlayerPawn.h"
 
+#include "AegisPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "ResourcesData.h"
@@ -18,6 +19,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -33,8 +35,6 @@ APlayerPawn::APlayerPawn()
 	Camera->SetupAttachment(SpringArm);
 
 	MovementComponent = CreateDefaultSubobject<UFloatingPawnMovement>("Floating Movement Component");
-
-	Resources = CreateDefaultSubobject<UResourcesData>("Resources");
 
 	RangeIndicatorDecal = CreateDefaultSubobject<UDecalComponent>("Range Indicator Decal");
 	RangeIndicatorDecal->SetVisibility(false);
@@ -59,13 +59,7 @@ void APlayerPawn::BeginPlay()
 		GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	}
 
-	if (GameState)
-	{
-		TowerCardsInHand.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
-	}
-
-	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::BeginPlay()"))
-	OnTowersInHandUpdatedDelegate.Broadcast();
+	
 }
 
 void APlayerPawn::ClearStructureHolograms()
@@ -168,7 +162,8 @@ void APlayerPawn::ClickGround()
 					RangeIndicatorDecal->SetVisibility(false);
 					if (StructureData->bRemoveInstanceOnPlacement)
 					{
-						RemoveTowerCardFromHand(StructureData);
+						AAegisPlayerController* AegisController = Cast<AAegisPlayerController>(Controller);
+						AegisController->Discard(StructureToPlace);
 					}
 					OnStopPlacingDelegate.Broadcast();
 				}
@@ -216,20 +211,6 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	// Bind the actions
 	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
-}
-
-bool APlayerPawn::AddTowerCardToHand(UStructureData* TowerData)
-{
-	TowerCardsInHand.Add(TowerData);
-	OnTowersInHandUpdatedDelegate.Broadcast();
-	return true;
-}
-
-bool APlayerPawn::RemoveTowerCardFromHand(UStructureData* TowerData)
-{
-	TowerCardsInHand.RemoveSingle(TowerData);
-	OnTowersInHandUpdatedDelegate.Broadcast();
-	return true;
 }
 
 

@@ -4,6 +4,7 @@
 #include "AegisMap.h"
 
 #include "MapTile.h"
+#include "Aegis/Pawns/AegisPlayerController.h"
 #include "Aegis/Pawns/PlayerPawn.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
@@ -121,7 +122,8 @@ bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* Str
 	MapStructures.Add(Location, Structure);
 
 	// Take any resources needed
-	PlayerPawn->Resources->SpendResources(StructureData->StructureCost);
+	const AAegisPlayerController* Controller = Cast<AAegisPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	Controller->Resources->SpendResources(StructureData->StructureCost);
 
 	return true;
 }
