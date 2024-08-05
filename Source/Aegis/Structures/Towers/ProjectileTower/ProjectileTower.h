@@ -26,6 +26,10 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UDefenderRangeComponent* RangeComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UStaticMeshComponent* PedestalMesh;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	UStaticMeshComponent* PointAtTargetMesh;
 
 
 	UFUNCTION(BlueprintCallable)

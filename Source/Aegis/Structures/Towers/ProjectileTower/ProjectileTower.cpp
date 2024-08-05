@@ -8,12 +8,20 @@
 #include "Aegis/Structures/StructureComponents/DefenderRangeComponent.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "Components/DecalComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 
 AProjectileTower::AProjectileTower()
 {
 	RangeComponent = CreateDefaultSubobject<UDefenderRangeComponent>("Range Component");
 	RangeComponent->SetupAttachment(SourcePoint);
 	ShotAvailable = true;
+
+	PedestalMesh = CreateDefaultSubobject<UStaticMeshComponent>("Pedestal Mesh");
+	PedestalMesh->SetupAttachment(MeshOrigin);
+	PointAtTargetMesh = CreateDefaultSubobject<UStaticMeshComponent>("Point At Target Mesh");
+	PointAtTargetMesh->SetupAttachment(PedestalMesh);
+	PointAtTargetMesh->SetRelativeLocation(FVector(0, 0, 100));
+	
 }
 
 void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
@@ -32,6 +40,8 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 			1/AttackSpeed, // float delay until elapsed
 			false); // looping?
 	}
+
+	PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
 }
 
 void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
