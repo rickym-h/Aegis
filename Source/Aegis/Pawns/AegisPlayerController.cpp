@@ -29,6 +29,13 @@ void AAegisPlayerController::BeginPlay()
 			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
 			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
 			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
 		}
 	}
 	DiscardAndReplenishHand();
