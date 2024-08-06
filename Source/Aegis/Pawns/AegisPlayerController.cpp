@@ -5,6 +5,7 @@
 
 #include "ResourcesData.h"
 #include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Structures/StructureData.h"
 #include "Aegis/Structures/StructureDataFactory.h"
 
@@ -24,9 +25,16 @@ void AAegisPlayerController::BeginPlay()
 		if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 		{
 			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
 		}
 	}
-	ReplenishHand(5);
+	DiscardAndReplenishHand();
+
+	AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+	GameState->EnemyFactory->OnWaveEndDelegate.AddUniqueDynamic(this, &AAegisPlayerController::DiscardAndReplenishHand);
 }
 
 void AAegisPlayerController::ShuffleDrawPile()
@@ -66,20 +74,39 @@ void AAegisPlayerController::DiscardAllCards()
 	OnTowersInHandUpdatedDelegate.Broadcast();
 }
 
+void AAegisPlayerController::DiscardAndReplenishHand()
+{
+	DiscardAllCards();
+	ReplenishHand(3);
+}
+
+
 bool AAegisPlayerController::ReplenishHand(const int32 HandTargetCount)
 {
-	while (CardsInHand.Num() <= HandTargetCount)
+	while (CardsInHand.Num() < HandTargetCount)
 	{
-		if (DrawPile.Num() > 0)
-		{
-			UStructureData* Card = DrawPile.Pop();
-			CardsInHand.Add(Card);
-		} else
+		DrawCards(1, false);
+	}
+	
+	OnTowersInHandUpdatedDelegate.Broadcast();
+	
+	return HandTargetCount == CardsInHand.Num();
+}
+
+bool AAegisPlayerController::DrawCards(const int32 NumOfCards, const bool BroadcastUpdate)
+{
+	const int32 CardsInHandCount = CardsInHand.Num();
+	
+	for (int i = 0; i < NumOfCards; i++)
+	{
+		// If needed, shuffle in the discard pile
+		if (DrawPile.Num() == 0)
 		{
 			// Shuffle in the discard pile
 
-			if(DiscardPile.Num() == 0)
+			if (DiscardPile.Num() == 0)
 			{
+				// There are no cards in the discard pile to shuffle in
 				break;
 			}
 			
@@ -88,11 +115,18 @@ bool AAegisPlayerController::ReplenishHand(const int32 HandTargetCount)
 
 			ShuffleDrawPile();
 		}
+
+		// Draw a single card
+		UStructureData* Card = DrawPile.Pop();
+		CardsInHand.Add(Card);
 	}
-	
-	OnTowersInHandUpdatedDelegate.Broadcast();
-	
-	return HandTargetCount == CardsInHand.Num();
+
+	if (BroadcastUpdate)
+	{
+		OnTowersInHandUpdatedDelegate.Broadcast();
+	}
+
+	return CardsInHandCount + NumOfCards == CardsInHand.Num();
 }
 
 int32 AAegisPlayerController::GetDrawPileCount() const

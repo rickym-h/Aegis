@@ -157,14 +157,14 @@ void APlayerPawn::ClickGround()
 				if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData, this))
 				{
 					PlayerActionState = Default;
-					StructureToPlace = nullptr;
-					ClearStructureHolograms();
-					RangeIndicatorDecal->SetVisibility(false);
 					if (StructureData->bRemoveInstanceOnPlacement)
 					{
 						AAegisPlayerController* AegisController = Cast<AAegisPlayerController>(Controller);
 						AegisController->Discard(StructureToPlace);
 					}
+					StructureToPlace = nullptr;
+					ClearStructureHolograms();
+					RangeIndicatorDecal->SetVisibility(false);
 					OnStopPlacingDelegate.Broadcast();
 				}
 			}

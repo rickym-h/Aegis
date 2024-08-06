@@ -17,6 +17,7 @@ TArray<UStructureData*> UStructureDataFactory::GenerateStarterTowers(UWorld* Wor
 		}
 
 		UStructureData* StructureData = NewObject<UStructureData>(WorldRef, StarterTowerDataClass);
+		StructureData->bRemoveInstanceOnPlacement = true;
 		StarterTowers.Add(StructureData);
 	}
 

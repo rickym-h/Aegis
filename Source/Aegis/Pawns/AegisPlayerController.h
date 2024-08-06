@@ -60,13 +60,18 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void DiscardAllCards();
 
+	UFUNCTION(BlueprintCallable)
+	void DiscardAndReplenishHand();
+	
 	/**
 	 * Adds random cards from the DrawPile into the CardsInHand. Shuffles the DiscardPile into the DrawPile if necessary.
 	 * @param HandTargetCount A target number of cards to have in the players hand at the end. (could result in less if there are not enough cards in the player deck)
 	 * @return A bool representing whether the target count has been reached or not.
 	 */
-	UFUNCTION(BlueprintCallable)
 	bool ReplenishHand(const int32 HandTargetCount);
+
+	UFUNCTION(BlueprintCallable)
+	bool DrawCards(const int32 NumOfCards, const bool BroadcastUpdate = true);
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnTowersInHandUpdated OnTowersInHandUpdatedDelegate;
