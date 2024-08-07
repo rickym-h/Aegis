@@ -3,7 +3,7 @@
 
 #include "CircleMathBlueprintLibrary.h"
 
-FVector2D UCircleMathBlueprintLibrary::GetPointOnCircle(FVector2D Centre, float Radius, float Theta)
+FVector2D UCircleMathBlueprintLibrary::GetPointOnCircle(const FVector2D Centre, const float Radius, const float Theta)
 {
 	return FVector2D((Radius * FMath::Sin(Theta)) + Centre.X, (Radius * FMath::Cos(Theta)) + Centre.Y);
 }

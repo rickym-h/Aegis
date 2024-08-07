@@ -30,6 +30,7 @@ struct FProjectilePackage
 	{
 		DamagePackage = FProjectileDamagePackage();
 		StartPoint = FVector::ZeroVector;
+		ForwardVector = FVector::ZeroVector;
 		TargetEnemy = nullptr;
 		Speed = 0;
 		WorldTimeSeconds = 0;
@@ -39,6 +40,7 @@ struct FProjectilePackage
 	{
 		DamagePackage = InDamagePackage;
 		StartPoint = InStartPoint;
+		ForwardVector = FVector::ZeroVector;
 		TargetEnemy = InTargetEnemy;
 		Speed = InSpeed;
 		WorldTimeSeconds = InWorldTimeSeconds;
