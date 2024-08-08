@@ -12,7 +12,7 @@
 class AEnemy;
 class AMapTile;
 // Delegate signature
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterRangeSignature, AEnemy*, OutEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterRangeSignature, const AEnemy*, OutEnemy);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class AEGIS_API UDefenderRangeComponent : public UCapsuleComponent

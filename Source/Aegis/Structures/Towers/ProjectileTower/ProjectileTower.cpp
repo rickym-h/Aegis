@@ -16,15 +16,11 @@ AProjectileTower::AProjectileTower()
 	RangeComponent->SetupAttachment(SourcePoint);
 	ShotAvailable = true;
 
-	PedestalMesh = CreateDefaultSubobject<UStaticMeshComponent>("Pedestal Mesh");
-	PedestalMesh->SetupAttachment(MeshOrigin);
-	PointAtTargetMesh = CreateDefaultSubobject<UStaticMeshComponent>("Point At Target Mesh");
-	PointAtTargetMesh->SetupAttachment(PedestalMesh);
-	PointAtTargetMesh->SetRelativeLocation(FVector(0, 0, 100));
+	
 	
 }
 
-void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
+void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
 
@@ -44,7 +40,7 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 	PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
 }
 
-void AProjectileTower::FireProjectileAtEnemy(AEnemy* Enemy)
+void AProjectileTower::FireProjectileAtEnemy(const AEnemy* Enemy)
 {
 	if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{

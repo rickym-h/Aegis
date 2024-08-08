@@ -22,6 +22,9 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
+
+	void SetStructureData(UStructureData* InStructureData, FTileCoord InLocation);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	UStructureData* StructureData;
 	

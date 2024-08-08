@@ -6,20 +6,17 @@
 #include "AegisPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
-#include "ResourcesData.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/Structure.h"
-#include "Aegis/Structures/StructureDataFactory.h"
 #include "Aegis/Structures/Towers/TowerData.h"
+#include "Aegis/Structures/Towers/ArcherTower/ArcherTowerData.h"
 #include "Aegis/Structures/Towers/ProjectileTower/ProjectileTower.h"
-#include "Aegis/Structures/Towers/ProjectileTower/ProjectileTowerData.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
-#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -40,7 +37,7 @@ APlayerPawn::APlayerPawn()
 	RangeIndicatorDecal->SetVisibility(false);
 	RangeIndicatorDecal->SetWorldLocation(FVector::ZeroVector);
 	RangeIndicatorDecal->SetWorldRotation(FRotator(90, 0, 0));
-	RangeIndicatorDecal->DecalSize = FVector(500, 86.60254038, 86.60254038);
+	RangeIndicatorDecal->DecalSize = FVector(500, 100, 100);
 	RangeIndicatorDecal->SetWorldScale3D(FVector(1,1,1));
 	//UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Rotating.M_RangeDecal_Rotating'")).Object;
 	UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Static.M_RangeDecal_Static'")).Object;
@@ -74,16 +71,16 @@ void APlayerPawn::ClearStructureHolograms()
 void APlayerPawn::SelectStructure(AStructure* StructureToSelect)
 {
 	// What to do to unselect the old tower
-	if (const AProjectileTower* ProjectileTower = Cast<AProjectileTower>(SelectedStructure))
+	if (const ATower* Tower = Cast<ATower>(SelectedStructure))
 	{
-		ProjectileTower->RangeIndicatorDecal->SetVisibility(false);
+		Tower->RangeIndicatorDecal->SetVisibility(false);
 	}
 	
 	SelectedStructure = StructureToSelect;
 	
-	if (const AProjectileTower* ProjectileTower = Cast<AProjectileTower>(SelectedStructure))
+	if (const ATower* Tower = Cast<ATower>(SelectedStructure))
 	{
-		ProjectileTower->RangeIndicatorDecal->SetVisibility(true);
+		Tower->RangeIndicatorDecal->SetVisibility(true);
 	}
 }
 
@@ -236,9 +233,8 @@ void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
 		StructureHologramComp->SetVisibility(true);
 	}
 
-	if (const UProjectileTowerData* ProjectileTowerData = Cast<UProjectileTowerData>(StructureData))
+	if (const UArcherTowerData* TowerData = Cast<UArcherTowerData>(StructureData))
 	{
-		const int DecalScale = 1+(ProjectileTowerData->TowerRange*2);
-		RangeIndicatorDecal->SetWorldScale3D(FVector(1, DecalScale, DecalScale));
+		RangeIndicatorDecal->SetWorldScale3D(FVector(1, TowerData->RangeInMetres, TowerData->RangeInMetres));
 	}
 }

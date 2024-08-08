@@ -26,7 +26,7 @@ void UDefenderRangeComponent::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	SetCapsuleSize(86.60254038, 86.60254038+300);
+	SetCapsuleSize(100, 100);
 
 }
 
@@ -45,8 +45,8 @@ void UDefenderRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedC
 void UDefenderRangeComponent::InitRange(const FTileCoord DefenderCoord, const int Range)
 {
 	// Set the range capsule
-	const int Scale = 1+(Range*2);
-	SetWorldScale3D(FVector(1, Scale, Scale));
+	//const int Scale = 1+(Range*2); USED TO BE TO CONVERT TILES->RANGE IN M
+	SetWorldScale3D(FVector(1, Range, Range));
 	OnComponentBeginOverlap.AddUniqueDynamic(this, &UDefenderRangeComponent::OnEnemyEnterRange);
 	
 	// Check if enemies are around as soon as the tower is spawned

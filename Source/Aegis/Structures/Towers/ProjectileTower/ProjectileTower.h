@@ -26,17 +26,13 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	UDefenderRangeComponent* RangeComponent;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	UStaticMeshComponent* PedestalMesh;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
-	UStaticMeshComponent* PointAtTargetMesh;
 
 
 	UFUNCTION(BlueprintCallable)
-	void TryFireAtEnemy(AEnemy* Enemy);
+	void TryFireAtEnemy(const AEnemy* Enemy);
 
 	UFUNCTION(BlueprintCallable)
-	void FireProjectileAtEnemy(AEnemy* Enemy);
+	void FireProjectileAtEnemy(const AEnemy* Enemy);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
 	bool ShotAvailable;

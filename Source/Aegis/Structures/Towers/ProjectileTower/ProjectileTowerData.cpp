@@ -14,8 +14,8 @@ AStructure* UProjectileTowerData::SpawnStructureFromData(const FTileCoord CoordT
 	AProjectileTower* NewStructure = GetWorld()->SpawnActorDeferred<AProjectileTower>(StructureBlueprintClass, ActorTransform);
 
 	NewStructure->StructureData = StructureData;
-	
 	NewStructure->CurrentLocation = CoordToSpawnStructure;
+	
 	NewStructure->ProjectileMesh = ProjectileMesh;
 	NewStructure->ProjectileSpeed = ProjectileSpeed;
 	NewStructure->AttackSpeed = AttackSpeed;
