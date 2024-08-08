@@ -40,6 +40,8 @@ void AEnemy::BeginPlay()
 {
 	Super::BeginPlay();
 
+	Health = MaxHealth;
+
 	GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	if (!GameState)
 	{

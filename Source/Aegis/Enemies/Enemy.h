@@ -40,8 +40,8 @@ protected:
 	float DamageToNexus = 1.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
-	float MaxHealth = 100.f;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float MaxHealth;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float Health = MaxHealth;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
