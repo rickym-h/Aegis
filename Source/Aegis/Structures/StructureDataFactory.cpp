@@ -3,7 +3,8 @@
 
 #include "StructureDataFactory.h"
 
-#include "Towers/ProjectileTower/ProjectileTowerData.h"
+#include "StructureData.h"
+
 
 TArray<UStructureData*> UStructureDataFactory::GenerateStarterTowers(UWorld* WorldRef) const
 {
