@@ -13,6 +13,13 @@ struct FProjectileDamagePackage
 {
 	GENERATED_BODY()
 
+	FProjectileDamagePackage()
+	{
+		PhysicalDamage = 0;
+		ExplosionRadius = 0;
+		OnHitParticleSystem = nullptr;
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float PhysicalDamage;
 

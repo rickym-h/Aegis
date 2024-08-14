@@ -28,6 +28,7 @@ APlayerPawn::APlayerPawn()
 	RootComponent = FocusPoint;
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
 	SpringArm->SetupAttachment(RootComponent);
+	BoomArmTargetLength = 2000;
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
@@ -142,7 +143,7 @@ void APlayerPawn::Tick(float DeltaTime)
 
 void APlayerPawn::ClickGround()
 {
-	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::ClickGround()"))
+	//UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::ClickGround()"))
 	UpdateHitResultUnderCursor();
 	if (const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
 	{

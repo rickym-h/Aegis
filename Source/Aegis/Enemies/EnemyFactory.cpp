@@ -17,7 +17,7 @@ void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
 
 	if (EnemiesInWorld.Num() == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::RemoveEnemyFromWorld() - Wave complete!"))
+		//UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::RemoveEnemyFromWorld() - Wave complete!"))
 		OnWaveEndDelegate.Broadcast();
 	}
 }
