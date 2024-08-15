@@ -333,14 +333,6 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 	const float Grass4Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.98)];
 	const float CliffLimit = ElevationNoiseDistribution[static_cast<int>(ElevationNoiseDistribution.Num() - 1 * 1)];
 
-	TMap<int, ETerrainType> ElevationTerrainMap;
-	ElevationTerrainMap.Add(0, Water);
-	ElevationTerrainMap.Add(1, Grass);
-	ElevationTerrainMap.Add(2, Grass);
-	ElevationTerrainMap.Add(3, Grass);
-	ElevationTerrainMap.Add(4, Grass);
-	ElevationTerrainMap.Add(5, Cliff);
-
 	// Set Terrain and Elevation
 	for (TTuple<FTileCoord, UMapTileData*> Elem : MapTilesData)
 	{
@@ -356,26 +348,32 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		if (Elem.Value->ElevationNoise < WaterLimit)
 		{
 			Elem.Value->Elevation = 0;
+			Elem.Value->TerrainType = Water;
 		}
 		else if (Elem.Value->ElevationNoise < Grass1Limit)
 		{
-			Elem.Value->Elevation = 1;
+			Elem.Value->Elevation = 0;
+			Elem.Value->TerrainType = Grass;
 		}
 		else if (Elem.Value->ElevationNoise < Grass2Limit)
 		{
-			Elem.Value->Elevation = 2;
+			Elem.Value->Elevation = 1;
+			Elem.Value->TerrainType = Grass;
 		}
 		else if (Elem.Value->ElevationNoise < Grass3Limit)
 		{
-			Elem.Value->Elevation = 3;
+			Elem.Value->Elevation = 2;
+			Elem.Value->TerrainType = Grass;
 		}
 		else if (Elem.Value->ElevationNoise < Grass4Limit)
 		{
-			Elem.Value->Elevation = 4;
+			Elem.Value->Elevation = 3;
+			Elem.Value->TerrainType = Grass;
 		}
 		else
 		{
-			Elem.Value->Elevation = 5;
+			Elem.Value->Elevation = 4;
+			Elem.Value->TerrainType = Cliff;
 		}
 
 		// Set max elevation (and adjust terrain type if necessary) based on distance to the start and end path tiles
@@ -383,7 +381,6 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		const int MaxElevation = FTileCoord::HexDistanceToTiles(PathTiles, Elem.Key);
 		Elem.Value->Elevation = FMath::Min(Elem.Value->Elevation, MaxElevation);
 
-		Elem.Value->TerrainType = ElevationTerrainMap[Elem.Value->Elevation];
 	}
 
 

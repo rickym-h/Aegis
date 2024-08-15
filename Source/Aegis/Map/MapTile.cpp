@@ -38,7 +38,7 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 	UE_LOG(LogTemp, Warning, TEXT("%d"), MapTileData->Elevation)
 
 	// Create bedrock meshes (if any)
-	for (int i = 0; i < MapTileData->Elevation; i++)
+	for (int i = 0; i <= MapTileData->Elevation; i++)
 	{
 		// Create a bedrock static mesh component
 		const FName ComponentName = FName(FString("BedRockLayer") + FString::FromInt(i));
@@ -46,7 +46,7 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 
 		BedrockStaticMeshComp->SetupAttachment(this->RootComponent);
 
-		BedrockStaticMeshComp->SetRelativeLocationAndRotation(FVector::ZeroVector + (FVector(0,0,50) * i), FRotator::ZeroRotator);
+		BedrockStaticMeshComp->SetRelativeLocationAndRotation(FVector(0,0,-50) + (FVector(0,0,50) * i), FRotator::ZeroRotator);
 		BedrockStaticMeshComp->SetStaticMesh(BedrockMesh);
 
 		BedrockStaticMeshComp->RegisterComponent();
@@ -56,7 +56,7 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 	}
 
 	// Set the top tile SM and location based on ground type
-	const FVector TileMeshLocation = MapTileData->Elevation * FVector(0, 0, 50);
+	const FVector TileMeshLocation = (MapTileData->Elevation) * FVector(0, 0, 50);
 	TileMesh->SetRelativeLocation(TileMeshLocation);
 
 	if (!MapTileData->bIsPath)
@@ -65,7 +65,7 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 		{
 		case Water:
 			TileMesh->SetStaticMesh(WaterMesh);
-			TileMesh->bAffectDistanceFieldLighting = false;
+			TileMesh->SetRelativeScale3D(FVector(1, 1, 0.6));
 			break;
 		case Grass:
 			TileMesh->SetStaticMesh(GrassMesh);
@@ -81,6 +81,7 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 	else
 	{
 		TileMesh->SetStaticMesh(PathMesh);
+		TileMesh->SetRelativeScale3D(FVector(1, 1, 0.75));
 	}
 
 	StructureLocation = TileCoord.ToWorldLocation() + TileMeshLocation + FVector(0, 0, 50);
