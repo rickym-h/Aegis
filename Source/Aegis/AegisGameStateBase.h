@@ -42,8 +42,6 @@ public:
 	UAegisMapFactory* MapFactory;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UEnemyFactory* EnemyFactory;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
-	UStructureDataFactory* StructureDataFactory;
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Projectile Pool")
 	AProjectileManager* ProjectileManager;
@@ -53,8 +51,6 @@ protected:
 	TSubclassOf<UAegisMapFactory> MapFactoryClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UEnemyFactory> EnemyFactoryClass;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
-	TSubclassOf<UStructureDataFactory> StructureDataFactoryClass;
 
 	UFUNCTION()
 	void SaveGameDelegateFunction(const FString& SlotName, const int32 UserIndex, bool bSuccess);

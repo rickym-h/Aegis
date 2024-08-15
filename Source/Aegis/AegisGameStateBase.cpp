@@ -8,7 +8,6 @@
 #include "Map/AegisMapFactory.h"
 #include "Map/MapTile.h"
 #include "SaveSystem/AegisSaveGame.h"
-#include "Structures/StructureDataFactory.h"
 #include "Structures/NexusBuilding/BuildingHealthComponent.h"
 #include "Structures/NexusBuilding/NexusBuilding.h"
 #include "Utilities/ProjectileManager.h"
@@ -35,11 +34,6 @@ void AAegisGameStateBase::PostInitializeComponents()
 	if (EnemyFactoryClass)
 	{
 		EnemyFactory = NewObject<UEnemyFactory>(GetWorld(), EnemyFactoryClass);
-	}
-	
-	if (StructureDataFactoryClass)
-	{
-		StructureDataFactory = NewObject<UStructureDataFactory>(GetWorld(), StructureDataFactoryClass);
 	}
 }
 

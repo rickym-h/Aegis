@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
 
+class UStructureDataFactory;
 /**
  * 
  */
@@ -13,5 +14,14 @@ UCLASS()
 class AEGIS_API UAegisGameInstance : public UGameInstance
 {
 	GENERATED_BODY()
-	
+
+public:
+	virtual void OnStart() override;
+
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Factories")
+	UStructureDataFactory* StructureDataFactory;
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
+	TSubclassOf<UStructureDataFactory> StructureDataFactoryClass;
 };

@@ -4,10 +4,12 @@
 #include "AegisPlayerController.h"
 
 #include "ResourcesData.h"
+#include "Aegis/AegisGameInstance.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Structures/StructureData.h"
 #include "Aegis/Structures/StructureDataFactory.h"
+#include "Kismet/GameplayStatics.h"
 
 AAegisPlayerController::AAegisPlayerController()
 {
@@ -20,13 +22,12 @@ void AAegisPlayerController::BeginPlay()
 
 	// If there are no cards in the draw pile, give the player some starter towers
 	// TODO make the deck persistent in the Game Instance
-	if (DrawPile.Num() == 0)
+	
+	if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	{
-		if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
-		{
-			DrawPile.Append(GameState->StructureDataFactory->GenerateStarterTowers(GetWorld()));
-		}
+		DrawPile.Append(GameInstance->StructureDataFactory->GenerateStarterTowers(GetWorld()));
 	}
+	
 	DiscardAndReplenishHand();
 
 	AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());

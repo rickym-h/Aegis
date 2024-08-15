@@ -34,9 +34,7 @@ AMapTile::AMapTile()
 void AMapTile::SetMapTileData(UMapTileData* Data)
 {
 	MapTileData = Data;
-
-	UE_LOG(LogTemp, Warning, TEXT("%d"), MapTileData->Elevation)
-
+	
 	// Create bedrock meshes (if any)
 	for (int i = 0; i <= MapTileData->Elevation; i++)
 	{
