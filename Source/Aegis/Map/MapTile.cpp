@@ -35,9 +35,10 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 {
 	MapTileData = Data;
 
-	const FVector NewMeshLocation = FVector(0, 0, MapTileData->Elevation * 40);
-	TileMesh->SetRelativeLocation(NewMeshLocation);
-	for (int i = 0; i < (FMath::RoundToPositiveInfinity(MapTileData->Elevation / 2.f)); i++)
+	UE_LOG(LogTemp, Warning, TEXT("%d"), MapTileData->Elevation)
+
+	// Create bedrock meshes (if any)
+	for (int i = 0; i < MapTileData->Elevation; i++)
 	{
 		// Create a bedrock static mesh component
 		const FName ComponentName = FName(FString("BedRockLayer") + FString::FromInt(i));
@@ -45,14 +46,18 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 
 		BedrockStaticMeshComp->SetupAttachment(this->RootComponent);
 
-		BedrockStaticMeshComp->SetRelativeLocationAndRotation(NewMeshLocation - (FVector(0, 0, 86) * i), FRotator::ZeroRotator);
-		BedrockStaticMeshComp->SetStaticMesh(CliffMesh);
+		BedrockStaticMeshComp->SetRelativeLocationAndRotation(FVector::ZeroVector + (FVector(0,0,50) * i), FRotator::ZeroRotator);
+		BedrockStaticMeshComp->SetStaticMesh(BedrockMesh);
 
 		BedrockStaticMeshComp->RegisterComponent();
 		BedrockStaticMeshComp->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 		BedrockMeshes.Push(BedrockStaticMeshComp);
 	}
+
+	// Set the top tile SM and location based on ground type
+	const FVector TileMeshLocation = MapTileData->Elevation * FVector(0, 0, 50);
+	TileMesh->SetRelativeLocation(TileMeshLocation);
 
 	if (!MapTileData->bIsPath)
 	{
@@ -75,12 +80,12 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 	}
 	else
 	{
-		//TileMesh->SetStaticMesh(PathMesh180);
-		TileMesh->SetStaticMesh(CliffMesh);
+		TileMesh->SetStaticMesh(PathMesh);
 	}
 
-	StructureLocation = TileCoord.ToWorldLocation() + NewMeshLocation + FVector(0, 0, 86);
+	StructureLocation = TileCoord.ToWorldLocation() + TileMeshLocation + FVector(0, 0, 50);
 
+	// Set the resource mesh SM and location
 	ResourceMesh->SetWorldLocation(StructureLocation);
 
 	switch (MapTileData->ResourceType)

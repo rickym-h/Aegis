@@ -18,29 +18,8 @@ public:
 	// Sets default values for this actor's properties
 	AMapTile();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* CollisionVolume;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* TileMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* ResourceMesh;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
-	TArray<UStaticMeshComponent*> BedrockMeshes;
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
 	FTileCoord TileCoord;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
-	float PathingGradient;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void ToggleShowGradients();
-
-	UPROPERTY(BlueprintReadWrite)
-	bool IsShowingGradients = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemies on Tile")
 	TSet<AEnemy*> EnemiesOnTile;
@@ -72,7 +51,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
 	UStaticMesh* DefaultMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
-	UStaticMesh* PathMesh180;
+	UStaticMesh* BedrockMesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
+	UStaticMesh* PathMesh;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
 	UStaticMesh* TreesMesh;
@@ -86,4 +67,19 @@ protected:
 	                             bool bFromSweep, const FHitResult& SweepResult);
 	UFUNCTION()
 	void OnComponentEndOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
+	float PathingGradient;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* CollisionVolume;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* TileMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* ResourceMesh;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	TArray<UStaticMeshComponent*> BedrockMeshes;
 };

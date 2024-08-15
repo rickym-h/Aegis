@@ -348,7 +348,7 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		if (Path.Contains(Elem.Key))
 		{
 			Elem.Value->bIsPath = true;
-			Elem.Value->Elevation = 0.5;
+			Elem.Value->Elevation = 0;
 
 			continue;
 		}
