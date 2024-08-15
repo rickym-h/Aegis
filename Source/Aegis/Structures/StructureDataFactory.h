@@ -21,5 +21,5 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	TArray<UStructureData*> GenerateStarterTowers(UWorld* WorldRef) const;
+	TArray<UStructureData*> GenerateStarterTowers(UObject* Outer) const;
 };

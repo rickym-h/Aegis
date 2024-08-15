@@ -6,6 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
 
+class UStructureData;
 class UStructureDataFactory;
 /**
  * 
@@ -18,6 +19,10 @@ class AEGIS_API UAegisGameInstance : public UGameInstance
 public:
 	virtual void OnStart() override;
 
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
+	TArray<UStructureData*> PlayerDeck;
+	
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Factories")
 	UStructureDataFactory* StructureDataFactory;
 

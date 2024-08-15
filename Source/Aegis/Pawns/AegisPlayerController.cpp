@@ -25,12 +25,12 @@ void AAegisPlayerController::BeginPlay()
 	
 	if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	{
-		DrawPile.Append(GameInstance->StructureDataFactory->GenerateStarterTowers(GetWorld()));
+		DrawPile.Append(GameInstance->PlayerDeck);
 	}
 	
 	DiscardAndReplenishHand();
 
-	AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	GameState->EnemyFactory->OnWaveEndDelegate.AddUniqueDynamic(this, &AAegisPlayerController::DiscardAndReplenishHand);
 }
 

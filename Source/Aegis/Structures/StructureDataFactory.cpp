@@ -6,7 +6,7 @@
 #include "StructureData.h"
 
 
-TArray<UStructureData*> UStructureDataFactory::GenerateStarterTowers(UWorld* WorldRef) const
+TArray<UStructureData*> UStructureDataFactory::GenerateStarterTowers(UObject* Outer) const
 {
 	TArray<UStructureData*> StarterTowers;
 
@@ -17,7 +17,7 @@ TArray<UStructureData*> UStructureDataFactory::GenerateStarterTowers(UWorld* Wor
 			UE_LOG(LogTemp, Error, TEXT("UStructureDataFactory::GenerateStarterTowers() - StarterTowerData is null"))
 		}
 
-		UStructureData* StructureData = NewObject<UStructureData>(WorldRef, StarterTowerDataClass);
+		UStructureData* StructureData = NewObject<UStructureData>(Outer, StarterTowerDataClass);
 		StructureData->bRemoveInstanceOnPlacement = true;
 		StarterTowers.Add(StructureData);
 	}
