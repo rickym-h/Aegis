@@ -59,8 +59,6 @@ protected:
 	UStaticMesh* TreesMesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
 	UStaticMesh* StoneMesh;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Meshes")
-	UStaticMesh* TreeStoneMesh;
 
 	UFUNCTION()
 	void OnComponentBeginOverlap(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,

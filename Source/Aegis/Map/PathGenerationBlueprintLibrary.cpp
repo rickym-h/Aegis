@@ -425,10 +425,6 @@ TMap<FTileCoord, UMapTileData*> UPathGenerationBlueprintLibrary::GenerateMapTile
 		{
 			Elem.Value->ResourceType = Stone;
 		}
-		if (CanTileHaveStone(Elem.Value) && CanTileHaveTree(Elem.Value) && Elem.Value->TreeNoise < TreeLimit && Elem.Value->StoneNoise < StoneLimit)
-		{
-			Elem.Value->ResourceType = TreeStone;
-		}
 	}
 
 	return MapTilesData;

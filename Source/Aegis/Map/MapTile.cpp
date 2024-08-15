@@ -96,9 +96,6 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 	case Stone:
 		ResourceMesh->SetStaticMesh(StoneMesh);
 		break;
-	case TreeStone:
-		ResourceMesh->SetStaticMesh(TreeStoneMesh);
-		break;
 	default:
 		ResourceMesh->SetStaticMesh(nullptr);
 		break;
