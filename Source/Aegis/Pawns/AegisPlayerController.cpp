@@ -8,7 +8,6 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Structures/StructureData.h"
-#include "Aegis/Structures/StructureDataFactory.h"
 #include "Kismet/GameplayStatics.h"
 
 AAegisPlayerController::AAegisPlayerController()

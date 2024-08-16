@@ -10,19 +10,6 @@
 
 
 class UAegisMap;
-
-UENUM()
-enum EStructureType
-{
-	Resources UMETA(DisplayName = "Resources"),
-	Research_Progression UMETA(DisplayName = "Research & Progression"),
-	Amenities_Services UMETA(DisplayName = "Amenities & Services"),
-	ContractTower UMETA(DisplayName = "Contract Tower"),
-	PhysicalTower UMETA(DisplayName = "Contract Tower"),
-	MagicTower UMETA(DisplayName = "Contract Tower"),
-	SupportTower UMETA(DisplayName = "Contract Tower"),
-};
-
 class AStructure;
 /**
  * 
@@ -31,17 +18,7 @@ UCLASS(BlueprintType)
 class AEGIS_API UStructureData : public UObject
 {
 	GENERATED_BODY()
-
-protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
-	TSubclassOf<AStructure> StructureBlueprintClass;
 	
-	UPROPERTY(BlueprintReadOnly, Category="MetaData")
-	UAegisMap* MapReference;
-	
-	UFUNCTION()
-	bool IsTileTypeValid(FTileCoord Location) const;
-
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Structure Data")
 	FResources StructureCost;
@@ -76,4 +53,15 @@ public:
 	
 	UFUNCTION(BlueprintCallable)
 	virtual bool CanStructureBePlaced(const FTileCoord Location, const bool bCheckSingleTile = false);
+
+protected:
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
+	TSubclassOf<AStructure> StructureBlueprintClass;
+	
+	UPROPERTY(BlueprintReadOnly, Category="MetaData")
+	UAegisMap* MapReference;
+	
+	UFUNCTION()
+	bool IsTileTypeValid(FTileCoord Location) const;
+
 };
