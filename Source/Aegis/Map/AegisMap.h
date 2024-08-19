@@ -7,14 +7,10 @@
 #include "AegisMap.generated.h"
 
 
-class UMapTileData;
-class UStructureData;
 class AStructure;
-class UTowerData;
-class ABaseTower;
-class ANexusBuilding;
 class AMapTile;
-
+class ANexusBuilding;
+class UMapTileData;
 /**
  * 
  */
@@ -48,9 +44,6 @@ public:
 	FTileCoord GetEnemySpawnCoord() const;
 	UFUNCTION()
 	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
-
-	UFUNCTION(BlueprintCallable)
-	bool AddStructureToMap(const FTileCoord Location, UStructureData* StructureData, APlayerPawn* PlayerPawn);
 
 	UFUNCTION(BlueprintCallable)
 	int GetNumOfTilesToEnd(const FTileCoord StartCoord);

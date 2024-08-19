@@ -4,13 +4,9 @@
 #include "AegisMap.h"
 
 #include "MapTile.h"
-#include "Aegis/Pawns/AegisPlayerController.h"
-#include "Aegis/Pawns/PlayerPawn.h"
+#include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
-#include "Aegis/Structures/Towers/Tower.h"
-#include "Aegis/Structures/Towers/TowerData.h"
-#include "Kismet/GameplayStatics.h"
 #include "MapTiles/MapTileData.h"
 
 
@@ -103,31 +99,6 @@ FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
 	return PathRoute[CurrentCoord];
 }
 
-bool UAegisMap::AddStructureToMap(const FTileCoord Location, UStructureData* StructureData, APlayerPawn* PlayerPawn)
-{
-	// Check the location is valid And resources are valid
-	if (!IsTileAvailable(Location)) { return false; } // Checks the tile is not a path
-	if (!StructureData->CanStructureBePlaced(Location)) { return false; } // Check location and resources are valid
-
-	// Get the tower class needed
-	if (!StructureData->GetStructureBlueprintClass()) { return false; }
-
-	// Create actor instance of tower class
-	// Set the data of the tower actor based on tower data
-	// Finish spawning tower actor
-	AStructure* Structure = StructureData->SpawnStructureFromData(Location, GetTile(Location)->StructureLocation, StructureData);
-
-	if (!Structure) { return false; }
-
-	MapStructures.Add(Location, Structure);
-
-	// Take any resources needed
-	const AAegisPlayerController* Controller = Cast<AAegisPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-	Controller->Resources->SpendResources(StructureData->StructureCost);
-
-	return true;
-}
-
 int UAegisMap::GetNumOfTilesToEnd(const FTileCoord StartCoord)
 {
 	int DistanceSoFar = 0;
@@ -181,7 +152,7 @@ bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 	// Check the location is not used by an offset of an existing structure
 	for (TTuple<FTileCoord, AStructure*> MapStructure : MapStructures)
 	{
-		for (FTileCoord Offset : MapStructure.Value->StructureData->StructureOffsets)
+		for (FTileCoord Offset : MapStructure.Value->StructureCard->StructureOffsets)
 		{
 			const FTileCoord UsedWorldCoord = MapStructure.Key + Offset;
 			if (UsedWorldCoord == Location) { return false; }

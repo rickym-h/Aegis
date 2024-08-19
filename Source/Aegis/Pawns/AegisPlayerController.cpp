@@ -4,11 +4,8 @@
 #include "AegisPlayerController.h"
 
 #include "ResourcesData.h"
-#include "Aegis/AegisGameInstance.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Enemies/EnemyFactory.h"
-#include "Aegis/Structures/StructureData.h"
-#include "Kismet/GameplayStatics.h"
 
 AAegisPlayerController::AAegisPlayerController()
 {
@@ -22,12 +19,12 @@ void AAegisPlayerController::BeginPlay()
 	// If there are no cards in the draw pile, give the player some starter towers
 	// TODO make the deck persistent in the Game Instance
 	
-	if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
-	{
-		DrawPile.Append(GameInstance->PlayerDeck);
-	}
+	// if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+	// {
+	// 	DrawPile.Append(GameInstance->PlayerDeck);
+	// }
 	
-	DiscardAndReplenishHand();
+	//DiscardAndReplenishHand();
 
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	GameState->EnemyFactory->OnWaveEndDelegate.AddUniqueDynamic(this, &AAegisPlayerController::DiscardAndReplenishHand);
@@ -35,18 +32,23 @@ void AAegisPlayerController::BeginPlay()
 
 void AAegisPlayerController::ShuffleDrawPile()
 {
-	DrawPile.Sort([this](const UStructureData &Card1, const UStructureData &Card2)
+	DrawPile.Sort([this](const UPlayerCard &Card1, const UPlayerCard &Card2)
 	{
 		return FMath::RandBool();
 	});
 }
 
-TArray<UStructureData*> AAegisPlayerController::GetCardsInHand()
+void AAegisPlayerController::ClickGround()
+{
+	UE_LOG(LogTemp, Warning, TEXT("AAegisPlayerController::ClickGround() - Click detected!"))
+}
+
+TArray<UPlayerCard*> AAegisPlayerController::GetCardsInHand()
 {
 	return CardsInHand;
 }
 
-bool AAegisPlayerController::Discard(UStructureData* CardToDiscard)
+bool AAegisPlayerController::Discard(UPlayerCard* CardToDiscard)
 {
 	if (!CardsInHand.Contains(CardToDiscard))
 	{
@@ -57,7 +59,7 @@ bool AAegisPlayerController::Discard(UStructureData* CardToDiscard)
 	CardsInHand.RemoveSingle(CardToDiscard);
 	DiscardPile.Add(CardToDiscard);
 
-	OnTowersInHandUpdatedDelegate.Broadcast();
+	OnCardsInHandUpdatedDelegate.Broadcast();
 
 	return true;
 }
@@ -65,9 +67,9 @@ bool AAegisPlayerController::Discard(UStructureData* CardToDiscard)
 void AAegisPlayerController::DiscardAllCards()
 {
 	DiscardPile.Append(CardsInHand);
-	CardsInHand = TArray<UStructureData*>();
+	CardsInHand = TArray<UPlayerCard*>();
 
-	OnTowersInHandUpdatedDelegate.Broadcast();
+	OnCardsInHandUpdatedDelegate.Broadcast();
 }
 
 void AAegisPlayerController::DiscardAndReplenishHand()
@@ -84,7 +86,7 @@ bool AAegisPlayerController::ReplenishHand(const int32 HandTargetCount)
 		DrawCards(1, false);
 	}
 	
-	OnTowersInHandUpdatedDelegate.Broadcast();
+	OnCardsInHandUpdatedDelegate.Broadcast();
 	
 	return HandTargetCount == CardsInHand.Num();
 }
@@ -107,19 +109,19 @@ bool AAegisPlayerController::DrawCards(const int32 NumOfCards, const bool Broadc
 			}
 			
 			DrawPile.Append(DiscardPile);
-			DiscardPile = TArray<UStructureData*>();
+			DiscardPile = TArray<UPlayerCard*>();
 
 			ShuffleDrawPile();
 		}
 
 		// Draw a single card
-		UStructureData* Card = DrawPile.Pop();
+		UPlayerCard* Card = DrawPile.Pop();
 		CardsInHand.Add(Card);
 	}
 
 	if (BroadcastUpdate)
 	{
-		OnTowersInHandUpdatedDelegate.Broadcast();
+		OnCardsInHandUpdatedDelegate.Broadcast();
 	}
 
 	return CardsInHandCount + NumOfCards == CardsInHand.Num();

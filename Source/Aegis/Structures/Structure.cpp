@@ -3,8 +3,6 @@
 
 #include "Structure.h"
 
-#include "StructureData.h"
-
 // Sets default values
 AStructure::AStructure()
 {
@@ -19,10 +17,4 @@ AStructure::AStructure()
 void AStructure::BeginPlay()
 {
 	Super::BeginPlay();
-}
-
-void AStructure::SetStructureData(UStructureData* InStructureData, const FTileCoord InLocation)
-{
-	this->StructureData = InStructureData;
-	this->CurrentLocation = InLocation;
 }

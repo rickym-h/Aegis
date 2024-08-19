@@ -3,14 +3,9 @@
 
 #include "AegisGameInstance.h"
 
-#include "Structures/StructureDataFactory.h"
-
 void UAegisGameInstance::OnStart()
 {
 	Super::OnStart();
 
-	if (StructureDataFactoryClass)
-	{
-		StructureDataFactory = NewObject<UStructureDataFactory>(this, StructureDataFactoryClass);
-	}
+	// TODO create a factory object for creating player cards
 }

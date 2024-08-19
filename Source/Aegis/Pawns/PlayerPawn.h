@@ -9,14 +9,10 @@
 
 class AStructure;
 class UResourcesData;
-class UStructureData;
 class UFloatingPawnMovement;
 class AAegisGameStateBase;
 class USpringArmComponent;
 class UCameraComponent;
-
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStopPlacingSignature);
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnBeginPlacingSignature, UStructureData*, StructureData);
 
 UENUM()
 enum EPlayerState
@@ -57,20 +53,12 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TEnumAsByte<EPlayerState> PlayerActionState;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
-	UStructureData* StructureToPlace;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
 	void ClearStructureHolograms();
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Decals")
 	UDecalComponent* RangeIndicatorDecal;
-
-	UPROPERTY(BlueprintAssignable)
-	FOnStopPlacingSignature OnStopPlacingDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnBeginPlacingSignature OnStartPlacingDelegate;
 
 	UFUNCTION(BlueprintImplementableEvent)
 	void UpdateStructureHologramMesh(UStaticMeshComponent* HologramMeshComponent, bool IsValid);
@@ -90,13 +78,7 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UFUNCTION(BlueprintCallable)
-	void ClickGround();
-
 	void Move(const FInputActionValue& InputActionValue);
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
-
-	UFUNCTION(BlueprintCallable)
-	void BeginPlacingStructure(UStructureData* StructureData);
 };

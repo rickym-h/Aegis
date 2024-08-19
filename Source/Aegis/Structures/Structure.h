@@ -8,6 +8,8 @@
 #include "Structure.generated.h"
 
 
+class UStructureCard;
+
 UCLASS()
 class AEGIS_API AStructure : public AActor
 {
@@ -21,18 +23,14 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:
-
-	void SetStructureData(UStructureData* InStructureData, FTileCoord InLocation);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
-	UStructureData* StructureData;
-	
+public:	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data", meta=(ToolTip="Origin point for the mesh, so any visible meshes part of this structure should be attached to this"))
 	USceneComponent* MeshOrigin;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	FTileCoord CurrentLocation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
+	UStructureCard* StructureCard;
 	
 };

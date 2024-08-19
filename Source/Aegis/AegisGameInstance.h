@@ -6,8 +6,7 @@
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
 
-class UStructureData;
-class UStructureDataFactory;
+class UPlayerCard;
 /**
  * 
  */
@@ -21,12 +20,7 @@ public:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
-	TArray<UStructureData*> PlayerDeck;
-	
-	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category="Factories")
-	UStructureDataFactory* StructureDataFactory;
+	TArray<UPlayerCard*> PlayerDeck;
 
 protected:
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
-	TSubclassOf<UStructureDataFactory> StructureDataFactoryClass;
 };

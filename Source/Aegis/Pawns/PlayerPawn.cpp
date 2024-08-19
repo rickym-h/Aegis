@@ -3,15 +3,12 @@
 
 #include "PlayerPawn.h"
 
-#include "AegisPlayerController.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/Towers/Tower.h"
-#include "Aegis/Structures/Towers/TowerData.h"
-#include "Aegis/Structures/Towers/ArcherTower/ArcherTowerData.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
@@ -104,78 +101,8 @@ void APlayerPawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (PlayerActionState == Placing)
-	{
-		// Set the hologram static mesh to where the player is looking;
-		UpdateHitResultUnderCursor();
-
-		if (const AMapTile* MapTile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
-		{
-			RangeIndicatorDecal->SetWorldLocation(MapTile->StructureLocation);
-			RangeIndicatorDecal->SetVisibility(true);
-			StructureHolograms[0]->SetWorldLocation(MapTile->StructureLocation);
-			const bool bIsPlacementPossible = StructureToPlace->CanStructureBePlaced(MapTile->TileCoord);
-			UpdateStructureHologramMesh(StructureHolograms[0], bIsPlacementPossible);
-			for (int i = 0; i < StructureToPlace->StructureOffsets.Num(); i++)
-			{
-				const AMapTile* OffsetTile = GameState->AegisMap->GetTile(MapTile->TileCoord + StructureToPlace->StructureOffsets[i]);
-				if (!OffsetTile)
-				{
-					StructureHolograms[1+i]->SetVisibility(false);
-					continue;
-				}
-				
-				const FVector StructureOffsetVector = OffsetTile->StructureLocation;
-				 
-				StructureHolograms[1+i]->SetWorldLocation(StructureOffsetVector);
-				StructureHolograms[1+i]->SetVisibility(true);
-				
-				// Update StructureHologram.
-				UpdateStructureHologramMesh(StructureHolograms[1+i], bIsPlacementPossible);
-			}
-
-		}
-	}
-
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000),
 	                                              GetWorld()->DeltaRealTimeSeconds, 10);
-}
-
-void APlayerPawn::ClickGround()
-{
-	//UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::ClickGround()"))
-	UpdateHitResultUnderCursor();
-	if (const AMapTile* Tile = Cast<AMapTile>(HitResultUnderCursor.GetActor()))
-	{
-		// Try to place tower if a tower is selected
-		if (PlayerActionState == Placing)
-		{
-			if (UStructureData* StructureData = Cast<UStructureData>(StructureToPlace))
-			{
-				if (GameState->AegisMap->AddStructureToMap(Tile->TileCoord, StructureData, this))
-				{
-					PlayerActionState = Default;
-					if (StructureData->bRemoveInstanceOnPlacement)
-					{
-						AAegisPlayerController* AegisController = Cast<AAegisPlayerController>(Controller);
-						AegisController->Discard(StructureToPlace);
-					}
-					StructureToPlace = nullptr;
-					ClearStructureHolograms();
-					RangeIndicatorDecal->SetVisibility(false);
-					OnStopPlacingDelegate.Broadcast();
-				}
-			}
-		}
-	}
-	
-	if (AStructure* Structure = Cast<AStructure>(HitResultUnderCursor.GetActor()))
-	{
-		SelectStructure(Structure);
-	} else
-	{
-		SelectStructure(nullptr);
-	}
 }
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
@@ -209,33 +136,4 @@ void APlayerPawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponen
 	UEnhancedInputComponent* PEI = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 	// Bind the actions
 	PEI->BindAction(InputActions->InputMove, ETriggerEvent::Triggered, this, &APlayerPawn::Move);
-}
-
-
-void APlayerPawn::BeginPlacingStructure(UStructureData* StructureData)
-{
-	PlayerActionState = Placing;
-	StructureToPlace = StructureData;
-	OnStartPlacingDelegate.Broadcast(StructureData);
-
-	// Ensure there are enough structure holograms
-	ClearStructureHolograms();
-	for (int i = 0; i < StructureData->StructureOffsets.Num()+1; i++)
-	{
-		//UStaticMeshComponent* StructureHologramComp = CreateDefaultSubobject<UStaticMeshComponent>("Hologram Structure" + i);
-		UStaticMeshComponent* StructureHologramComp = NewObject<UStaticMeshComponent>(this, UStaticMeshComponent::StaticClass());
-		StructureHologramComp->RegisterComponent();
-		
-		//StructureHologramComp->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::KeepWorldTransform);
-		StructureHologramComp->SetVisibility(false);
-		StructureHologramComp->SetCollisionResponseToAllChannels(ECR_Ignore);
-		StructureHologramComp->SetWorldLocation(FTileCoord().ToWorldLocation());
-		StructureHolograms.Add(StructureHologramComp);
-		StructureHologramComp->SetVisibility(true);
-	}
-
-	if (const UArcherTowerData* TowerData = Cast<UArcherTowerData>(StructureData))
-	{
-		RangeIndicatorDecal->SetWorldScale3D(FVector(1, TowerData->RangeInMetres, TowerData->RangeInMetres));
-	}
 }

@@ -6,11 +6,11 @@
 #include "GameFramework/PlayerController.h"
 #include "AegisPlayerController.generated.h"
 
+class UPlayerCard;
 class UResourcesData;
-class UStructureData;
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnTowersInHandUpdated);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCardsInHandUpdatedSignature);
 
 /**
  * 
@@ -23,28 +23,34 @@ class AEGIS_API AAegisPlayerController : public APlayerController
 public:
 	AAegisPlayerController();
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Resources")
+	UResourcesData* Resources;
 protected:
 
 	virtual void BeginPlay() override;
 	
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cards")
-	TArray<UStructureData*> DrawPile;
+	TArray<UPlayerCard*> DrawPile;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cards")
-	TArray<UStructureData*> CardsInHand;
+	TArray<UPlayerCard*> CardsInHand;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cards")
-	TArray<UStructureData*> DiscardPile;
+	TArray<UPlayerCard*> DiscardPile;
 
 	UFUNCTION()
 	void ShuffleDrawPile();
 	
 public:
+
+	UFUNCTION(BlueprintCallable)
+	void ClickGround();
 	
 	/**
 	 * 
 	 * @return A list of cards currently 'playable' to be used in game. A subset of cards in the player's deck.
 	 */
 	UFUNCTION(BlueprintCallable)
-	TArray<UStructureData*> GetCardsInHand();
+	TArray<UPlayerCard*> GetCardsInHand();
 	
 	/**
 	 * 
@@ -52,8 +58,7 @@ public:
 	 * @return A bool representing whether the card has been discarded successfully or not.
 	 */
 	UFUNCTION(BlueprintCallable)
-	bool Discard(UStructureData* CardToDiscard);
-
+	bool Discard(UPlayerCard* CardToDiscard);
 	/**
 	 * Moves all cards in the current hand into the DiscardPile
 	 */
@@ -74,7 +79,7 @@ public:
 	bool DrawCards(const int32 NumOfCards, const bool BroadcastUpdate = true);
 	
 	UPROPERTY(BlueprintAssignable)
-	FOnTowersInHandUpdated OnTowersInHandUpdatedDelegate;
+	FOnCardsInHandUpdatedSignature OnCardsInHandUpdatedDelegate;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetDrawPileCount() const;
@@ -82,6 +87,4 @@ public:
 	int32 GetDiscardPileCount() const;
 	
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Resources")
-	UResourcesData* Resources;
 };

@@ -19,7 +19,7 @@ enum ETerrainType
 UENUM()
 enum EResourceType
 {
-	None UMETA(DisplayName = "None"),
+	Empty UMETA(DisplayName = "Empty"),
 	Tree UMETA(DisplayName = "Tree"),
 	Stone UMETA(DisplayName = "Stone"),
 	TreeStone UMETA(DisplayName = "Tree & Stone"),

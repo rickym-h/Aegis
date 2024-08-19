@@ -9,7 +9,6 @@
 class AProjectileManager;
 class USaveGame;
 class UAegisSaveGame;
-class UStructureDataFactory;
 class UEnemyFactory;
 class UAegisMapFactory;
 class UAegisMap;

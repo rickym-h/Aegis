@@ -7,7 +7,7 @@ UMapTileData::UMapTileData()
 {
 	TerrainType = Grass;
 	bIsPath = false;
-	ResourceType = None;
+	ResourceType = Empty;
 	Elevation = 1;
 	ElevationNoise = 0;
 }
