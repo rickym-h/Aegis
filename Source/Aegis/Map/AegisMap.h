@@ -7,6 +7,7 @@
 #include "AegisMap.generated.h"
 
 
+class UStructureCard;
 class AStructure;
 class AMapTile;
 class ANexusBuilding;
@@ -25,10 +26,8 @@ public:
 	UFUNCTION()
 	void DestroyMap();
 
-
 	UFUNCTION()
-	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPathRoute,
-	                     const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
+	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
 
 	UFUNCTION()
 	bool IsCoordInPath(FTileCoord Coord) const;
@@ -53,9 +52,12 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Blueprints")
 	TSubclassOf<AMapTile> MapTileBP;
+
+	AStructure* AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location);
 	
 	UFUNCTION(BlueprintCallable)
 	bool IsTileAvailable(const FTileCoord Location) const;
+	bool CanStructureBePlaced(const UStructureCard* StructureCard, FTileCoord Location);
 
 protected:
 	// Map Tiles

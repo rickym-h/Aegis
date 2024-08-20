@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "GameFramework/PlayerController.h"
 #include "AegisPlayerController.generated.h"
 
@@ -44,6 +45,7 @@ protected:
 	TWeakObjectPtr<UPlayerCard> SelectedCard;
 	
 
+	void TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord);
 	
 public:
 	UFUNCTION(BlueprintCallable)

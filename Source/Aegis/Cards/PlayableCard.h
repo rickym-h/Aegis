@@ -3,10 +3,10 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "UObject/Interface.h"
 #include "PlayableCard.generated.h"
 
-struct FTileCoord;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
 class UPlayableCard : public UInterface
@@ -23,7 +23,8 @@ class AEGIS_API IPlayableCard
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
+	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interact")
-	void PlayCard(const FTileCoord& Location);
-	virtual void PlayCard_Implementation(const FTileCoord& Location) {};
+	bool PlayCard(const FTileCoord& LocationCoord);
+	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) {return false;};
 };

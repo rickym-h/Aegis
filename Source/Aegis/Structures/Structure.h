@@ -33,4 +33,5 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
 	UStructureCard* StructureCard;
 	
+	FTransform ActorTransform;
 };

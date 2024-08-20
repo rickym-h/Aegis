@@ -4,11 +4,13 @@
 #include "AegisPlayerController.h"
 
 #include "ResourcesData.h"
+#include "Aegis/AegisGameInstance.h"
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Cards/PlayableCard.h"
 #include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
+#include "Kismet/GameplayStatics.h"
 
 AAegisPlayerController::AAegisPlayerController()
 {
@@ -19,15 +21,14 @@ void AAegisPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// If there are no cards in the draw pile, give the player some starter towers
-	// TODO make the deck persistent in the Game Instance
+	// Get cards from the game instance
 	
-	// if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
-	// {
-	// 	DrawPile.Append(GameInstance->PlayerDeck);
-	// }
+	if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
+	{
+		DrawPile.Append(GameInstance->PlayerDeck);	
+	}
 	
-	//DiscardAndReplenishHand();
+	DiscardAndReplenishHand();
 
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	GameState->EnemyFactory->OnWaveEndDelegate.AddUniqueDynamic(this, &AAegisPlayerController::DiscardAndReplenishHand);
@@ -49,6 +50,32 @@ bool AAegisPlayerController::SelectCard(UPlayerCard* PlayerCard)
 	return true;
 }
 
+void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord)
+{
+	// Check the player has enough resources
+	if (!Resources->IsResourcesEnough(Card->CardCost))
+	{
+		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Player does not have enough resources to play card!"))
+		return;
+	}
+
+	// Check if the card implements the IPlayableCard interface
+	if (!UKismetSystemLibrary::DoesImplementInterface(Card, UPlayableCard::StaticClass()))
+	{
+		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Card does not implement UPlayableCard interface!"))
+		return;
+	}
+	
+	if (!IPlayableCard::Execute_PlayCard(Card, LocationCoord))
+	{
+		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Attempted to play card but failed. Check implemented PlayCard_Implementation()"))
+		return;
+	}
+	
+	Resources->SpendResources(Card->CardCost);
+	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Played card successfully! Spent resources!"))
+}
+
 void AAegisPlayerController::ClickGround()
 {
 	FHitResult HitResultUnderCursor;
@@ -59,20 +86,7 @@ void AAegisPlayerController::ClickGround()
 	// Attempt to play the selected card, if any
 	if (UPlayerCard* Card = SelectedCard.Get())
 	{
-		// Check the player has enough resources
-		if (Resources->IsResourcesEnough(Card->CardCost))
-		{
-			if (Card->Implements<UPlayableCard>())
-			{
-				IPlayableCard::Execute_PlayCard(Card, LocationCoord);
-			} else
-			{
-				UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::ClickGround - Card does not implement UPlayableCard interface!"));
-			}
-		} else
-		{
-			UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::ClickGround - Player does not have enough resources to play card!"));
-		}
+		TryPlayCardAtLocation(Card, LocationCoord);
 		return;
 	}
 
@@ -119,7 +133,10 @@ bool AAegisPlayerController::ReplenishHand(const int32 HandTargetCount)
 {
 	while (CardsInHand.Num() < HandTargetCount)
 	{
-		DrawCards(1, false);
+		if (!DrawCards(1, false))
+		{
+			break;
+		}
 	}
 	
 	OnCardsInHandUpdatedDelegate.Broadcast();

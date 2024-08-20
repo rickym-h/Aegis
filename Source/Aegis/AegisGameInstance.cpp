@@ -3,9 +3,16 @@
 
 #include "AegisGameInstance.h"
 
+#include "Cards/CardFactory.h"
+
 void UAegisGameInstance::OnStart()
 {
 	Super::OnStart();
-
-	// TODO create a factory object for creating player cards
+	
+	if (!CardFactoryClass)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAegisGameInstance::OnStart - Card factory value not set!"))
+		return;
+	}
+	CardFactory = NewObject<UCardFactory>(this, CardFactoryClass);
 }

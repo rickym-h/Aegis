@@ -141,6 +141,34 @@ TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTiles(const TMap<FTileCoord, U
 }
 
 
+AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location)
+{
+	if (!StructureCard)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAegisMap::AddStructureToMap - StructureCard reference is null!"))
+		return nullptr;
+	}
+
+	if (!CanStructureBePlaced(StructureCard, Location))
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAegisMap::AddStructureToMap - Structure cannot be placed! Maybe it is overlapping with another structure or the path?"))
+		return nullptr;
+	}
+
+	// Get the Structure Class
+	TSubclassOf<AStructure> StructureBlueprintClass = StructureCard->StructureBlueprintClass;
+
+	// Get target location to spawn structure
+	const FTransform ActorTransform = FTransform(GetTile(Location)->StructureLocation);
+
+	// Start spawning the structure. (finish spawning should be handled by the caller)
+	UE_LOG(LogTemp, Display, TEXT("UAegisMap::AddStructureToMap - Starting spawning structure..."))
+	AStructure* Structure = GetWorld()->SpawnActorDeferred<AStructure>(StructureBlueprintClass, ActorTransform);
+	Structure->ActorTransform = ActorTransform;
+
+	return Structure;
+}
+
 bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 {
 	// Check the location is not part of the path
@@ -159,5 +187,15 @@ bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 		}
 	}
 
+	return true;
+}
+
+bool UAegisMap::CanStructureBePlaced(const UStructureCard* StructureCard, FTileCoord Location)
+{
+	for (const FTileCoord LocalCoord : StructureCard->StructureOffsets)
+	{
+		const FTileCoord WorldCoord = Location + LocalCoord;
+		if (!IsTileAvailable(WorldCoord)) { return false; }
+	}
 	return true;
 }
