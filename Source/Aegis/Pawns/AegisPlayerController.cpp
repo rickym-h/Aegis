@@ -81,6 +81,9 @@ void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTil
 	
 	Resources->SpendResources(Card->CardCost);
 	Discard(Card);
+	SelectedCard = nullptr;
+	OnSelectedCardUpdatedDelegate.Broadcast();
+	
 	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Played card successfully! Spent resources and moved to discard pile!"))
 }
 
