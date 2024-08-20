@@ -83,7 +83,7 @@ struct FTileCoord
 		return FTileCoord(Q, R);
 	}
 
-	static FTileCoord PixelToHex(const FVector& PixelPoint, const float TileRadius = 100)
+	static FTileCoord FromWorldLocation(const FVector& PixelPoint, const float TileRadius = 100)
 	{
 		const float q = (sqrt(3) / 3 * PixelPoint.Y - 1. / 3 * PixelPoint.X) / TileRadius;
 		const float r = (2. / 3 * PixelPoint.X) / TileRadius;

@@ -230,7 +230,7 @@ TArray<FTileCoord> UPathGenerationBlueprintLibrary::GetPoissonClusterCoords(cons
 	TArray<FTileCoord> NodePoints;
 	for (const FVector2d PoissonCluster : PoissonClusters)
 	{
-		NodePoints.Emplace(FTileCoord::PixelToHex(FVector(PoissonCluster.X, PoissonCluster.Y, 0) * 100));
+		NodePoints.Emplace(FTileCoord::FromWorldLocation(FVector(PoissonCluster.X, PoissonCluster.Y, 0) * 100));
 	}
 	
 	NodePoints.Sort([](const FTileCoord& A, const FTileCoord& B)
