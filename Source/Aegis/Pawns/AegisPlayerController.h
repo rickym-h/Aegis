@@ -45,11 +45,14 @@ protected:
 	TWeakObjectPtr<UPlayerCard> SelectedCard;
 	
 
-	void TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord);
+	void TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord) const;
 	
 public:
 	UFUNCTION(BlueprintCallable)
 	bool SelectCard(UPlayerCard* PlayerCard);
+	
+	UFUNCTION(BlueprintCallable)
+	UPlayerCard* GetSelectedCard() const;
 
 	UFUNCTION(BlueprintCallable)
 	void ClickGround();

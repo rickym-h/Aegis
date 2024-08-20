@@ -44,13 +44,19 @@ void AAegisPlayerController::ShuffleDrawPile()
 
 bool AAegisPlayerController::SelectCard(UPlayerCard* PlayerCard)
 {
+	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::SelectCard - Selecting card!"))
 	if (!CardsInHand.Contains(PlayerCard)) { return false; }
 	
 	SelectedCard = PlayerCard;
 	return true;
 }
 
-void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord)
+UPlayerCard* AAegisPlayerController::GetSelectedCard() const
+{
+	return SelectedCard.Get();
+}
+
+void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord) const
 {
 	// Check the player has enough resources
 	if (!Resources->IsResourcesEnough(Card->CardCost))
