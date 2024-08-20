@@ -5,7 +5,10 @@
 
 #include "ResourcesData.h"
 #include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Cards/PlayableCard.h"
+#include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Enemies/EnemyFactory.h"
+#include "Aegis/Map/TileCoordHelperLibrary.h"
 
 AAegisPlayerController::AAegisPlayerController()
 {
@@ -38,9 +41,42 @@ void AAegisPlayerController::ShuffleDrawPile()
 	});
 }
 
+bool AAegisPlayerController::SelectCard(UPlayerCard* PlayerCard)
+{
+	if (!CardsInHand.Contains(PlayerCard)) { return false; }
+	
+	SelectedCard = PlayerCard;
+	return true;
+}
+
 void AAegisPlayerController::ClickGround()
 {
-	UE_LOG(LogTemp, Warning, TEXT("AAegisPlayerController::ClickGround() - Click detected!"))
+	FHitResult HitResultUnderCursor;
+	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
+	
+	const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(HitResultUnderCursor.Location);
+	
+	// Attempt to play the selected card, if any
+	if (UPlayerCard* Card = SelectedCard.Get())
+	{
+		// Check the player has enough resources
+		if (Resources->IsResourcesEnough(Card->CardCost))
+		{
+			if (Card->Implements<UPlayableCard>())
+			{
+				IPlayableCard::Execute_PlayCard(Card, LocationCoord);
+			} else
+			{
+				UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::ClickGround - Card does not implement UPlayableCard interface!"));
+			}
+		} else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::ClickGround - Player does not have enough resources to play card!"));
+		}
+		return;
+	}
+
+	// TODO select a building or tile on ground
 }
 
 TArray<UPlayerCard*> AAegisPlayerController::GetCardsInHand()

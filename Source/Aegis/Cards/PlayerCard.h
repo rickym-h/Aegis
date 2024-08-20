@@ -19,9 +19,10 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Card Data")
 	FText CardName = FText::FromString("Default Card Name");
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Card Data")
 	FText CardDescription = FText::FromString("Default Card Description");
+	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Card Data")
 	FResources CardCost = FResources();
-	
 };

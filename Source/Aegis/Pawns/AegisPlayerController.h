@@ -39,8 +39,15 @@ protected:
 
 	UFUNCTION()
 	void ShuffleDrawPile();
+
+	UPROPERTY()
+	TWeakObjectPtr<UPlayerCard> SelectedCard;
+	
+
 	
 public:
+	UFUNCTION(BlueprintCallable)
+	bool SelectCard(UPlayerCard* PlayerCard);
 
 	UFUNCTION(BlueprintCallable)
 	void ClickGround();
