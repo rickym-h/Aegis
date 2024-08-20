@@ -12,6 +12,7 @@ class UResourcesData;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCardsInHandUpdatedSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSelectedCardUpdatedSignature);
 
 /**
  * 
@@ -45,7 +46,7 @@ protected:
 	TWeakObjectPtr<UPlayerCard> SelectedCard;
 	
 
-	void TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord) const;
+	void TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord);
 	
 public:
 	UFUNCTION(BlueprintCallable)
@@ -92,6 +93,8 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnCardsInHandUpdatedSignature OnCardsInHandUpdatedDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnSelectedCardUpdatedSignature OnSelectedCardUpdatedDelegate;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetDrawPileCount() const;

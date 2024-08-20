@@ -48,6 +48,7 @@ bool AAegisPlayerController::SelectCard(UPlayerCard* PlayerCard)
 	if (!CardsInHand.Contains(PlayerCard)) { return false; }
 	
 	SelectedCard = PlayerCard;
+	OnSelectedCardUpdatedDelegate.Broadcast();
 	return true;
 }
 
@@ -56,7 +57,7 @@ UPlayerCard* AAegisPlayerController::GetSelectedCard() const
 	return SelectedCard.Get();
 }
 
-void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord) const
+void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord)
 {
 	// Check the player has enough resources
 	if (!Resources->IsResourcesEnough(Card->CardCost))
@@ -79,7 +80,8 @@ void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTil
 	}
 	
 	Resources->SpendResources(Card->CardCost);
-	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Played card successfully! Spent resources!"))
+	Discard(Card);
+	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Played card successfully! Spent resources and moved to discard pile!"))
 }
 
 void AAegisPlayerController::ClickGround()
