@@ -169,7 +169,7 @@ AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, co
 	return Structure;
 }
 
-bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
+bool UAegisMap::IsTileAvailable(const FTileCoord& Location) const
 {
 	// Check if the coord is even represented by a tile
 	if (!MapTiles.Contains(Location)) { return false; }
@@ -181,19 +181,21 @@ bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 	if (MapStructures.Contains(Location)) { return false; }
 
 	// Check the location is not used by an offset of an existing structure
-	for (TTuple<FTileCoord, AStructure*> MapStructure : MapStructures)
+	for (const TTuple<FTileCoord, AStructure*> MapStructurePair : MapStructures)
 	{
-		for (FTileCoord Offset : MapStructure.Value->StructureCard->StructureOffsets)
+		const AStructure* Structure = MapStructurePair.Value;
+		const FTileCoord StructureLocation = MapStructurePair.Key;
+		
+		for (const FTileCoord Offset : Structure->StructureCard->StructureOffsets)
 		{
-			const FTileCoord UsedWorldCoord = MapStructure.Key + Offset;
-			if (UsedWorldCoord == Location) { return false; }
+			if (Location == StructureLocation + Offset) { return false; }
 		}
 	}
 
 	return true;
 }
 
-bool UAegisMap::CanStructureBePlaced(const UStructureCard* StructureCard, FTileCoord Location)
+bool UAegisMap::CanStructureBePlaced(const UStructureCard* StructureCard, const FTileCoord& Location)
 {
 	for (const FTileCoord LocalCoord : StructureCard->StructureOffsets)
 	{
@@ -205,6 +207,9 @@ bool UAegisMap::CanStructureBePlaced(const UStructureCard* StructureCard, FTileC
 		// Check that the tile fits the placement constraints of the card
 		if (!StructureCard->AllowedTerrains.Contains(MapTileDataMap[WorldCoord]->TerrainType)) { return false; } // Check terrains
 		if (!StructureCard->AllowedResources.Contains(MapTileDataMap[WorldCoord]->ResourceType)) { return false; } // Check resources
+
+		// Check that all the map tiles have the same elevations
+		if (MapTileDataMap[WorldCoord]->Elevation != MapTileDataMap[Location]->Elevation) { return false; }
 	}
 	
 	return true;

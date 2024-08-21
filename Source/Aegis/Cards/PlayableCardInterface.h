@@ -5,11 +5,11 @@
 #include "CoreMinimal.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "UObject/Interface.h"
-#include "PlayableCard.generated.h"
+#include "PlayableCardInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UPlayableCard : public UInterface
+class UPlayableCardInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,7 +17,7 @@ class UPlayableCard : public UInterface
 /**
  * 
  */
-class AEGIS_API IPlayableCard
+class AEGIS_API IPlayableCardInterface
 {
 	GENERATED_BODY()
 

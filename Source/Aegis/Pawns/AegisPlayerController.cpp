@@ -6,7 +6,7 @@
 #include "ResourcesData.h"
 #include "Aegis/AegisGameInstance.h"
 #include "Aegis/AegisGameStateBase.h"
-#include "Aegis/Cards/PlayableCard.h"
+#include "Aegis/Cards/PlayableCardInterface.h"
 #include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
@@ -74,14 +74,14 @@ void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTil
 		return;
 	}
 
-	// Check if the card implements the IPlayableCard interface
-	if (!UKismetSystemLibrary::DoesImplementInterface(Card, UPlayableCard::StaticClass()))
+	// Check if the card implements the IPlayableCardInterface interface
+	if (!UKismetSystemLibrary::DoesImplementInterface(Card, UPlayableCardInterface::StaticClass()))
 	{
-		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Card does not implement UPlayableCard interface!"))
+		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Card does not implement UPlayableCardInterface interface!"))
 		return;
 	}
 	
-	if (!IPlayableCard::Execute_PlayCard(Card, LocationCoord))
+	if (!IPlayableCardInterface::Execute_PlayCard(Card, LocationCoord))
 	{
 		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::TryPlayCardAtLocation - Attempted to play card but failed. Check implemented PlayCard_Implementation()"))
 		return;

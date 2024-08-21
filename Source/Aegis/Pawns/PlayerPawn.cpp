@@ -143,7 +143,7 @@ void APlayerPawn::UpdateHologramPositions()
 			StructureHolograms[i]->SetWorldLocation(OffsetTileStructureLocation);
 		} else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::UpdateHologramPositions - No valid location for offset tile!"))
+			//UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::UpdateHologramPositions - No valid location for offset tile!"))
 			FVector OffsetVector = (LocationCoord + StructureCard->StructureOffsets[i]).ToWorldLocation();
 			OffsetVector.Z = CentreTile->StructureLocation.Z;
 			StructureHolograms[i]->SetWorldLocation(OffsetVector);

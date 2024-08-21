@@ -56,8 +56,8 @@ public:
 	AStructure* AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location);
 	
 	UFUNCTION(BlueprintCallable)
-	bool IsTileAvailable(const FTileCoord Location) const;
-	bool CanStructureBePlaced(const UStructureCard* StructureCard, FTileCoord Location);
+	bool IsTileAvailable(const FTileCoord& Location) const;
+	bool CanStructureBePlaced(const UStructureCard* StructureCard, const FTileCoord& Location);
 
 protected:
 	// Map Tiles

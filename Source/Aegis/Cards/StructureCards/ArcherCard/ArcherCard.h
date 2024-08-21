@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Cards/PlayableCard.h"
+#include "Aegis/Cards/PlayableCardInterface.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "ArcherCard.generated.h"
 
@@ -11,7 +11,7 @@
  * 
  */
 UCLASS()
-class AEGIS_API UArcherCard : public UStructureCard, public IPlayableCard
+class AEGIS_API UArcherCard : public UStructureCard, public IPlayableCardInterface
 {
 	GENERATED_BODY()
 
