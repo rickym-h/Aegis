@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Cards/PlayableCardInterface.h"
+#include "Aegis/Cards/RangeInterface.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "ArcherCard.generated.h"
 
@@ -11,12 +12,13 @@
  * 
  */
 UCLASS()
-class AEGIS_API UArcherCard : public UStructureCard, public IPlayableCardInterface
+class AEGIS_API UArcherCard : public UStructureCard, public IPlayableCardInterface, public IRangeInterface
 {
 	GENERATED_BODY()
 
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
+	virtual float GetRangeInMetres_Implementation() override;
 
 public:
 	

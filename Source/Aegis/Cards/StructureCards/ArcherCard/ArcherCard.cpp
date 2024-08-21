@@ -29,3 +29,8 @@ bool UArcherCard::PlayCard_Implementation(const FTileCoord& LocationCoord)
 	// If successful, return true
 	return true;
 }
+
+float UArcherCard::GetRangeInMetres_Implementation()
+{
+	return RangeInMetres;
+}

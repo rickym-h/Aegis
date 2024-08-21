@@ -7,6 +7,7 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Cards/RangeInterface.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Map/MapTile.h"
 #include "Camera/CameraComponent.h"
@@ -14,6 +15,7 @@
 #include "GameFramework/FloatingPawnMovement.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Input/InputConfigData.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APlayerPawn::APlayerPawn()
@@ -99,9 +101,22 @@ void APlayerPawn::UpdateSelectedCard()
 				StructureHologramComp->SetVisibility(true);
 			}
 		}
+
+		// Set the decal data if applicable
+		if (UKismetSystemLibrary::DoesImplementInterface(SelectedCard, URangeInterface::StaticClass()))
+		{
+			const float Range = IRangeInterface::Execute_GetRangeInMetres(SelectedCard);
+			RangeIndicatorDecal->SetWorldScale3D(FVector(1, Range, Range));
+			RangeIndicatorDecal->SetVisibility(true);
+		} else
+		{
+			RangeIndicatorDecal->SetVisibility(false);
+		}
+		
 	} else
 	{
 		ClearStructureHolograms();
+		RangeIndicatorDecal->SetVisibility(false);
 	}
 }
 
@@ -169,7 +184,16 @@ void APlayerPawn::Tick(float DeltaTime)
 			UpdateHologramPositions();
 		}
 		
-		// TODO If card has range, update decal positions
+		// If card has range, update decal position
+		if (UKismetSystemLibrary::DoesImplementInterface(SelectedCard, URangeInterface::StaticClass()))
+		{
+			if (AegisController->GetHoveredHitResult()->IsValidBlockingHit())
+			{
+				const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(AegisController->GetHoveredHitResult()->Location);
+				const AMapTile* CentreTile = GameState->AegisMap->GetTile(LocationCoord);
+				RangeIndicatorDecal->SetWorldLocation(CentreTile->StructureLocation);
+			}
+		}
 	}
 	
 }

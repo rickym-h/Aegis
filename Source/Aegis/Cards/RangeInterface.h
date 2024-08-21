@@ -3,13 +3,12 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "UObject/Interface.h"
-#include "PlayableCardInterface.generated.h"
+#include "RangeInterface.generated.h"
 
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)
-class UPlayableCardInterface : public UInterface
+class URangeInterface : public UInterface
 {
 	GENERATED_BODY()
 };
@@ -17,14 +16,13 @@ class UPlayableCardInterface : public UInterface
 /**
  * 
  */
-class AEGIS_API IPlayableCardInterface
+class AEGIS_API IRangeInterface
 {
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
 public:
-	
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interface Functions")
-	bool PlayCard(const FTileCoord& LocationCoord);
-	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) {return false;};
+	float GetRangeInMetres();
+	virtual float GetRangeInMetres_Implementation() { return 0.f; };
 };
