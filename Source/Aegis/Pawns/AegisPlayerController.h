@@ -27,6 +27,9 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Resources")
 	UResourcesData* Resources;
+
+	const FHitResult* GetHoveredHitResult() const;
+
 protected:
 
 	virtual void BeginPlay() override;
@@ -44,16 +47,19 @@ protected:
 
 	UPROPERTY()
 	TWeakObjectPtr<UPlayerCard> SelectedCard;
-	
 
 	void TryPlayCardAtLocation(UPlayerCard* Card, const FTileCoord& LocationCoord);
 	
+	FHitResult HitResultUnderCursor;
 public:
 	UFUNCTION(BlueprintCallable)
 	bool SelectCard(UPlayerCard* PlayerCard);
 	
 	UFUNCTION(BlueprintCallable)
 	UPlayerCard* GetSelectedCard() const;
+	
+	UPROPERTY(BlueprintAssignable)
+	FOnSelectedCardUpdatedSignature OnSelectedCardUpdatedDelegate;
 
 	UFUNCTION(BlueprintCallable)
 	void ClickGround();
@@ -93,13 +99,13 @@ public:
 	
 	UPROPERTY(BlueprintAssignable)
 	FOnCardsInHandUpdatedSignature OnCardsInHandUpdatedDelegate;
-	UPROPERTY(BlueprintAssignable)
-	FOnSelectedCardUpdatedSignature OnSelectedCardUpdatedDelegate;
 
 	UFUNCTION(BlueprintCallable)
 	int32 GetDrawPileCount() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetDiscardPileCount() const;
 	
+	virtual void Tick(float DeltaSeconds) override;
+
 	
 };

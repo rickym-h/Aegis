@@ -14,7 +14,15 @@
 
 AAegisPlayerController::AAegisPlayerController()
 {
+	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+	
 	Resources = CreateDefaultSubobject<UResourcesData>("Resources");
+}
+
+const FHitResult* AAegisPlayerController::GetHoveredHitResult() const
+{
+	return &HitResultUnderCursor;
 }
 
 void AAegisPlayerController::BeginPlay()
@@ -89,7 +97,6 @@ void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTil
 
 void AAegisPlayerController::ClickGround()
 {
-	FHitResult HitResultUnderCursor;
 	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
 	
 	const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(HitResultUnderCursor.Location);
@@ -199,5 +206,12 @@ int32 AAegisPlayerController::GetDrawPileCount() const
 int32 AAegisPlayerController::GetDiscardPileCount() const
 {
 	return DiscardPile.Num();
+}
+
+void AAegisPlayerController::Tick(float DeltaSeconds)
+{
+	Super::Tick(DeltaSeconds);
+
+	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
 }
 

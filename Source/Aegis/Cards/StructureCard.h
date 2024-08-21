@@ -26,5 +26,5 @@ public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Tower Class")
 	TSubclassOf<AStructure> StructureBlueprintClass;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Structure Data")
-	TArray<FTileCoord> StructureOffsets;
+	TArray<FTileCoord> StructureOffsets = {FTileCoord()};
 };

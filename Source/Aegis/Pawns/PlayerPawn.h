@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "AegisPlayerController.h"
 #include "InputActionValue.h"
 #include "GameFramework/Pawn.h"
 #include "PlayerPawn.generated.h"
@@ -24,11 +25,14 @@ public:
 	APlayerPawn();
 
 protected:
+	UFUNCTION()
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Game")
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="References")
 	AAegisGameStateBase* GameState;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="References")
+	AAegisPlayerController* AegisController;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UFloatingPawnMovement* MovementComponent;
@@ -37,17 +41,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	USpringArmComponent* SpringArm;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* FocusPoint;
+	USceneComponent* FocusPoint;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	class UInputMappingContext* InputMapping;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	class UInputConfigData* InputActions;
-
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
-
+	void ClearStructureHolograms();
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Decals")
 	UMaterial* DecalMaterial;
@@ -56,6 +59,14 @@ protected:
 
 	int BoomArmTargetLength;
 
+	UFUNCTION()
+	void UpdateSelectedCard();
+	UPROPERTY()
+	UPlayerCard* SelectedCard;
+	
+	UFUNCTION(BlueprintImplementableEvent)
+	void UpdateStructureHologramMesh(UStaticMeshComponent* HologramMeshComponent, bool IsValid);
+	void UpdateHologramPositions();
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;

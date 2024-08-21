@@ -171,6 +171,9 @@ AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, co
 
 bool UAegisMap::IsTileAvailable(const FTileCoord Location) const
 {
+	// Check if the coord is even represented by a tile
+	if (!MapTiles.Contains(Location)) { return false; }
+	
 	// Check the location is not part of the path
 	if (PathRoute.Contains(Location)) { return false; }
 
@@ -195,7 +198,14 @@ bool UAegisMap::CanStructureBePlaced(const UStructureCard* StructureCard, FTileC
 	for (const FTileCoord LocalCoord : StructureCard->StructureOffsets)
 	{
 		const FTileCoord WorldCoord = Location + LocalCoord;
+		
+		// Check if the tile is available
 		if (!IsTileAvailable(WorldCoord)) { return false; }
+
+		// Check that the tile fits the placement constraints of the card
+		if (!StructureCard->AllowedTerrains.Contains(MapTileDataMap[WorldCoord]->TerrainType)) { return false; } // Check terrains
+		if (!StructureCard->AllowedResources.Contains(MapTileDataMap[WorldCoord]->ResourceType)) { return false; } // Check resources
 	}
+	
 	return true;
 }
