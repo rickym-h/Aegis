@@ -26,6 +26,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Game")
+	AAegisGameStateBase* GameState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UFloatingPawnMovement* MovementComponent;
@@ -41,23 +44,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Enhanced Input")
 	class UInputConfigData* InputActions;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Game")
-	AAegisGameStateBase* GameState;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
-	void ClearStructureHolograms();
+
 	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Decals")
+	UMaterial* DecalMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Decals")
 	UDecalComponent* RangeIndicatorDecal;
-
-	UFUNCTION(BlueprintImplementableEvent)
-	void UpdateStructureHologramMesh(UStaticMeshComponent* HologramMeshComponent, bool IsValid);
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Selection")
-	AStructure* SelectedStructure;
-	UFUNCTION()
-	void SelectStructure(AStructure* StructureToSelect);
 
 	int BoomArmTargetLength;
 

@@ -6,8 +6,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/AegisGameStateBase.h"
-#include "Aegis/Structures/Structure.h"
-#include "Aegis/Structures/Towers/Tower.h"
 #include "Camera/CameraComponent.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/FloatingPawnMovement.h"
@@ -36,9 +34,14 @@ APlayerPawn::APlayerPawn()
 	RangeIndicatorDecal->SetWorldRotation(FRotator(90, 0, 0));
 	RangeIndicatorDecal->DecalSize = FVector(500, 100, 100);
 	RangeIndicatorDecal->SetWorldScale3D(FVector(1,1,1));
-	//UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Rotating.M_RangeDecal_Rotating'")).Object;
-	UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Static.M_RangeDecal_Static'")).Object;
-	RangeIndicatorDecal->SetMaterial(0, DecalMat);
+	
+	if (DecalMaterial)
+	{
+		RangeIndicatorDecal->SetMaterial(0, DecalMaterial);
+	} else
+	{
+		UE_LOG(LogTemp, Error, TEXT("APlayerPawn::APlayerPawn - Decal material could not be found"));
+	}
 }
 
 // Called when the game starts or when spawned
@@ -49,33 +52,9 @@ void APlayerPawn::BeginPlay()
 	if (Cast<AAegisGameStateBase>(GetWorld()->GetGameState()))
 	{
 		GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-	}
-
-	
-}
-
-void APlayerPawn::ClearStructureHolograms()
-{
-	for(UStaticMeshComponent* Component : StructureHolograms)
+	} else
 	{
-		Component->DestroyComponent();
-	}
-	StructureHolograms = TArray<UStaticMeshComponent*>();
-}
-
-void APlayerPawn::SelectStructure(AStructure* StructureToSelect)
-{
-	// What to do to unselect the old tower
-	if (const ATower* Tower = Cast<ATower>(SelectedStructure))
-	{
-		Tower->RangeIndicatorDecal->SetVisibility(false);
-	}
-	
-	SelectedStructure = StructureToSelect;
-	
-	if (const ATower* Tower = Cast<ATower>(SelectedStructure))
-	{
-		Tower->RangeIndicatorDecal->SetVisibility(true);
+		UE_LOG(LogTemp, Error, TEXT("APlayerPawn::BeginPlay - Could not set GameState!"))
 	}
 }
 
