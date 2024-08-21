@@ -14,13 +14,6 @@ class AAegisGameStateBase;
 class USpringArmComponent;
 class UCameraComponent;
 
-UENUM()
-enum EPlayerState
-{
-	Default UMETA(DisplayName = "Default"),
-	Placing UMETA(DisplayName = "Placing Structures")
-};
-
 UCLASS()
 class AEGIS_API APlayerPawn : public APawn
 {
@@ -52,8 +45,6 @@ protected:
 	AAegisGameStateBase* GameState;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
-	TEnumAsByte<EPlayerState> PlayerActionState;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
 	void ClearStructureHolograms();
 	
@@ -67,10 +58,6 @@ protected:
 	AStructure* SelectedStructure;
 	UFUNCTION()
 	void SelectStructure(AStructure* StructureToSelect);
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Data")
-	FHitResult HitResultUnderCursor;
-	FHitResult* UpdateHitResultUnderCursor();
 
 	int BoomArmTargetLength;
 

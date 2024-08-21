@@ -6,7 +6,6 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/AegisGameStateBase.h"
-#include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Camera/CameraComponent.h"
@@ -40,8 +39,6 @@ APlayerPawn::APlayerPawn()
 	//UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Rotating.M_RangeDecal_Rotating'")).Object;
 	UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Static.M_RangeDecal_Static'")).Object;
 	RangeIndicatorDecal->SetMaterial(0, DecalMat);
-
-	PlayerActionState = Default;
 }
 
 // Called when the game starts or when spawned
@@ -80,20 +77,6 @@ void APlayerPawn::SelectStructure(AStructure* StructureToSelect)
 	{
 		Tower->RangeIndicatorDecal->SetVisibility(true);
 	}
-}
-
-FHitResult* APlayerPawn::UpdateHitResultUnderCursor()
-{
-	const APlayerController* PlayerController = Cast<APlayerController>(Controller);
-	if (!PlayerController) { return nullptr; }
-
-	// TArray<TEnumAsByte<EObjectTypeQuery>> ObjectTypes;
-	// ObjectTypes.Add(UEngineTypes::ConvertToObjectType(ECC_GameTraceChannel3));
-	// PlayerController->GetHitResultUnderCursorForObjects(ObjectTypes, false, HitResultUnderCursor);
-
-	PlayerController->GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
-
-	return &HitResultUnderCursor;
 }
 
 // Called every frame
