@@ -13,7 +13,7 @@ ANexusBuilding::ANexusBuilding()
 	PrimaryActorTick.bCanEverTick = false;
 
 	CollisionCapsule = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
-	RootComponent = CollisionCapsule;
+	CollisionCapsule->SetupAttachment(RootComponent);
 
 	BuildingMesh = CreateDefaultSubobject<UStaticMeshComponent>("Building Mesh");
 	BuildingMesh->SetupAttachment(RootComponent);
@@ -31,15 +31,7 @@ ANexusBuilding::ANexusBuilding()
 void ANexusBuilding::BeginPlay()
 {
 	Super::BeginPlay();
-
-	// FTimerHandle DealDamageTimerHandle;
-	//
-	// FTimerDelegate Delegate; // Delegate to bind function with parameters
-	// Delegate.BindUFunction(this, "TakeDamage", 10); // Character is the parameter we wish to pass with the function.
-	//
-	// GetWorld()->GetTimerManager().SetTimer(DealDamageTimerHandle, Delegate, 5, true);
-
-	//UGameplayStatics::ApplyDamage(this, 10, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+	
 }
 
 // Called every frame
