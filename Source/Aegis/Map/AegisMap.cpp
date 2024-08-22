@@ -7,6 +7,7 @@
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
+#include "Kismet/GameplayStatics.h"
 #include "MapTiles/MapTileData.h"
 
 
@@ -165,6 +166,10 @@ AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, co
 	UE_LOG(LogTemp, Display, TEXT("UAegisMap::AddStructureToMap - Starting spawning structure..."))
 	AStructure* Structure = GetWorld()->SpawnActorDeferred<AStructure>(StructureBlueprintClass, ActorTransform);
 	Structure->ActorTransform = ActorTransform;
+
+	// Add structure to map and add data about the structure to the structure
+	Structure->StructureCard = DuplicateObject(StructureCard, UGameplayStatics::GetGameInstance(this));
+	MapStructures.Add(Location, Structure);
 
 	return Structure;
 }

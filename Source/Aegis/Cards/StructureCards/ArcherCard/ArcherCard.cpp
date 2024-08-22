@@ -6,6 +6,7 @@
 #include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Structures/Structure.h"
+#include "Aegis/Structures/Towers/ArcherTower/ArcherTower.h"
 #include "Kismet/GameplayStatics.h"
 
 bool UArcherCard::PlayCard_Implementation(const FTileCoord& LocationCoord)
@@ -22,6 +23,14 @@ bool UArcherCard::PlayCard_Implementation(const FTileCoord& LocationCoord)
 	UE_LOG(LogTemp, Display, TEXT("UArcherCard::PlayCard_Implementation - Successfully added structure to map!"))
 
 	// Set structure data (e.g. tower stats)
+	if (AArcherTower* ArcherTower = Cast<AArcherTower>(Structure))
+	{
+		ArcherTower->InitArcherTowerData(RangeInMetres, ShotsPerSecond, DamagePerShot);
+	} else
+	{
+		UE_LOG(LogTemp, Error, TEXT("UArcherCard::PlayCard_Implementation - Structure not archer tower! Failed to InitArcherTowerData()"))
+	}
+	
 
 	UGameplayStatics::FinishSpawningActor(Structure, Structure->ActorTransform);
 	UE_LOG(LogTemp, Display, TEXT("UArcherCard::PlayCard_Implementation - Finished spawning structure!"))
