@@ -132,7 +132,6 @@ struct FTileCoord
 		return Tiles.Array();
 	}
 
-
 	bool operator==(const FTileCoord& RHSTile) const
 	{
 		return (this->IsValid() && RHSTile.IsValid() && (this->Q == RHSTile.Q) && (this->R == RHSTile.R));

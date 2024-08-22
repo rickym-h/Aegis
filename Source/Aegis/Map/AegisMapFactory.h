@@ -4,9 +4,10 @@
 
 #include "CoreMinimal.h"
 #include "AegisMap.h"
-#include "Aegis/AegisGameStateBase.h"
 #include "AegisMapFactory.generated.h"
 
+class UAegisGameMap;
+class UAegisWorldMap;
 class ANexusBuilding;
 class AMapTile;
 /**
@@ -23,14 +24,19 @@ public:
 	static TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute);
 
 	UFUNCTION()
-	UAegisMap* GenerateMapWithNoise(const int PathNodeLength) const;
+	UAegisGameMap* GenerateGameMap(const int PathNodeLength) const;
+	UFUNCTION()
+	UAegisGameMap* GenerateWorldMap(const int PathNodeLength) const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
-	TSubclassOf<UAegisMap> AegisMapClass;
+	TSubclassOf<UAegisGameMap> AegisGameMapClass;
+	UPROPERTY(EditDefaultsOnly, Category="Map")
+	TSubclassOf<UAegisWorldMap> WorldMapClass;
 
 	UPROPERTY(EditDefaultsOnly, Category="Tiles")
 	TSubclassOf<AMapTile> GrassTileBP;
+	
 	UPROPERTY(EditDefaultsOnly, Category="Tiles")
 	TSubclassOf<ANexusBuilding> NexusBuildingBP;
 

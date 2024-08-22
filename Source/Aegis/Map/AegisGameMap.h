@@ -13,4 +13,28 @@ UCLASS()
 class AEGIS_API UAegisGameMap : public UAegisMap
 {
 	GENERATED_BODY()
+
+public:
+	UFUNCTION()
+	FTileCoord GetEnemySpawnCoord() const;
+
+	UFUNCTION()
+	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
+
+	UFUNCTION(BlueprintCallable)
+	int GetNumOfTilesToEnd(const FTileCoord StartCoord);
+
+	virtual bool IsTileAvailable(const FTileCoord& Location) const override;
+
+	UPROPERTY()
+	ANexusBuilding* NexusBuilding;
+protected:
+	
+	
+	// Path Data
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
+	TMap<FTileCoord, FTileCoord> PathRoute;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
+	TArray<FTileCoord> PathStartTiles;
+	
 };

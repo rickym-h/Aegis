@@ -6,6 +6,7 @@
 #include "GameFramework/GameStateBase.h"
 #include "AegisGameStateBase.generated.h"
 
+class UAegisGameMap;
 class AProjectileManager;
 class USaveGame;
 class UAegisSaveGame;
@@ -35,7 +36,7 @@ private:
 
 public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Map")
-	UAegisMap* AegisMap;
+	UAegisGameMap* AegisMap;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UAegisMapFactory* MapFactory;

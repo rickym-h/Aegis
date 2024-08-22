@@ -13,4 +13,11 @@ UCLASS()
 class AEGIS_API UAegisWorldMap : public UAegisMap
 {
 	GENERATED_BODY()
+
+public:
+	TMap<FTileCoord, TSet<FTileCoord>> NodeGraph;
+	TArray<FTileCoord> ExploredNodes;
+	
+
+protected:
 };

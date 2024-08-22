@@ -5,6 +5,7 @@
 
 #include "Enemies/EnemyFactory.h"
 #include "Kismet/GameplayStatics.h"
+#include "Map/AegisGameMap.h"
 #include "Map/AegisMapFactory.h"
 #include "Map/MapTile.h"
 #include "SaveSystem/AegisSaveGame.h"
@@ -42,10 +43,10 @@ void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 	// Destroy AegisMap
 	if (AegisMap)
 	{
-		AegisMap->DestroyMap();
+		UE_LOG(LogTemp, Error, TEXT("AAegisGameStateBase::GenerateTestMapFromMapFactory - No implementation found to destroy map!"))
 	}
 
-	AegisMap = MapFactory->GenerateMapWithNoise(3);
+	AegisMap = MapFactory->GenerateGameMap(3);
 }
 
 void AAegisGameStateBase::SaveGame()
