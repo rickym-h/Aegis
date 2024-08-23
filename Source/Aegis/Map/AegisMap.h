@@ -23,15 +23,8 @@ class AEGIS_API UAegisMap : public UObject
 public:
 	UAegisMap();
 
-	UFUNCTION()
-	void DestroyMap();
-
-	UFUNCTION()
-	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPathRoute, const TArray<FTileCoord>& InPathStartTiles, ANexusBuilding* InNexusBuilding);
-
-	UFUNCTION()
-	bool IsCoordInPath(FTileCoord Coord) const;
-
+	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& MapTileData);
+	
 	UFUNCTION()
 	AMapTile* GetTile(FTileCoord Coord);
 	UFUNCTION()
@@ -39,44 +32,28 @@ public:
 	UFUNCTION()
 	UMapTileData* GetTileData(FTileCoord Coord);
 
-	UFUNCTION()
-	FTileCoord GetEnemySpawnCoord() const;
-	UFUNCTION()
-	FTileCoord GetNextCoordInPath(const FTileCoord CurrentCoord) const;
-
-	UFUNCTION(BlueprintCallable)
-	int GetNumOfTilesToEnd(const FTileCoord StartCoord);
-
-	UPROPERTY()
-	ANexusBuilding* NexusBuilding;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Blueprints")
-	TSubclassOf<AMapTile> MapTileBP;
-
-	AStructure* AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location);
+	AStructure* AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location, bool bFinishSpawningStructure = false);
 	
 	UFUNCTION(BlueprintCallable)
-	bool IsTileAvailable(const FTileCoord& Location) const;
+	virtual bool IsTileAvailable(const FTileCoord& Location) const;
 	bool CanStructureBePlaced(const UStructureCard* StructureCard, const FTileCoord& Location);
 
 protected:
-	// Map Tiles
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Blueprints")
+	TSubclassOf<AMapTile> MapTileBP;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, AMapTile*> MapTiles;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
 	TMap<FTileCoord, UMapTileData*> MapTileDataMap;
 
 	AMapTile* CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const;
-	TMap<FTileCoord, AMapTile*> GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const;
+	TMap<FTileCoord, AMapTile*> GenerateMapTilesFromData();
 
-	// Path Data
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
-	TMap<FTileCoord, FTileCoord> PathRoute;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
-	TArray<FTileCoord> PathStartTiles;
 
 	// Structure Data
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Map Data")
+	TMap<FTileCoord, UStructureCard*> MapStructureData;
 	TMap<FTileCoord, AStructure*> MapStructures;
 
 };

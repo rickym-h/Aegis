@@ -34,24 +34,22 @@ class AEGIS_API UMapTileData : public UObject
 	GENERATED_BODY()
 
 public:
-	UMapTileData();
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
+	TEnumAsByte<ETerrainType> TerrainType = Grass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	TEnumAsByte<ETerrainType> TerrainType;
+	bool bIsPath = false;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	bool bIsPath;
-
+	TEnumAsByte<EResourceType> ResourceType = Empty;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	TEnumAsByte<EResourceType> ResourceType;
+	float TreeNoise = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	float TreeNoise;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	float StoneNoise;
+	float StoneNoise = 0;
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	int32 Elevation;
+	int32 Elevation = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Data")
-	float ElevationNoise;
+	float ElevationNoise = 0;
 };

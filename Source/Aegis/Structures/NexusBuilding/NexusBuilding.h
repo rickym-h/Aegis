@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Structures/Structure.h"
 #include "GameFramework/Actor.h"
 #include "NexusBuilding.generated.h"
 
@@ -10,7 +11,7 @@ class UCapsuleComponent;
 class UBuildingHealthComponent;
 
 UCLASS()
-class AEGIS_API ANexusBuilding : public AActor
+class AEGIS_API ANexusBuilding : public AStructure
 {
 	GENERATED_BODY()
 

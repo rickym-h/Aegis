@@ -6,7 +6,6 @@
 #include "MapTile.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Structures/Structure.h"
-#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Kismet/GameplayStatics.h"
 #include "MapTiles/MapTileData.h"
 
@@ -15,45 +14,11 @@ UAegisMap::UAegisMap()
 {
 }
 
-void UAegisMap::DestroyMap()
+void UAegisMap::PopulateMapData(const TMap<FTileCoord, UMapTileData*>& MapTileData)
 {
-	if (NexusBuilding)
-	{
-		NexusBuilding->Destroy();
-	}
-	for (const TTuple<FTileCoord, AMapTile*> Element : MapTiles)
-	{
-		if (AMapTile* Tile = Element.Value)
-		{
-			Tile->Destroy();
-		}
-	}
-	for (const TTuple<FTileCoord, AStructure*> Element : MapStructures)
-	{
-		if (AStructure* Structure = Element.Value)
-		{
-			Structure->Destroy();
-		}
-	}
-}
+	this->MapTileDataMap = MapTileData;
 
-
-void UAegisMap::PopulateMapData(
-	const TMap<FTileCoord, UMapTileData*>& InMapTileData,
-	const TMap<FTileCoord, FTileCoord>& InPathRoute,
-	const TArray<FTileCoord>& InPathStartTiles,
-	ANexusBuilding* InNexusBuilding)
-{
-	this->MapTiles = GenerateMapTiles(InMapTileData);
-	this->MapTileDataMap = InMapTileData;
-	this->PathRoute = InPathRoute;
-	this->PathStartTiles = InPathStartTiles;
-	this->NexusBuilding = InNexusBuilding;
-}
-
-bool UAegisMap::IsCoordInPath(const FTileCoord Coord) const
-{
-	return PathRoute.Contains(Coord);
+	GenerateMapTilesFromData();
 }
 
 AMapTile* UAegisMap::GetTile(const FTileCoord Coord)
@@ -85,36 +50,6 @@ UMapTileData* UAegisMap::GetTileData(FTileCoord Coord)
 	return nullptr;
 }
 
-FTileCoord UAegisMap::GetEnemySpawnCoord() const
-{
-	if (PathStartTiles.Num() == 1) { return PathStartTiles[0]; }
-
-	const int RandomIndex = FMath::RandRange(0, PathStartTiles.Num() - 1);
-	//UE_LOG(LogTemp, Warning, TEXT("Index: %i"), RandomIndex)
-	return PathStartTiles[RandomIndex];
-}
-
-FTileCoord UAegisMap::GetNextCoordInPath(const FTileCoord CurrentCoord) const
-{
-	//return FTileCoord(8, 0);
-	return PathRoute[CurrentCoord];
-}
-
-int UAegisMap::GetNumOfTilesToEnd(const FTileCoord StartCoord)
-{
-	int DistanceSoFar = 0;
-	FTileCoord CurrentCoord = StartCoord;
-	while (PathRoute.Contains(CurrentCoord))
-	{
-		FTileCoord NextCoord = PathRoute[CurrentCoord];
-		if (CurrentCoord == NextCoord) { break; }
-
-		DistanceSoFar++;
-		CurrentCoord = NextCoord;
-	}
-	return DistanceSoFar;
-}
-
 AMapTile* UAegisMap::CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const
 {
 	const FVector Location = Coord.ToWorldLocation();
@@ -128,21 +63,23 @@ AMapTile* UAegisMap::CreateMapTile(const FTileCoord Coord, UMapTileData* MapTile
 	return Tile;
 }
 
-TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTiles(const TMap<FTileCoord, UMapTileData*>& MapTileData) const
+TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTilesFromData()
 {
 	TMap<FTileCoord, AMapTile*> OutMapTiles;
 
-	for (TTuple<FTileCoord, UMapTileData*> Element : MapTileData)
+	for (TTuple<FTileCoord, UMapTileData*> Element : MapTileDataMap)
 	{
 		AMapTile* MapTile = CreateMapTile(Element.Key, Element.Value);
 		OutMapTiles.Add(Element.Key, MapTile);
 	}
 
+	MapTiles = OutMapTiles;
+
 	return OutMapTiles;
 }
 
 
-AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location)
+AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, const FTileCoord Location, bool bFinishSpawningStructure)
 {
 	if (!StructureCard)
 	{
@@ -171,6 +108,11 @@ AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, co
 	Structure->StructureCard = DuplicateObject(StructureCard, UGameplayStatics::GetGameInstance(this));
 	MapStructures.Add(Location, Structure);
 
+	if (bFinishSpawningStructure)
+	{
+		UGameplayStatics::FinishSpawningActor(Structure, Structure->ActorTransform);
+	}
+	
 	return Structure;
 }
 
@@ -178,9 +120,6 @@ bool UAegisMap::IsTileAvailable(const FTileCoord& Location) const
 {
 	// Check if the coord is even represented by a tile
 	if (!MapTiles.Contains(Location)) { return false; }
-	
-	// Check the location is not part of the path
-	if (PathRoute.Contains(Location)) { return false; }
 
 	// Check the location is not used for an existing structure
 	if (MapStructures.Contains(Location)) { return false; }

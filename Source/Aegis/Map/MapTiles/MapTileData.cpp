@@ -2,12 +2,3 @@
 
 
 #include "MapTileData.h"
-
-UMapTileData::UMapTileData()
-{
-	TerrainType = Grass;
-	bIsPath = false;
-	ResourceType = Empty;
-	Elevation = 1;
-	ElevationNoise = 0;
-}
