@@ -79,7 +79,6 @@ UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) co
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateMapWithNoise - Node count: %i"), PoissonNodeCoords.Num())
-
 	return Map;
 }
 
@@ -302,7 +301,7 @@ TArray<FTileCoord> UAegisMapFactory::SelectRandomPathThroughNodeGraph(const int3
 {
 	TMap<FTileCoord, FTileCoord> ChildToParentMap;
 
-	auto GetStepsToCentre = [](FTileCoord LChild, TMap<FTileCoord, FTileCoord> LChildToParentMap)
+	auto GetStepsToCentre = [](const FTileCoord LChild, TMap<FTileCoord, FTileCoord> LChildToParentMap)
 	{
 		int32 Count = 0;
 		FTileCoord Head = LChild;
@@ -339,7 +338,11 @@ TArray<FTileCoord> UAegisMapFactory::SelectRandomPathThroughNodeGraph(const int3
 			if (Explored.Contains(Neighbour) || Frontier.Contains(Neighbour)) { continue; }
 
 			// If a suitable target node has not been found, add this node to the frontier and continue searching
-			if (GetStepsToCentre(Neighbour, ChildToParentMap) != PathLengthInNodes) { Frontier.Add(Neighbour); }
+			if (GetStepsToCentre(Neighbour, ChildToParentMap) != PathLengthInNodes)
+			{
+				Frontier.Add(Neighbour);
+				continue;
+			}
 
 			// Reverse through the ChildToParentMap to find the path to the centre from the suitable node
 			TMap<FTileCoord, FTileCoord> PathThroughNodeGraph;
