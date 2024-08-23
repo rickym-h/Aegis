@@ -26,6 +26,10 @@ public:
 
 	virtual bool IsTileAvailable(const FTileCoord& Location) const override;
 
+	
+	void PopulateGameMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPath, const TArray<FTileCoord>& InPathStartCoords, ANexusBuilding* InNexusBuilding);
+
+
 	UPROPERTY()
 	ANexusBuilding* NexusBuilding;
 protected:

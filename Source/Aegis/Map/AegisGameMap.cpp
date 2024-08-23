@@ -41,3 +41,13 @@ bool UAegisGameMap::IsTileAvailable(const FTileCoord& Location) const
 
 	return true;
 }
+
+void UAegisGameMap::PopulateGameMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPath,
+	const TArray<FTileCoord>& InPathStartCoords, ANexusBuilding* InNexusBuilding)
+{
+	PopulateMapData(InMapTileData);
+
+	this->PathRoute = InPath;
+	this->PathStartTiles = InPathStartCoords;
+	this->NexusBuilding = InNexusBuilding;
+}

@@ -22,6 +22,8 @@ class AEGIS_API UAegisMap : public UObject
 
 public:
 	UAegisMap();
+
+	void PopulateMapData(const TMap<FTileCoord, UMapTileData*>& MapTileData);
 	
 	UFUNCTION()
 	AMapTile* GetTile(FTileCoord Coord);
@@ -47,7 +49,7 @@ protected:
 	TMap<FTileCoord, UMapTileData*> MapTileDataMap;
 
 	AMapTile* CreateMapTile(const FTileCoord Coord, UMapTileData* MapTileData) const;
-	TMap<FTileCoord, AMapTile*> GenerateMapTilesFromData() const;
+	TMap<FTileCoord, AMapTile*> GenerateMapTilesFromData();
 
 
 	// Structure Data

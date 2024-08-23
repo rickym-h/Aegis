@@ -14,6 +14,13 @@ UAegisMap::UAegisMap()
 {
 }
 
+void UAegisMap::PopulateMapData(const TMap<FTileCoord, UMapTileData*>& MapTileData)
+{
+	this->MapTileDataMap = MapTileData;
+
+	GenerateMapTilesFromData();
+}
+
 AMapTile* UAegisMap::GetTile(const FTileCoord Coord)
 {
 	// For some reason TMap::Find throws an error, so we manually check if is contained and then return the value.
@@ -56,7 +63,7 @@ AMapTile* UAegisMap::CreateMapTile(const FTileCoord Coord, UMapTileData* MapTile
 	return Tile;
 }
 
-TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTilesFromData() const
+TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTilesFromData()
 {
 	TMap<FTileCoord, AMapTile*> OutMapTiles;
 
@@ -65,6 +72,8 @@ TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTilesFromData() const
 		AMapTile* MapTile = CreateMapTile(Element.Key, Element.Value);
 		OutMapTiles.Add(Element.Key, MapTile);
 	}
+
+	MapTiles = OutMapTiles;
 
 	return OutMapTiles;
 }
