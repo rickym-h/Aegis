@@ -45,6 +45,7 @@ TArray<FTileCoord> UAegisMapFactory::GetPathStartCoords(TMap<FTileCoord, FTileCo
 
 UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) const
 {
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Start!"));
 	const FRandomStream RandomStream = FRandomStream(static_cast<int32>(FDateTime::Now().ToUnixTimestamp()));
 	const FVector2D ElevationNoiseOffset = GetRandomNoiseOffset(RandomStream);
 	const FVector2D PathingNoiseOffset = GetRandomNoiseOffset(RandomStream);
@@ -52,33 +53,42 @@ UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) co
 	const FVector2D StoneNoiseOffset = GetRandomNoiseOffset(RandomStream);
 
 	// Generate the poisson nodes to build the path around
-	const TArray<FTileCoord> PoissonNodeCoords = GeneratePoissonNodeCoords(8, 100, 5000, RandomStream);
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generating poisson data..."));
+	const TArray<FTileCoord> PoissonNodeCoords = GeneratePoissonNodeCoords(4, 100, 5000, RandomStream);
+	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateGameMap - Node count: %i"), PoissonNodeCoords.Num())
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Connecting poisson nodes via pseudo Delaunay Triangulation..."));
 	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = GeneratePseudoDelaunayTriangulation(PoissonNodeCoords, 8);
 
 	// Generate a path from the graph
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Selecting nodes to path through"));
 	const TArray<FTileCoord> PathNodes = SelectRandomPathThroughNodeGraph(PathLengthInNodes, PoissonNodeGraph, RandomStream);
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generating path through selected nodes via A*..."));
 	const TMap<FTileCoord, FTileCoord> Path = GenerateAStarPathThroughNodes(PathNodes, PathingNoiseOffset);
 
-	// Generate MapTileData from the path and noise offsets
+	// Generate MapTileData from the path and noise offsets...
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = GenerateMapTilesDataAroundPath(Path, ElevationNoiseOffset, TreeNoiseOffset, StoneNoiseOffset);
 
 	// Spawn a NexusBuilding
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Creating Nexus building..."));
 	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0, 0, 0), FRotator(0, 0, 0));
 
 	// Set path start tile coords
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Getting path starting coords..."));
 	const TArray<FTileCoord> PathStartTileCoords = GetPathStartCoords(Path);
 
 	// Create map instance
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Creating Map instance..."));
 	UAegisGameMap* Map = NewObject<UAegisGameMap>(GetWorld(), AegisGameMapClass);
 	Map->PopulateGameMapData(MapTilesData, Path, PathStartTileCoords, NexusBuilding);
 
 	// Set TilesToEnd of every tile
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Setting path properties..."));
 	for (AMapTile* Tile : Map->GetTiles())
 	{
 		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateMapWithNoise - Node count: %i"), PoissonNodeCoords.Num())
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Complete!"));
 	return Map;
 }
 
@@ -107,10 +117,10 @@ TArray<FTileCoord> UAegisMapFactory::GeneratePoissonNodeCoords(const int32 Poiss
 
 	// Sort by distance to centre
 	NodePoints.Sort([](const FTileCoord& A, const FTileCoord& B)
-		{
-			//return FVector::Dist(A.ToWorldLocation(), FVector::ZeroVector) < FVector::Dist(B.ToWorldLocation(), FVector::ZeroVector);
-			return FTileCoord::HexDistance(A, FTileCoord()) <  FTileCoord::HexDistance(B, FTileCoord());
-		});
+	{
+		//return FVector::Dist(A.ToWorldLocation(), FVector::ZeroVector) < FVector::Dist(B.ToWorldLocation(), FVector::ZeroVector);
+		return FTileCoord::HexDistance(A, FTileCoord()) <  FTileCoord::HexDistance(B, FTileCoord());
+	});
 	
 	return NodePoints;
 }
@@ -299,75 +309,63 @@ TMap<FTileCoord, TSet<FTileCoord>> UAegisMapFactory::GeneratePseudoDelaunayTrian
 
 TArray<FTileCoord> UAegisMapFactory::SelectRandomPathThroughNodeGraph(const int32 PathLengthInNodes, const TMap<FTileCoord, TSet<FTileCoord>>& PoissonNodeGraph, FRandomStream RandomStream)
 {
-	TMap<FTileCoord, FTileCoord> ChildToParentMap;
-
-	auto GetStepsToCentre = [](const FTileCoord LChild, TMap<FTileCoord, FTileCoord> LChildToParentMap)
+	if (PoissonNodeGraph.Num() < PathLengthInNodes)
 	{
-		int32 Count = 0;
-		FTileCoord Head = LChild;
-		while (Head != FTileCoord())
+		UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateRandomPathThroughNodeGraph - Graph size is too small to find a path of length %i"), PathLengthInNodes);
+		return TArray<FTileCoord>();
+	}
+	
+	// The stack for DFS searching. Keeps track of the head node, and the path to that node at any time.
+	TArray<TTuple<FTileCoord, TArray<FTileCoord>>> Stack;
+
+	// NOTE - this DFS does not make use of an "explored"/"visited" list of nodes, as the suitable path is not necessarily the shortest path to the
+	// end node, it is just searching for any path to any node that meets a certain length. This means that looping is allowed and only
+	// backtracking is needed.
+	
+	TArray<FTileCoord> InitialPath = {FTileCoord()};
+	const TTuple<FTileCoord, TArray<FTileCoord>> InitialValue = TTuple<FTileCoord, TArray<FTileCoord>>(FTileCoord(),InitialPath);
+	Stack.Add(InitialValue);
+	
+	while (Stack.Num() != 0)
+	{
+		// Get the top node and the path to it
+		const TTuple<FTileCoord, TArray<FTileCoord>> Head = Stack.Pop();
+
+		// Check if this head is a suitable return node, and return if it is
+		if (Head.Value.Num() == PathLengthInNodes)
 		{
-			Head = LChildToParentMap[Head];
-			Count++;
+			return Head.Value;
 		}
-		return Count;
-	};
-	
-	TArray<FTileCoord> Frontier;
-	TSet<FTileCoord> Explored;
-	
-	Frontier.Add(FTileCoord());
 
-	while (Frontier.Num() != 0)
-	{
-		FTileCoord Head = Frontier.Pop();
-		Explored.Add(Head);
-
-		TArray<FTileCoord> NeighbourNodes = PoissonNodeGraph[Head].Array();
+		// The path is not long enough, get all neighbouring nodes
+		TArray<FTileCoord> NeighbourNodes = PoissonNodeGraph[Head.Key].Array();
 		NeighbourNodes.Sort([RandomStream](FTileCoord A, FTileCoord B)
 		{
-			return RandomStream.FRand() < 0.5;
+			//return RandomStream.FRand() < 0.5;
+			return FTileCoord::HexDistance(A, FTileCoord()) > FTileCoord::HexDistance(B, FTileCoord());
 		});
 
-		// Iterate over neighbors of the frontier
-		for (const FTileCoord Neighbour : NeighbourNodes)
+		for (FTileCoord NeighbourNode : NeighbourNodes)
 		{
-			ChildToParentMap.Add(Neighbour, Head);
-
-			// If we have explored this node or is it already in the frontier, skip it
-			if (Explored.Contains(Neighbour) || Frontier.Contains(Neighbour)) { continue; }
-
-			// If a suitable target node has not been found, add this node to the frontier and continue searching
-			if (GetStepsToCentre(Neighbour, ChildToParentMap) != PathLengthInNodes)
+			if (Head.Value.Contains(NeighbourNode))
 			{
-				Frontier.Add(Neighbour);
+				// Node exists in the path so far, skip
 				continue;
 			}
+			
+			// Create the path to neighbour by adding this tile to the path to its parent
+			TArray<FTileCoord> PathToNeighbour = Head.Value;
+			PathToNeighbour.Add(NeighbourNode);
+			
+			TTuple<FTileCoord, TArray<FTileCoord>> StackValue;
+			StackValue.Key = NeighbourNode;
+			StackValue.Value = PathToNeighbour;
 
-			// Reverse through the ChildToParentMap to find the path to the centre from the suitable node
-			TMap<FTileCoord, FTileCoord> PathThroughNodeGraph;
-			FTileCoord ChildHead = Neighbour;
-			while (ChildHead != FTileCoord())
-			{
-				FTileCoord ParentHead = ChildToParentMap[ChildHead];
-				PathThroughNodeGraph.Add(ParentHead, ChildHead);
-				ChildHead = ParentHead;
-			}
-
-			// Using the reversed path, generate an array of nodes until the target node
-			TArray<FTileCoord> PathFromCentre;
-			FTileCoord CentreHead = FTileCoord();
-			while (CentreHead != Neighbour)
-			{
-				PathFromCentre.Add(CentreHead);
-				CentreHead = PathThroughNodeGraph[CentreHead];
-			}
-			PathFromCentre.Add(Neighbour);
-			return PathFromCentre;
+			Stack.Add(StackValue);
 		}
 	}
 
-	UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateRandomPathThroughNodeGraph - Could not find path through node graph!! Maybe the graph is too small?"));
+	UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateRandomPathThroughNodeGraph - Could not find path through node graph!!"));
 	return TArray<FTileCoord>();
 }
 
