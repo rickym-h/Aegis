@@ -62,7 +62,8 @@ UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) co
 	const FDateTime TimeStamp_GeneratedPoissonNodes = FDateTime::Now();
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated Poisson nodes in %fms"), (TimeStamp_GeneratedPoissonNodes - TimeStamp_GeneratedRandomOffsets).GetTotalMilliseconds());
 	
-	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = GeneratePseudoDelaunayTriangulation(PoissonNodeCoords, 8);
+	//const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = GeneratePseudoDelaunayTriangulation(PoissonNodeCoords, 8);
+	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = GenerateDelaunayTriangulation(PoissonNodeCoords);
 	const FDateTime TimeStamp_GeneratedPoissonNodeGraph = FDateTime::Now();
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated Pseudo Delaunay Triangulation nodes in %fms"), (TimeStamp_GeneratedPoissonNodeGraph - TimeStamp_GeneratedPoissonNodes).GetTotalMilliseconds());
 		
@@ -250,97 +251,137 @@ TArray<FVector2D> UAegisMapFactory::GetPoissonDiskClusters(const int32 PoissonDi
 	return OutputLocations;
 }
 
-TMap<FTileCoord, TSet<FTileCoord>> UAegisMapFactory::GeneratePseudoDelaunayTriangulation(const TArray<FTileCoord>& PoissonNodeCoords, const int PoissonRadius)
+TMap<FTileCoord, TSet<FTileCoord>> UAegisMapFactory::GenerateDelaunayTriangulation(const TArray<FTileCoord>& PoissonNodeCoords)
 {
-	TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph;
-
-	// For each node, create a blob containing all the tiles adjacent to the blob
-	TMap<FTileCoord, TSet<FTileCoord>> Blobs;
-	TMap<FTileCoord, bool> IsBlobComplete;
+	std::vector<Point> points;
+	TMap<Point, FTileCoord> PointToCoord;
 	for (FTileCoord Node : PoissonNodeCoords)
 	{
-		//TSet<FTileCoord> InitialBlob = TSet(FTileCoord::GetTilesInRadius(Node, FMath::RoundToNegativeInfinity(static_cast<float>(PoissonRadius-1)/2.f)));
-		TSet<FTileCoord> InitialBlob = TSet(FTileCoord::GetTilesInRadius(Node, 1));
-		Blobs.Add(Node, InitialBlob);
-		IsBlobComplete.Add(Node, false);
+		FVector NodeLoc = Node.ToWorldLocation();
+		Point p = Point(NodeLoc.X, NodeLoc.Y);
+		PointToCoord.Add(p, Node);
+		points.push_back(p);
 	}
-	TSet<FTileCoord> BlobbedTiles;
-	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+
+	if (points.size() < 3)
 	{
-		BlobbedTiles.Append(Pair.Value);
+		return TMap<FTileCoord, TSet<FTileCoord>>();
 	}
-	
-	// For each un-complete blob, add the closest adjacent un-blobbed tile.
-		// If no such adjacent tile exists, mark node/blob as complete
-		// If the closest adjacent tile is beyond 2xPoissonRadius in distance, mark node as complete
-	for (int RangeToClaim = 1; RangeToClaim < PoissonRadius/2; RangeToClaim++)
+	auto xmin = points[0].x;
+	auto xmax = xmin;
+	auto ymin = points[0].y;
+	auto ymax = ymin;
+	for (auto const& pt : points)
 	{
-		for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+		xmin = std::min(xmin, pt.x);
+		xmax = std::max(xmax, pt.x);
+		ymin = std::min(ymin, pt.y);
+		ymax = std::max(ymax, pt.y);
+	}
+
+	const auto dx = xmax - xmin;
+	const auto dy = ymax - ymin;
+	const auto dmax = std::max(dx, dy);
+	const auto midx = (xmin + xmax) / static_cast<float>(2.);
+	const auto midy = (ymin + ymax) / static_cast<float>(2.);
+
+	/* Init Delaunay triangulation. */
+	Delaunay d = Delaunay();
+
+	const auto p0 = Point{midx - 20 * dmax, midy - dmax};
+	const auto p1 = Point{midx, midy + 20 * dmax};
+	const auto p2 = Point{midx + 20 * dmax, midy - dmax};
+	d.triangles.emplace_back(Triangle{p0, p1, p2});
+
+	for (auto const& pt : points)
+	{
+		std::vector<Edge> edges;
+		std::vector<Triangle> tmps;
+		for (auto const& tri : d.triangles)
 		{
-			if (IsBlobComplete[Pair.Key]) { continue; }
-
-			// Find all adjacent tiles to the blob
-			TSet<FTileCoord> Blob = Pair.Value;
-			TSet<FTileCoord> BlobAdjacent = TSet(FTileCoord::GetTilesInRadius(Blob.Array(), RangeToClaim));
-			for (FTileCoord BlobTile : Blob) { BlobAdjacent.Remove(BlobTile); }
-
-			// Remove any tiles that exist in another blob
-			TSet<FTileCoord> CleanedBlobAdjacent; 
-			for (FTileCoord AdjacentTile : BlobAdjacent)
+			/* Check if the point is inside the triangle circumcircle. */
+			const auto dist = (tri.circle.x - pt.x) * (tri.circle.x - pt.x) +
+				(tri.circle.y - pt.y) * (tri.circle.y - pt.y);
+			if ((dist - tri.circle.radius) <= 1e-4)
 			{
-				if (!BlobbedTiles.Contains(AdjacentTile))
+				edges.push_back(tri.e0);
+				edges.push_back(tri.e1);
+				edges.push_back(tri.e2);
+			}
+			else
+			{
+				tmps.push_back(tri);
+			}
+		}
+
+		/* Delete duplicate edges. */
+		std::vector<bool> remove(edges.size(), false);
+		for (auto it1 = edges.begin(); it1 != edges.end(); ++it1)
+		{
+			for (auto it2 = edges.begin(); it2 != edges.end(); ++it2)
+			{
+				if (it1 == it2)
 				{
-					CleanedBlobAdjacent.Add(AdjacentTile);
+					continue;
+				}
+				if (*it1 == *it2)
+				{
+					remove[std::distance(edges.begin(), it1)] = true;
+					remove[std::distance(edges.begin(), it2)] = true;
 				}
 			}
-
-			if (CleanedBlobAdjacent.Num() == 0)
-			{
-				IsBlobComplete[Pair.Key] = true;
-				continue;
-			}
-			
-			// Add to blob
-			for (FTileCoord AdjacentTile : CleanedBlobAdjacent)
-			{
-				Blobs[Pair.Key].Add(AdjacentTile);
-				BlobbedTiles.Add(AdjacentTile);
-			}
 		}
+
+		edges.erase(
+			std::remove_if(edges.begin(), edges.end(),
+			               [&](auto const& e) { return remove[&e - &edges[0]]; }),
+			edges.end());
+
+		/* Update triangulation. */
+		for (auto const& e : edges)
+		{
+			tmps.push_back({e.p0, e.p1, {pt.x, pt.y}});
+		}
+		d.triangles = tmps;
 	}
-	
-	// For each blob
-		// Find all adjacent tiles to the blob not in the blob
-		// For each of these adjacent tiles, get the blob / node it is part of, and add it to the set for this blob
-		// Add the set to the PoissonNodeGraph
-	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : Blobs)
+
+	/* Remove original super triangle. */
+	d.triangles.erase(
+		std::remove_if(d.triangles.begin(), d.triangles.end(),
+			[&](auto const& tri)
+			{
+			    return ((tri.p0 == p0 || tri.p1 == p0 || tri.p2 == p0) ||
+			        (tri.p0 == p1 || tri.p1 == p1 || tri.p2 == p1) ||
+			        (tri.p0 == p2 || tri.p1 == p2 || tri.p2 == p2));
+			}),
+		d.triangles.end());
+
+	/* Add edges. */
+	for (auto const& tri : d.triangles)
 	{
-		TSet<FTileCoord> AdjacentNodes;
-		
-		TSet<FTileCoord> AdjacentToBlob = TSet(FTileCoord::GetTilesInRadius(Pair.Value.Array(), 1));
-		for (FTileCoord BlobTile : Pair.Value)
-		{
-			AdjacentToBlob.Remove(BlobTile);
-		}
-
-		for (FTileCoord AdjacentTile : AdjacentToBlob)
-		{
-			// Find which blob this tile is part of, and add the parent node to the adjacent nodes
-			for (TPair<FTileCoord, TSet<FTileCoord>> PossibleAdjacentBlob : Blobs)
-			{
-				if (PossibleAdjacentBlob.Value.Contains(AdjacentTile))
-				{
-					AdjacentNodes.Add(PossibleAdjacentBlob.Key);
-					break;
-				}
-			}
-		}
-		
-		PoissonNodeGraph.Add(Pair.Key, AdjacentNodes);
+		d.edges.push_back(tri.e0);
+		d.edges.push_back(tri.e1);
+		d.edges.push_back(tri.e2);
 	}
-	
-	// return complete set of connected nodes
-	return PoissonNodeGraph;
+
+	TMap<FTileCoord, TSet<FTileCoord>> OutTriangulation;
+	for (Edge Edge : d.edges)
+	{
+		FTileCoord CoordA = PointToCoord[Edge.p0];
+		FTileCoord CoordB = PointToCoord[Edge.p1];
+		if (!OutTriangulation.Contains(CoordA))
+		{
+			OutTriangulation.Add(CoordA, TSet<FTileCoord>{});
+		}
+		OutTriangulation[CoordA].Add(CoordB);
+		if (!OutTriangulation.Contains(CoordB))
+		{
+			OutTriangulation.Add(CoordB, TSet<FTileCoord>{});
+		}
+		OutTriangulation[CoordB].Add(CoordA);
+	}
+
+	return OutTriangulation;
 }
 
 TArray<FTileCoord> UAegisMapFactory::SelectRandomPathThroughNodeGraph(const int32 PathLengthInNodes, const TMap<FTileCoord, TSet<FTileCoord>>& PoissonNodeGraph, FRandomStream RandomStream)
