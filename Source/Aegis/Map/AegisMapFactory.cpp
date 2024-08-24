@@ -45,50 +45,85 @@ TArray<FTileCoord> UAegisMapFactory::GetPathStartCoords(TMap<FTileCoord, FTileCo
 
 UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) const
 {
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Start!"));
-	const FRandomStream RandomStream = FRandomStream(static_cast<int32>(FDateTime::Now().ToUnixTimestamp()));
+	//const int32 Seed = static_cast<int32>(sFDateTime::Now().ToUnixTimestamp());
+	constexpr int32 Seed = 1724523875;
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Started! Seed: %i"), Seed);
+	const FDateTime TimeSTamp_Start = FDateTime::Now();
+
+	const FRandomStream RandomStream = FRandomStream(Seed);
 	const FVector2D ElevationNoiseOffset = GetRandomNoiseOffset(RandomStream);
 	const FVector2D PathingNoiseOffset = GetRandomNoiseOffset(RandomStream);
 	const FVector2D TreeNoiseOffset = GetRandomNoiseOffset(RandomStream);
 	const FVector2D StoneNoiseOffset = GetRandomNoiseOffset(RandomStream);
+	const FDateTime TimeStamp_GeneratedRandomOffsets = FDateTime::Now();
 
 	// Generate the poisson nodes to build the path around
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generating poisson data..."));
 	const TArray<FTileCoord> PoissonNodeCoords = GeneratePoissonNodeCoords(4, 100, 5000, RandomStream);
-	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateGameMap - Node count: %i"), PoissonNodeCoords.Num())
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Connecting poisson nodes via pseudo Delaunay Triangulation..."));
+	const FDateTime TimeStamp_GeneratedPoissonNodes = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated Poisson nodes in %fms"), (TimeStamp_GeneratedPoissonNodes - TimeStamp_GeneratedRandomOffsets).GetTotalMilliseconds());
+	
 	const TMap<FTileCoord, TSet<FTileCoord>> PoissonNodeGraph = GeneratePseudoDelaunayTriangulation(PoissonNodeCoords, 8);
+	const FDateTime TimeStamp_GeneratedPoissonNodeGraph = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated Pseudo Delaunay Triangulation nodes in %fms"), (TimeStamp_GeneratedPoissonNodeGraph - TimeStamp_GeneratedPoissonNodes).GetTotalMilliseconds());
+		
+	// Draw lines between each connected node
+	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : PoissonNodeGraph)
+	{
+		for (FTileCoord AdjacentNode : Pair.Value)
+		{
+			FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
+			FVector End = AdjacentNode.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+	
+			FColor Color = FColor::Red; // Line color
+	
+			// Draw the debug line
+			DrawDebugLine(GetWorld(), Start, End, Color, true, -1, 0, 5);
+		}
+	}
+	const FDateTime TimeStamp_DrawnEdgesInWorld = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Drawn node graph in world in %fms"), (TimeStamp_DrawnEdgesInWorld - TimeStamp_GeneratedPoissonNodeGraph).GetTotalMilliseconds());
 
 	// Generate a path from the graph
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Selecting nodes to path through"));
 	const TArray<FTileCoord> PathNodes = SelectRandomPathThroughNodeGraph(PathLengthInNodes, PoissonNodeGraph, RandomStream);
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generating path through selected nodes via A*..."));
+	const FDateTime TimeStamp_SelectPathNodes = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Selected path poisson nodes in %fms"), (TimeStamp_SelectPathNodes - TimeStamp_DrawnEdgesInWorld).GetTotalMilliseconds());
+	
 	const TMap<FTileCoord, FTileCoord> Path = GenerateAStarPathThroughNodes(PathNodes, PathingNoiseOffset);
+	const FDateTime TimeStamp_GenerateAStarPath = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated path through selected nodes via A* in %fms"), (TimeStamp_GenerateAStarPath - TimeStamp_SelectPathNodes).GetTotalMilliseconds());
 
 	// Generate MapTileData from the path and noise offsets...
 	const TMap<FTileCoord, UMapTileData*> MapTilesData = GenerateMapTilesDataAroundPath(Path, ElevationNoiseOffset, TreeNoiseOffset, StoneNoiseOffset);
-
+	const FDateTime TimeStamp_GeneratedMapTileData = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated map tile data in %fms"), (TimeStamp_GeneratedMapTileData - TimeStamp_GenerateAStarPath).GetTotalMilliseconds());
+	
 	// Spawn a NexusBuilding
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Creating Nexus building..."));
 	ANexusBuilding* NexusBuilding = GetWorld()->SpawnActor<ANexusBuilding>(NexusBuildingBP, FVector(0, 0, 0), FRotator(0, 0, 0));
+	const FDateTime TimeStamp_CreatedNexusBuilding = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Created Nexus building in %fms"), (TimeStamp_CreatedNexusBuilding - TimeStamp_GeneratedMapTileData).GetTotalMilliseconds());
 
 	// Set path start tile coords
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Getting path starting coords..."));
 	const TArray<FTileCoord> PathStartTileCoords = GetPathStartCoords(Path);
+	const FDateTime TimeStamp_GotPathStartCoords = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Got path starting coords in %fms"), (TimeStamp_GotPathStartCoords - TimeStamp_CreatedNexusBuilding).GetTotalMilliseconds());
 
 	// Create map instance
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Creating Map instance..."));
 	UAegisGameMap* Map = NewObject<UAegisGameMap>(GetWorld(), AegisGameMapClass);
 	Map->PopulateGameMapData(MapTilesData, Path, PathStartTileCoords, NexusBuilding);
+	const FDateTime TimeStamp_CreateMapInstance = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Created map instance in %fms"), (TimeStamp_CreateMapInstance - TimeStamp_GotPathStartCoords).GetTotalMilliseconds());
 
 	// Set TilesToEnd of every tile
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Setting path properties..."));
-	for (AMapTile* Tile : Map->GetTiles())
+	TArray<FTileCoord> PathCoords;
+	Path.GenerateKeyArray(PathCoords);
+	for (FTileCoord PathTile : PathCoords)
 	{
-		Tile->TilesToEnd = Map->GetNumOfTilesToEnd(Tile->TileCoord);
+		Map->GetTile(PathTile)->TilesToEnd = Map->GetNumOfTilesToEnd(PathTile);
 	}
+	const FDateTime TimeStamp_SetTilesToEnd = FDateTime::Now();
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Set path 'TilesToEnd' in %fms"), (TimeStamp_SetTilesToEnd - TimeStamp_CreateMapInstance).GetTotalMilliseconds());
 
-	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Complete!"));
+	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Complete in %fms!"), (TimeStamp_SetTilesToEnd - TimeSTamp_Start).GetTotalMilliseconds());
 	return Map;
 }
 
@@ -122,6 +157,7 @@ TArray<FTileCoord> UAegisMapFactory::GeneratePoissonNodeCoords(const int32 Poiss
 		return FTileCoord::HexDistance(A, FTileCoord()) <  FTileCoord::HexDistance(B, FTileCoord());
 	});
 	
+	UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GeneratePoissonNodeCoords - Poisson node count: %i"), NodePoints.Num())
 	return NodePoints;
 }
 
@@ -371,94 +407,113 @@ TArray<FTileCoord> UAegisMapFactory::SelectRandomPathThroughNodeGraph(const int3
 
 TMap<FTileCoord, FTileCoord> UAegisMapFactory::GenerateAStarPathThroughNodes(const TArray<FTileCoord>& PathNodes, FVector2D PathingNoiseOffset)
 {
-	TMap<FTileCoord, FTileCoord> Path;
-	Path.Add(FTileCoord(), FTileCoord());
-	
-	// For every node in the path array, use A* to connect it to the previous node
-	for (int NodeIndex = 0; NodeIndex < PathNodes.Num()-1; NodeIndex++)
+	for (float PathingNoiseExponent = 10; PathingNoiseExponent >= 0; PathingNoiseExponent -= 1)
 	{
-		const FTileCoord StartTile = PathNodes[NodeIndex];
-		const FTileCoord EndTile = PathNodes[NodeIndex+1];
+		TMap<FTileCoord, FTileCoord> Path;
+		Path.Add(FTileCoord(), FTileCoord());
 
-		TMap<FTileCoord, FTileCoord> PathFromEndToStart = AStarPathFind(EndTile, StartTile, PathingNoiseOffset, Path);
-		Path.Append(PathFromEndToStart);
-	}
-	return Path;
-}
-
-TMap<FTileCoord, FTileCoord> UAegisMapFactory::AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset,
-	const TMap<FTileCoord, FTileCoord>& ExistingPath)
-{
-	bool PathFound = false;
-	TMap<FTileCoord, FTileCoord> Path;
-
-	while (!PathFound)
-	{
-		TPriorityQueue<FTileCoord> Frontier;
-		Frontier.Push(StartTile, 0);
-
-		TMap<FTileCoord, FTileCoord> CameFrom;
-		TMap<FTileCoord, float> CostSoFar;
-		CostSoFar.Add(StartTile, 0);
-
-		FVector GoalTileLocation = GoalTile.ToWorldLocation();
-
-		while (!Frontier.IsEmpty())
+		bool HasFailed = false;
+		// For every node in the path array, use A* to connect it to the previous node
+		for (int NodeIndex = 0; NodeIndex < PathNodes.Num()-1; NodeIndex++)
 		{
-			const FTileCoord Current = Frontier.Pop();
-			if (Current == GoalTile)
+			const FTileCoord StartTile = PathNodes[NodeIndex];
+			const FTileCoord EndTile = PathNodes[NodeIndex+1];
+
+			TMap<FTileCoord, FTileCoord> PathFromEndToStart;
+			if (AStarPathFind(EndTile, StartTile, PathingNoiseOffset, Path, PathFromEndToStart, PathingNoiseExponent))
 			{
+				Path.Append(PathFromEndToStart);
+			} else
+			{
+				HasFailed = true;
 				break;
 			}
-
-			for (FTileCoord Neighbour : FTileCoord::GetTilesInRadius(Current, 1))
-			{
-				TSet<FTileCoord> ExistingPathAndAdjacent;
-				for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
-				{
-					if (Element.Value == FTileCoord()) { continue; }
-					ExistingPathAndAdjacent.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
-				}
-				if (ExistingPathAndAdjacent.Contains(Neighbour) && (Neighbour != GoalTile))
-				{
-					continue;
-				}
-				// Find the weight of the neighbor tile. If the tile is in the exclusion list or is outside the boundary, returns -1
-				// If the neighbor tile is the goal tile, ignores the impassable weight
-				float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true, 10);
-
-				float NewCost = CostSoFar[Current] + NextWeight;
-				if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])
-				{
-					CameFrom.Add(Neighbour, Current);
-					CostSoFar.Add(Neighbour, NewCost);
-					float Heuristic = FVector::Distance(GoalTileLocation, Neighbour.ToWorldLocation()) / 100.f;
-					float Priority = NewCost + Heuristic;
-					Frontier.Push(Neighbour, Priority);
-				}
-			}
 		}
-
-		if (IsPathValid(StartTile, GoalTile, CameFrom))
+		if (!HasFailed)
 		{
-			PathFound = true;
+			return Path;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("UAegisMapFactory::GenerateAStarPathThroughNodes - Failed with Exponent of %f, trying again with lower exponent..."), PathingNoiseExponent);
+	}
+	
+	UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::GenerateAStarPathThroughNodes - Could not find path through nodes!!"));
+	return TMap<FTileCoord, FTileCoord>();	
+}
 
-			FTileCoord CurrentTile = GoalTile;
-			while (CurrentTile != StartTile)
-			{
-				FTileCoord CameFromTile = CameFrom[CurrentTile];
-				Path.Add(CameFromTile, CurrentTile);
-				CurrentTile = CameFromTile;
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Fatal, TEXT("UPathGenerationBlueprintLibrary::AStarPathFind() - No path found."))
-			break;
-		}
+bool UAegisMapFactory::AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset,
+                                     const TMap<FTileCoord, FTileCoord>& ExistingPath, TMap<FTileCoord, FTileCoord>& OutputPath, const float WeightExponent)
+{	
+	if (WeightExponent < 0)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::AStarPathFind - Weight multiplier cannot be below 0! Cancelling A* Search."));
+		return false;
+	}
+	
+	// Get set of tiles in existing path. These are used to exclude the path from searches, and to avoid tiles adjacent to the path
+	TSet<FTileCoord> ExistingPathAndAdjacentTiles = TSet<FTileCoord>(FTileCoord::GetTilesInRadius(FTileCoord(), 1));
+	TSet<FTileCoord> ExistingPathTiles = {FTileCoord()};
+	for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
+	{
+		// Add a tile in the path to ExistingPathTiles
+		ExistingPathTiles.Add(Element.Value);
+		ExistingPathAndAdjacentTiles.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
 	}
 
-	return Path;
+	
+	TPriorityQueue<FTileCoord> Frontier;
+	Frontier.Push(StartTile, 0);
+
+	TMap<FTileCoord, FTileCoord> CameFrom;
+	TMap<FTileCoord, float> CostSoFar;
+	CostSoFar.Add(StartTile, 0);
+
+	FVector GoalTileLocation = GoalTile.ToWorldLocation();
+
+	while (!Frontier.IsEmpty())
+	{
+		const FTileCoord Current = Frontier.Pop();
+		if (Current == GoalTile)
+		{
+			// Found the goal! reconstruct the path and return
+			FTileCoord TraceBackHead = Current;
+			while (TraceBackHead != StartTile)
+			{
+				FTileCoord TraceBackParent = CameFrom[TraceBackHead];
+				OutputPath.Add(TraceBackParent, TraceBackHead);
+				TraceBackHead = TraceBackParent;
+			}
+			return true;
+		}
+
+		for (FTileCoord Neighbour : FTileCoord::GetTilesInRadius(Current, 1))
+		{
+			// If the tile is in the path, skip it
+			if (ExistingPathTiles.Contains(Neighbour) && Neighbour != GoalTile) { continue; }
+			
+			// Find the weight of the neighbor tile. Fetched using the pathing noise distribution. Low Perlin scale to be more "random".
+			float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true, WeightExponent);
+
+			// If the tile is adjacent to the path, increase the weight to encourage a spacing. (but will go through it if there is no other option)
+			if (ExistingPathAndAdjacentTiles.Contains(Neighbour))
+			{
+				NextWeight *= 20;
+			}
+
+			const float NewCost = CostSoFar[Current] + NextWeight;
+			if (!CostSoFar.Contains(Neighbour) || NewCost < CostSoFar[Neighbour])
+			{
+				// This path to the neighbour is better than any previous one, so record it
+				CameFrom.Add(Neighbour, Current);
+				CostSoFar.Add(Neighbour, NewCost);
+				float Heuristic = FVector::Distance(GoalTileLocation, Neighbour.ToWorldLocation()) / 100.f;
+				float Priority = NewCost + Heuristic;
+				Frontier.Push(Neighbour, Priority);
+			}
+		}
+	}
+	
+	UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::AStarPathFind - Could not find A* path! returning false..."));
+	return false;
 }
 
 TMap<FTileCoord, UMapTileData*> UAegisMapFactory::GenerateMapTilesDataAroundPath(const TMap<FTileCoord, FTileCoord>& Path,
@@ -641,12 +696,14 @@ float UAegisMapFactory::GetNodeWeight(const FTileCoord Tile, const FVector2D Noi
 
 		NoiseSampleLoc = FVector2D(x + XDistortion, y + YDistortion);
 	}
+
+	// Clamp the value to be between 0->1 to avoid negative weights?
 	const float x = (FMath::PerlinNoise2D(NoiseSampleLoc) + 1.f) / 2.f;
 
-	// If used for pathing, the noise is multiplied exponentially to make high weights worth more, and clamped to above 0 to avoid negative weights 
+	// If used for pathing, the noise is multiplied exponentially to make high weights worth more 
 	if (bDistortNoise)
 	{
-		return 1 + FMath::Pow(x + 0.5, 10.f);
+		return FMath::Pow(x + 0.5, 10.f);
 	}
 
 	return x;

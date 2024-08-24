@@ -4,7 +4,7 @@
 #include "Enemy.h"
 
 #include "Aegis/AegisGameStateBase.h"
-#include "Aegis/Map/AegisMap.h"
+#include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Components/CapsuleComponent.h"
