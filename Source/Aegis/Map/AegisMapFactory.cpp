@@ -413,7 +413,7 @@ TArray<FTileCoord> UAegisMapFactory::SelectRandomPathThroughNodeGraph(const int3
 		const TTuple<FTileCoord, TArray<FTileCoord>> Head = Stack.Pop();
 
 		// Check if this head is a suitable return node, and return if it is
-		if (Head.Value.Num() == PathLengthInNodes)
+		if (Head.Value.Num() == PathLengthInNodes + 1) // Checks +1 because the FTileCoord(0,0) counts as a node so path length will be one less than the counted nodes
 		{
 			return Head.Value;
 		}
