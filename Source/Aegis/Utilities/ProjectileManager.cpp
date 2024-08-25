@@ -4,7 +4,7 @@
 #include "ProjectileManager.h"
 
 #include "NiagaraFunctionLibrary.h"
-#include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"

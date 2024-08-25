@@ -97,12 +97,11 @@ class AEGIS_API UAegisMapFactory : public UObject
 public:
 	virtual void PostInitProperties() override;
 
-	static TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute);
 
 	UFUNCTION()
 	UAegisGameMap* GenerateGameMap(const int PathLengthInNodes) const;
 	UFUNCTION()
-	UAegisGameMap* GenerateWorldMap() const;
+	UAegisWorldMap* GenerateWorldMap() const;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category="Map")
@@ -140,6 +139,7 @@ protected:
 	static bool AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset, const TMap<FTileCoord, FTileCoord>& ExistingPath, TMap<FTileCoord, FTileCoord>& OutputPath, float WeightExponent);
 	static TMap<FTileCoord, UMapTileData*> GenerateMapTilesDataAroundPath(const TMap<FTileCoord, FTileCoord>& Path, FVector2D ElevationNoiseOffset, FVector2D TreeNoiseOffset, FVector2D StoneNoiseOffset);
 	
+	static TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute);
 	static bool IsPathValid(const FTileCoord StartTile, const FTileCoord GoalTile, const TMap<FTileCoord, FTileCoord>& Path);
 	static float GetNodeWeight(const FTileCoord Tile, const FVector2D NoiseOffset, const bool bDistortNoise, const int32 PerlinScale);
 };

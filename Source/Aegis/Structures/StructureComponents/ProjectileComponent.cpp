@@ -3,7 +3,7 @@
 
 #include "ProjectileComponent.h"
 
-#include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 
 // Sets default values for this component's properties

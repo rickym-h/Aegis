@@ -45,8 +45,8 @@ TArray<FTileCoord> UAegisMapFactory::GetPathStartCoords(TMap<FTileCoord, FTileCo
 
 UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) const
 {
-	//const int32 Seed = static_cast<int32>(sFDateTime::Now().ToUnixTimestamp());
-	constexpr int32 Seed = 1724523875;
+	const int32 Seed = static_cast<int32>(FDateTime::Now().ToUnixTimestamp());
+	//constexpr int32 Seed = 1724523875;
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Started! Seed: %i"), Seed);
 	const FDateTime TimeSTamp_Start = FDateTime::Now();
 
@@ -58,7 +58,7 @@ UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) co
 	const FDateTime TimeStamp_GeneratedRandomOffsets = FDateTime::Now();
 
 	// Generate the poisson nodes to build the path around
-	const TArray<FTileCoord> PoissonNodeCoords = GeneratePoissonNodeCoords(4, 100, 5000, RandomStream);
+	const TArray<FTileCoord> PoissonNodeCoords = GeneratePoissonNodeCoords(8, 100, 5000, RandomStream);
 	const FDateTime TimeStamp_GeneratedPoissonNodes = FDateTime::Now();
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated Poisson nodes in %fms"), (TimeStamp_GeneratedPoissonNodes - TimeStamp_GeneratedRandomOffsets).GetTotalMilliseconds());
 	
@@ -128,8 +128,12 @@ UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) co
 	return Map;
 }
 
-UAegisGameMap* UAegisMapFactory::GenerateWorldMap() const
+UAegisWorldMap* UAegisMapFactory::GenerateWorldMap() const
 {
+	const int32 Seed = static_cast<int32>(FDateTime::Now().ToUnixTimestamp());
+	const FRandomStream RandomStream = FRandomStream(Seed);
+	const FVector2D ElevationNoiseOffset = GetRandomNoiseOffset(RandomStream);
+	const FVector2D PathingNoiseOffset = GetRandomNoiseOffset(RandomStream);
 	return nullptr;
 }
 

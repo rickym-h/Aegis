@@ -3,7 +3,8 @@
 
 #include "MapTile.h"
 
-#include "Aegis/AegisGameStateBase.h"
+#include "AegisGameMap.h"
+#include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "MapTiles/MapTileData.h"
 

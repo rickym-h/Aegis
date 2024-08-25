@@ -3,15 +3,14 @@
 
 #include "AegisGameStateBase.h"
 
-#include "Enemies/EnemyFactory.h"
+#include "Aegis/Enemies/EnemyFactory.h"
 #include "Kismet/GameplayStatics.h"
-#include "Map/AegisGameMap.h"
-#include "Map/AegisMapFactory.h"
-#include "Map/MapTile.h"
-#include "SaveSystem/AegisSaveGame.h"
-#include "Structures/NexusBuilding/BuildingHealthComponent.h"
-#include "Structures/NexusBuilding/NexusBuilding.h"
-#include "Utilities/ProjectileManager.h"
+#include "Aegis/Map/AegisGameMap.h"
+#include "Aegis/Map/AegisMapFactory.h"
+#include "Aegis/SaveSystem/AegisSaveGame.h"
+#include "Aegis/Structures/NexusBuilding/BuildingHealthComponent.h"
+#include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
+#include "Aegis/Utilities/ProjectileManager.h"
 
 
 void AAegisGameStateBase::BeginPlay()
@@ -46,7 +45,7 @@ void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 		UE_LOG(LogTemp, Error, TEXT("AAegisGameStateBase::GenerateTestMapFromMapFactory - No implementation found to destroy map!"))
 	}
 
-	AegisMap = MapFactory->GenerateGameMap(10);
+	AegisMap = MapFactory->GenerateGameMap(3);
 }
 
 void AAegisGameStateBase::SaveGame()
