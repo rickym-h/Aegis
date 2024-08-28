@@ -4,10 +4,10 @@
 #include "AegisPlayerController.h"
 
 #include "ResourcesData.h"
-#include "Aegis/AegisGameInstance.h"
-#include "Aegis/AegisGameStateBase.h"
 #include "Aegis/Cards/PlayableCardInterface.h"
 #include "Aegis/Cards/PlayerCard.h"
+#include "Aegis/Core/AegisGameInstance.h"
+#include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "Kismet/GameplayStatics.h"

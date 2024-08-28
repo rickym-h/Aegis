@@ -3,7 +3,7 @@
 
 #include "AegisGameInstance.h"
 
-#include "Cards/CardFactory.h"
+#include "Aegis/Cards/CardFactory.h"
 
 void UAegisGameInstance::OnStart()
 {

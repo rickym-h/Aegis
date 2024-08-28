@@ -19,7 +19,6 @@ class UAegisMap;
 UCLASS()
 class AEGIS_API AAegisGameStateBase : public AGameStateBase
 {
-private:
 	GENERATED_BODY()
 
 	virtual void BeginPlay() override;
@@ -43,7 +42,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Factories")
 	UEnemyFactory* EnemyFactory;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Projectile Pool")
+	UPROPERTY(BlueprintReadOnly, Category="Projectile Pool")
 	AProjectileManager* ProjectileManager;
 
 protected:

@@ -3,7 +3,8 @@
 
 #include "ArcherCard.h"
 
-#include "Aegis/AegisGameStateBase.h"
+#include "Aegis/Core/GameStates/AegisGameStateBase.h"
+#include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Map/AegisMap.h"
 #include "Aegis/Structures/Structure.h"
 #include "Aegis/Structures/Towers/ArcherTower/ArcherTower.h"

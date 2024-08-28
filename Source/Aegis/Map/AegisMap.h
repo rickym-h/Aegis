@@ -28,7 +28,7 @@ public:
 	UFUNCTION()
 	AMapTile* GetTile(FTileCoord Coord);
 	UFUNCTION()
-	TArray<AMapTile*> GetTiles();
+	TArray<AMapTile*> GetTiles() const;
 	UFUNCTION()
 	UMapTileData* GetTileData(FTileCoord Coord);
 

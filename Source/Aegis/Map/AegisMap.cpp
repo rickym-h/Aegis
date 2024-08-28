@@ -31,13 +31,10 @@ AMapTile* UAegisMap::GetTile(const FTileCoord Coord)
 	return nullptr;
 }
 
-TArray<AMapTile*> UAegisMap::GetTiles()
+TArray<AMapTile*> UAegisMap::GetTiles() const
 {
 	TArray<AMapTile*> Tiles;
-	for (const TPair<FTileCoord, AMapTile*>& Entry : MapTiles)
-	{
-		Tiles.Add(Entry.Value);
-	}
+	MapTiles.GenerateValueArray(Tiles);
 	return Tiles;
 }
 
@@ -65,17 +62,15 @@ AMapTile* UAegisMap::CreateMapTile(const FTileCoord Coord, UMapTileData* MapTile
 
 TMap<FTileCoord, AMapTile*> UAegisMap::GenerateMapTilesFromData()
 {
-	TMap<FTileCoord, AMapTile*> OutMapTiles;
+	MapTiles = TMap<FTileCoord, AMapTile*>();
 
 	for (TTuple<FTileCoord, UMapTileData*> Element : MapTileDataMap)
 	{
 		AMapTile* MapTile = CreateMapTile(Element.Key, Element.Value);
-		OutMapTiles.Add(Element.Key, MapTile);
+		MapTiles.Add(Element.Key, MapTile);
 	}
 
-	MapTiles = OutMapTiles;
-
-	return OutMapTiles;
+	return MapTiles;
 }
 
 
