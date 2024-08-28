@@ -42,3 +42,21 @@ void UProjectileComponent::FireArrowAtEnemy(const FVector& StartPoint, const AEn
 	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
 	GameState->ProjectileManager->FireProjectile(DamagePackage, StartPoint, Enemy, 10, ArrowMesh);
 }
+
+void UProjectileComponent::FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius)
+{
+	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
+	
+	if (!GameState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
+		return;
+	}
+
+	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
+	DamagePackage.PhysicalDamage = Damage;
+	DamagePackage.ExplosionRadius = ExplosionRadius;
+
+	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
+	GameState->ProjectileManager->FireProjectile(DamagePackage, StartPoint, Enemy, 10, ArrowMesh);
+}
