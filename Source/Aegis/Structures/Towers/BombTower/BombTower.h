@@ -1,26 +1,25 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Structures/Towers/Tower.h"
-#include "ArcherTower.generated.h"
+#include "BombTower.generated.h"
 
+class AEnemy;
 class UProjectileComponent;
 class UDefenderRangeComponent;
-/**
- * 
- */
+
 UCLASS()
-class AEGIS_API AArcherTower : public ATower
+class AEGIS_API ABombTower : public ATower
 {
 	GENERATED_BODY()
 
 public:
-	AArcherTower();
+	// Sets default values for this actor's properties
+	ABombTower();
 
-	void InitArcherTowerData(const int InRangeInMeters, const float InShotsPerSecond, const float InDamage);
+	void InitBombTowerData(const int InRangeInMeters, const float InShotsPerSecond, const float InDamage, const float InExplosionRadius);
 
 protected:
 	// Called when the game starts or when spawned
@@ -31,12 +30,13 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UProjectileComponent* ProjectileComponent;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Archer Tower Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Bomb Tower Data")
 	float ShotsPerSecond;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Archer Tower Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Bomb Tower Data")
 	float Damage;
-
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Bomb Tower Data")
+	float ExplosionRadius;
+	
 	UFUNCTION()
 	void TryFireAtEnemy(const AEnemy* Enemy);
 	bool bShotAvailable = true;

@@ -1,14 +1,16 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "ArcherTower.h"
+#include "BombTower.h"
 
 #include "Aegis/Structures/StructureComponents/DefenderRangeComponent.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
 #include "Components/DecalComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
-AArcherTower::AArcherTower()
+
+// Sets default values
+ABombTower::ABombTower()
 {
 	RangeComponent = CreateDefaultSubobject<UDefenderRangeComponent>("Range Component");
 	RangeComponent->SetupAttachment(SourcePoint);
@@ -16,45 +18,50 @@ AArcherTower::AArcherTower()
 	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("Projectile Component");
 }
 
-void AArcherTower::InitArcherTowerData(const int InRangeInMeters, const float InShotsPerSecond, const float InDamage)
+void ABombTower::InitBombTowerData(const int InRangeInMeters, const float InShotsPerSecond, const float InDamage, const float InExplosionRadius)
 {
 	if (InRangeInMeters < 0) { return; }
 	if (InShotsPerSecond < 0) { return; }
+	if (InShotsPerSecond < 0) { return; }
 	this->ShotsPerSecond = InShotsPerSecond;
 	this->Damage = InDamage;
+	this->ExplosionRadius = InExplosionRadius;
 
-	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AArcherTower::TryFireAtEnemy);
+	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &ABombTower::TryFireAtEnemy);
 	RangeComponent->InitRange(CurrentLocation, InRangeInMeters);
 
 	RangeIndicatorDecal->SetWorldScale3D(FVector(1, InRangeInMeters, InRangeInMeters));
 }
 
-void AArcherTower::BeginPlay()
+// Called when the game starts or when spawned
+void ABombTower::BeginPlay()
 {
 	Super::BeginPlay();
+	
 }
 
-void AArcherTower::TryFireAtEnemy(const AEnemy* Enemy)
+void ABombTower::TryFireAtEnemy(const AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
 
 	if (bShotAvailable)
 	{
 		bShotAvailable = false;
-		ProjectileComponent->FireArrowAtEnemy(SourcePoint->GetComponentLocation(), Enemy, Damage);
+		ProjectileComponent->FireBombProjectileAtEnemy(SourcePoint->GetComponentLocation(), Enemy, Damage, ExplosionRadius);
 
 		GetWorld()->GetTimerManager().SetTimer(
 			ReloadTimerHandle, // handle to cancel timer at a later time
 			this, // the owning object
-			&AArcherTower::ReloadShot, // function to call on elapsed
+			&ABombTower::ReloadShot, // function to call on elapsed
 			1/ShotsPerSecond, // float delay until elapsed
 			false); // looping?
 	}
 
 	PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
+
 }
 
-void AArcherTower::ReloadShot()
+void ABombTower::ReloadShot()
 {
 	bShotAvailable = true;
 

@@ -25,5 +25,8 @@ public:
 
 	UFUNCTION()
 	static void FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage);
+	
+	UFUNCTION()
+	static void FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius);
 		
 };
