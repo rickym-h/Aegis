@@ -57,10 +57,6 @@ struct FMapNode
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FMapNodeCoordinate NodeCoordinate = FMapNodeCoordinate();
-	FVector2D GetCanvasLocation() const
-	{
-		return FVector2D(NodeCoordinate.Layer, NodeCoordinate.Row);
-	}
 };
 
 USTRUCT(BlueprintType)
