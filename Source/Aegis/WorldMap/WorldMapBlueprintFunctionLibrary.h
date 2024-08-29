@@ -101,5 +101,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	static FWorldMapData GenerateWorldMapData(const FWorldMapCreationConfig MapConfig);
+
+	UFUNCTION(BlueprintCallable)
+	static FVector2D GetMapPosition(const FMapNode Node, const float ContainerHeight, const int32 RowCount);
 	
 };

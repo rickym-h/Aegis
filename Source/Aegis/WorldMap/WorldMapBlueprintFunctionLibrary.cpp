@@ -32,3 +32,13 @@ FWorldMapData UWorldMapBlueprintFunctionLibrary::GenerateWorldMapData(const FWor
 
 	return WorldMapData;
 }
+
+FVector2D UWorldMapBlueprintFunctionLibrary::GetMapPosition(const FMapNode Node, const float ContainerHeight, const int32 RowCount)
+{
+	const float NodeSpacing = ContainerHeight / (RowCount+1);
+
+	const float xPos = (Node.NodeCoordinate.Layer+1) * NodeSpacing;
+	const float yPos = (Node.NodeCoordinate.Row+1) * NodeSpacing;
+
+	return FVector2D(xPos, yPos);
+}
