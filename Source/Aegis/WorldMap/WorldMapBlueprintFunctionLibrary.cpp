@@ -33,12 +33,37 @@ FWorldMapData UWorldMapBlueprintFunctionLibrary::GenerateWorldMapData(const FWor
 	return WorldMapData;
 }
 
-FVector2D UWorldMapBlueprintFunctionLibrary::GetMapPosition(const FMapNode Node, const float ContainerHeight, const int32 RowCount)
+FVector2D UWorldMapBlueprintFunctionLibrary::GetMapPosition(const FMapNodeCoordinate NodeCoordinate, const float ContainerHeight, const int32 RowCount)
 {
 	const float NodeSpacing = ContainerHeight / (RowCount+1);
 
-	const float xPos = (Node.NodeCoordinate.Layer+1) * NodeSpacing;
-	const float yPos = (Node.NodeCoordinate.Row+1) * NodeSpacing;
+	const float xPos = (NodeCoordinate.Layer+1) * NodeSpacing;
+	const float yPos = (NodeCoordinate.Row+1) * NodeSpacing;
 
 	return FVector2D(xPos, yPos);
+}
+
+FWorldMapData UWorldMapBlueprintFunctionLibrary::ExploreNode(const FMapNode Node, FWorldMapData WorldMapData)
+{
+	if (!WorldMapData.MapNodes.Contains(Node))
+	{
+		UE_LOG(LogTemp, Error, TEXT("UWorldMapBlueprintFunctionLibrary::ExploreNode - Node is not in WorldMapData.MapNodes"));
+		return WorldMapData;
+	}
+
+	if (!WorldMapData.HeadNode.OutGoingConnections.Contains(Node.NodeCoordinate))
+	{
+		UE_LOG(LogTemp, Error, TEXT("UWorldMapBlueprintFunctionLibrary::ExploreNode - Node coordinate is not a valid explorable coordinate from the head node."));
+		return WorldMapData;
+	}
+	
+	WorldMapData.ExploredNodes.Add(Node);
+	WorldMapData.HeadNode = Node;
+
+	return WorldMapData;
+}
+
+float UWorldMapBlueprintFunctionLibrary::GetAngleBetweenTwoPoints(const FVector2D Origin, const FVector2D Destination)
+{
+	return FMath::Atan2(Destination.Y - Origin.Y, Destination.X - Origin.X);
 }

@@ -33,6 +33,11 @@ struct FMapNodeCoordinate
 	int32 Layer = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Row = 0;
+
+	bool operator==(const FMapNodeCoordinate& RHSMapNodeCoordinate) const
+	{
+		return (this->Layer == RHSMapNodeCoordinate.Layer && this->Row == RHSMapNodeCoordinate.Row);
+	}
 };
 
 
@@ -57,6 +62,11 @@ struct FMapNode
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FMapNodeCoordinate NodeCoordinate = FMapNodeCoordinate();
+
+	bool operator==(const FMapNode& RHSMapNode) const
+	{
+		return (this->NodeCoordinate == RHSMapNode.NodeCoordinate);
+	}
 };
 
 USTRUCT(BlueprintType)
@@ -66,6 +76,12 @@ struct FWorldMapData
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FMapNode> MapNodes;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FMapNode HeadNode;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	TArray<FMapNode> ExploredNodes;
 };
 
 
@@ -103,6 +119,12 @@ public:
 	static FWorldMapData GenerateWorldMapData(const FWorldMapCreationConfig MapConfig);
 
 	UFUNCTION(BlueprintCallable)
-	static FVector2D GetMapPosition(const FMapNode Node, const float ContainerHeight, const int32 RowCount);
+	static FVector2D GetMapPosition(const FMapNodeCoordinate NodeCoordinate, const float ContainerHeight, const int32 RowCount);
+
+	UFUNCTION(BlueprintCallable)
+	static FWorldMapData ExploreNode(const FMapNode Node, FWorldMapData WorldMapData);
 	
+
+	UFUNCTION(BlueprintCallable)
+	static float GetAngleBetweenTwoPoints(const FVector2D Origin, const FVector2D Destination);
 };

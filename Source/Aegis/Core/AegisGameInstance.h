@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/WorldMap/WorldMapBlueprintFunctionLibrary.h"
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
 
@@ -22,6 +23,9 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
 	TArray<UPlayerCard*> PlayerDeck;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Player Data")
+	FWorldMapData WorldMapData;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Factories")
 	UCardFactory* CardFactory;
