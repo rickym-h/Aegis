@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Utilities/CircleMathBlueprintLibrary.h"
 #include "Aegis/WorldMap/WorldMapBlueprintFunctionLibrary.h"
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
@@ -20,6 +21,11 @@ class AEGIS_API UAegisGameInstance : public UGameInstance
 public:
 	virtual void OnStart() override;
 
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerData(TArray<UPlayerCard*> InPlayerDeck, FWorldMapData InWorldMapData, FString InPlayerName);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
+	FString PlayerName = "";
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
 	TArray<UPlayerCard*> PlayerDeck;

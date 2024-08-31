@@ -16,6 +16,11 @@ TArray<UPlayerCard*> UCardFactory::GenerateStarterTowers(UObject* OuterGameInsta
 			UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Encountered a null StarterCard"))
 			return OutCards;
 		}
+		if (!OuterGameInstance)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Encountered a null OuterGameInstance"))
+			return OutCards;
+		}
 
 		UPlayerCard* StructureData = NewObject<UPlayerCard>(OuterGameInstance, StarterCardClass);
 		
