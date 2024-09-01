@@ -68,19 +68,20 @@ UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) co
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Generated Pseudo Delaunay Triangulation nodes in %fms"), (TimeStamp_GeneratedPoissonNodeGraph - TimeStamp_GeneratedPoissonNodes).GetTotalMilliseconds());
 		
 	// Draw lines between each connected node
-	for (TPair<FTileCoord, TSet<FTileCoord>> Pair : PoissonNodeGraph)
-	{
-		for (FTileCoord AdjacentNode : Pair.Value)
-		{
-			FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
-			FVector End = AdjacentNode.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+	// for (TPair<FTileCoord, TSet<FTileCoord>> Pair : PoissonNodeGraph)
+	// {
+	// 	for (FTileCoord AdjacentNode : Pair.Value)
+	// 	{
+	// 		FVector Start = Pair.Key.ToWorldLocation() + FVector(0, 0, 400); // Origin
+	// 		FVector End = AdjacentNode.ToWorldLocation() + FVector(0, 0, 400); // Endpoint
+	//
+	// 		FColor Color = FColor::Red; // Line color
+	//
+	// 		// Draw the debug line
+	// 		DrawDebugLine(GetWorld(), Start, End, Color, true, -1, 0, 5);
+	// 	}
+	// }
 	
-			FColor Color = FColor::Red; // Line color
-	
-			// Draw the debug line
-			DrawDebugLine(GetWorld(), Start, End, Color, true, -1, 0, 5);
-		}
-	}
 	const FDateTime TimeStamp_DrawnEdgesInWorld = FDateTime::Now();
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Drawn node graph in world in %fms"), (TimeStamp_DrawnEdgesInWorld - TimeStamp_GeneratedPoissonNodeGraph).GetTotalMilliseconds());
 

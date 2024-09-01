@@ -96,6 +96,13 @@ struct FWorldMapCreationConfig
 {
 	GENERATED_BODY()
 
+	FWorldMapCreationConfig()
+	{
+		StartingLayerNodesCount = 0;
+		PreBossLayerNodesCount = 0;
+		LayersCount = 0;
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 StartingLayerNodesCount;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
