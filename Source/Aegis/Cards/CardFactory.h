@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Core/Player/PlayerData.h"
 #include "UObject/NoExportTypes.h"
 #include "CardFactory.generated.h"
 
@@ -19,9 +20,14 @@ class AEGIS_API UCardFactory : public UObject
 public:
 	UFUNCTION(BlueprintCallable)
 	TArray<UPlayerCard*> GenerateStarterTowers(UObject* OuterGameInstance) const;
+	UFUNCTION(BlueprintCallable)
+	TArray<UPlayerCard*> GenerateStarterTowersForCharacter(UObject* OuterGameInstance, const TEnumAsByte<EPlayerCharacter> Character) const;
 	
 	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cards")
 	TArray<TSubclassOf<UPlayerCard>> StarterCards;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cards")
+	TArray<TSubclassOf<UPlayerCard>> DariusStarterCards;
 };
