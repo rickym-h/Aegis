@@ -3,7 +3,6 @@
 
 #include "CardFactory.h"
 
-#include "InputBehavior.h"
 #include "PlayerCard.h"
 
 TArray<UPlayerCard*> UCardFactory::GenerateStarterTowers(UObject* OuterGameInstance) const
