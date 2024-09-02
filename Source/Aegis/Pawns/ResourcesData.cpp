@@ -23,6 +23,16 @@ void UResourcesData::AddResources(const UResourcesData* ResourcesToAdd)
 		ResourcesToAdd->GetManaCrystals());
 }
 
+void UResourcesData::AddResources(const FResources& ResourcesToAdd)
+{
+	AddResources(
+		ResourcesToAdd.Wood,
+		ResourcesToAdd.Stone,
+		ResourcesToAdd.Gold,
+		ResourcesToAdd.Runes,
+		ResourcesToAdd.ManaCrystals);
+}
+
 bool UResourcesData::IsResourcesEnough(const FResources& ResourcesCost) const
 {
 	return (
