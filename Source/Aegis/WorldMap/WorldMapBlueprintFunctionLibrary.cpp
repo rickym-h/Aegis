@@ -30,6 +30,9 @@ FWorldMapData UWorldMapBlueprintFunctionLibrary::GenerateWorldMapData(const FWor
 	WorldMapData.MapNodes.Add(MiddleRest);
 	WorldMapData.MapNodes.Add(EndingNode);
 
+	WorldMapData.HeadNode = FMapNode();
+	WorldMapData.HeadNode.OutGoingConnections = {StartingNode.NodeCoordinate};
+
 	return WorldMapData;
 }
 

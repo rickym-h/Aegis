@@ -33,7 +33,7 @@ struct FMapNodeCoordinate
 	int32 Layer = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 Row = 0;
-
+	
 	bool operator==(const FMapNodeCoordinate& RHSMapNodeCoordinate) const
 	{
 		return (this->Layer == RHSMapNodeCoordinate.Layer && this->Row == RHSMapNodeCoordinate.Row);
@@ -73,6 +73,12 @@ USTRUCT(BlueprintType)
 struct FWorldMapData
 {
 	GENERATED_BODY()
+	FWorldMapData()
+	{
+		MapNodes = TArray<FMapNode>();
+		HeadNode = FMapNode();
+		ExploredNodes = TArray<FMapNode>();
+	}
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FMapNode> MapNodes;
@@ -89,6 +95,13 @@ USTRUCT(BlueprintType)
 struct FWorldMapCreationConfig
 {
 	GENERATED_BODY()
+
+	FWorldMapCreationConfig()
+	{
+		StartingLayerNodesCount = 0;
+		PreBossLayerNodesCount = 0;
+		LayersCount = 0;
+	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 StartingLayerNodesCount;
@@ -115,7 +128,7 @@ class AEGIS_API UWorldMapBlueprintFunctionLibrary : public UBlueprintFunctionLib
 
 public:
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FWorldMapData GenerateWorldMapData(const FWorldMapCreationConfig MapConfig);
 
 	UFUNCTION(BlueprintCallable)

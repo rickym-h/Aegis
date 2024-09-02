@@ -29,3 +29,41 @@ TArray<UPlayerCard*> UCardFactory::GenerateStarterTowers(UObject* OuterGameInsta
 
 	return OutCards;
 }
+
+TArray<UPlayerCard*> UCardFactory::GenerateStarterTowersForCharacter(UObject* OuterGameInstance, const TEnumAsByte<EPlayerCharacter> Character) const
+{
+	TArray<UPlayerCard*> OutCards;
+	if (!OuterGameInstance)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Encountered a null OuterGameInstance"))
+		return OutCards;
+	}
+	
+	TArray<TSubclassOf<UPlayerCard>> CardClassArray;
+	switch (Character)
+	{
+	case Darius:
+		CardClassArray.Append(DariusStarterCards);
+		break;
+	default:
+		UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Character Enum not recognised! Creating default starter towers."));
+		CardClassArray.Append(StarterCards);
+		break;
+	}
+	
+
+	for (const TSubclassOf<UPlayerCard> StarterCardClass : CardClassArray)
+	{
+		if (!StarterCardClass)
+		{
+			UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Encountered a null StarterCard"))
+			return OutCards;
+		}
+
+		UPlayerCard* StructureData = NewObject<UPlayerCard>(OuterGameInstance, StarterCardClass);
+		
+		OutCards.Add(StructureData);
+	}
+
+	return OutCards;
+}

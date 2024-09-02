@@ -8,6 +8,7 @@
 #include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Core/AegisGameInstance.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
+#include "Aegis/Core/Player/PlayerData.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "Kismet/GameplayStatics.h"
@@ -33,7 +34,14 @@ void AAegisPlayerController::BeginPlay()
 	
 	if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	{
-		DrawPile.Append(GameInstance->PlayerDeck);	
+		if (const UPlayerData* PlayerData = GameInstance->GetPlayerData())
+		{
+			DrawPile.Append(PlayerData->GetPlayerDeck());	
+		} else
+		{
+			UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::GameInstance - PlayerData not valid!"))
+			return;
+		}
 	}
 	
 	DiscardAndReplenishHand();

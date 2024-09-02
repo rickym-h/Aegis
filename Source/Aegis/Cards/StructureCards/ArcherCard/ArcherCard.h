@@ -16,10 +16,6 @@ class AEGIS_API UArcherCard : public UStructureCard, public IPlayableCardInterfa
 {
 	GENERATED_BODY()
 
-protected:
-	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
-	virtual float GetRangeInMetres_Implementation() override;
-
 public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Archer Card Data")
@@ -30,4 +26,8 @@ public:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Archer Card Data")
 	float DamagePerShot = 1.f;
+
+protected:
+	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
+	virtual float GetRangeInMetres_Implementation() override;
 };

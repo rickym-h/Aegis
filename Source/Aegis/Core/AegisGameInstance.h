@@ -8,6 +8,7 @@
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
 
+class UPlayerData;
 class UCardFactory;
 class UPlayerCard;
 /**
@@ -22,16 +23,10 @@ public:
 	virtual void OnStart() override;
 
 	UFUNCTION(BlueprintCallable)
-	void SetPlayerData(TArray<UPlayerCard*> InPlayerDeck, FWorldMapData InWorldMapData, FString InPlayerName);
+	UPlayerData* GetPlayerData() const;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
-	FString PlayerName = "";
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Player Data")
-	TArray<UPlayerCard*> PlayerDeck;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Player Data")
-	FWorldMapData WorldMapData;
+	UFUNCTION(BlueprintCallable)
+	void SetPlayerData(UPlayerData* InPlayerData);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Factories")
 	UCardFactory* CardFactory;
@@ -40,4 +35,7 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Factories")
 	TSubclassOf<UCardFactory> CardFactoryClass;
+
+	UPROPERTY(EditAnywhere, Category="Player Data")
+	UPlayerData* PlayerData;
 };

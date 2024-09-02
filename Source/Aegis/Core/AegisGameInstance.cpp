@@ -17,9 +17,12 @@ void UAegisGameInstance::OnStart()
 	CardFactory = NewObject<UCardFactory>(this, CardFactoryClass);
 }
 
-void UAegisGameInstance::SetPlayerData(const TArray<UPlayerCard*> InPlayerDeck, const FWorldMapData InWorldMapData, const FString InPlayerName)
+UPlayerData* UAegisGameInstance::GetPlayerData() const
 {
-	this->PlayerName = InPlayerName;
-	this->PlayerDeck = InPlayerDeck;
-	this->WorldMapData = InWorldMapData;
+	return PlayerData;
+}
+
+void UAegisGameInstance::SetPlayerData(UPlayerData* InPlayerData)
+{
+	this->PlayerData = InPlayerData;
 }
