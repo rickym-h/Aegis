@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "BombTower.h"
+#include "ProjectileTower.h"
 
 #include "Aegis/Structures/StructureComponents/DefenderRangeComponent.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
@@ -10,7 +10,7 @@
 
 
 // Sets default values
-ABombTower::ABombTower()
+AProjectileTower::AProjectileTower()
 {
 	RangeComponent = CreateDefaultSubobject<UDefenderRangeComponent>("Range Component");
 	RangeComponent->SetupAttachment(SourcePoint);
@@ -18,50 +18,51 @@ ABombTower::ABombTower()
 	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("Projectile Component");
 }
 
-void ABombTower::InitBombTowerData(const int InRangeInMeters, const float InShotsPerSecond, const float InDamage, const float InExplosionRadius)
+void AProjectileTower::InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed,
+	const float InRangeMetres, UStaticMesh* InProjectileMesh)
 {
-	if (InRangeInMeters < 0) { return; }
-	if (InShotsPerSecond < 0) { return; }
-	if (InShotsPerSecond < 0) { return; }
-	this->ShotsPerSecond = InShotsPerSecond;
-	this->Damage = InDamage;
-	this->ExplosionRadius = InExplosionRadius;
+	if (InAttackSpeed < 0 || InRangeMetres < 0)
+	{
+		return;
+	}
+	this->ProjectileDamagePackage = InProjectileDamagePackage;
+	this->AttackSpeed = InAttackSpeed;	
+	this->ProjectileMesh = InProjectileMesh;
 
-	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &ABombTower::TryFireAtEnemy);
-	RangeComponent->InitRange(CurrentLocation, InRangeInMeters);
+	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
+	RangeComponent->InitRange(CurrentLocation, InRangeMetres);
 
-	RangeIndicatorDecal->SetWorldScale3D(FVector(1, InRangeInMeters, InRangeInMeters));
+	RangeIndicatorDecal->SetWorldScale3D(FVector(1, InRangeMetres, InRangeMetres));
 }
 
 // Called when the game starts or when spawned
-void ABombTower::BeginPlay()
+void AProjectileTower::BeginPlay()
 {
 	Super::BeginPlay();
 	
 }
 
-void ABombTower::TryFireAtEnemy(const AEnemy* Enemy)
+void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
 
 	if (bShotAvailable)
 	{
 		bShotAvailable = false;
-		ProjectileComponent->FireBombProjectileAtEnemy(SourcePoint->GetComponentLocation(), Enemy, Damage, ExplosionRadius);
+		ProjectileComponent->FireCustomProjectile(ProjectileDamagePackage, SourcePoint->GetComponentLocation(), Enemy, 10, ProjectileMesh);
 
 		GetWorld()->GetTimerManager().SetTimer(
 			ReloadTimerHandle, // handle to cancel timer at a later time
 			this, // the owning object
-			&ABombTower::ReloadShot, // function to call on elapsed
-			1/ShotsPerSecond, // float delay until elapsed
+			&AProjectileTower::ReloadShot, // function to call on elapsed
+			1/AttackSpeed, // float delay until elapsed
 			false); // looping?
 	}
 
 	PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
-
 }
 
-void ABombTower::ReloadShot()
+void AProjectileTower::ReloadShot()
 {
 	bShotAvailable = true;
 

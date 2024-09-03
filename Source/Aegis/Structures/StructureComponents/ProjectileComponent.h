@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Enemies/Enemy.h"
+#include "Aegis/Utilities/ProjectileManager.h"
 #include "Components/ActorComponent.h"
 #include "ProjectileComponent.generated.h"
 
@@ -21,7 +22,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-public:	
+public:
+
+	UFUNCTION()
+	static void FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy, const float ProjectileSpeed, UStaticMesh* ProjectileMesh);
 
 	UFUNCTION()
 	static void FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage);

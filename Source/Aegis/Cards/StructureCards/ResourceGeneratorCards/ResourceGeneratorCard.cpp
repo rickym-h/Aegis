@@ -6,7 +6,6 @@
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Structures/ResourceCollectors/ResourceCollector.h"
-#include "Aegis/Structures/Towers/ArcherTower/ArcherTower.h"
 #include "Kismet/GameplayStatics.h"
 
 bool UResourceGeneratorCard::PlayCard_Implementation(const FTileCoord& LocationCoord)

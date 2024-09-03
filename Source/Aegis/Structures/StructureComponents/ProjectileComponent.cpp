@@ -26,6 +26,20 @@ void UProjectileComponent::BeginPlay()
 	
 }
 
+void UProjectileComponent::FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy,
+	const float ProjectileSpeed, UStaticMesh* ProjectileMesh)
+{
+	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
+	
+	if (!GameState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
+		return;
+	}
+	
+	GameState->ProjectileManager->FireProjectile(DamagePackage, StartPoint, Enemy, ProjectileSpeed, ProjectileMesh);
+}
+
 void UProjectileComponent::FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage)
 {
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
