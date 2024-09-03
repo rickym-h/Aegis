@@ -8,6 +8,7 @@
 #include "Aegis/Map/MapTile.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/StatusEffectComponent.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -33,6 +34,8 @@ AEnemy::AEnemy()
 
 	TargetPoint = CreateDefaultSubobject<USceneComponent>("Target Point");
 	TargetPoint->SetupAttachment(RootComponent);
+
+	StatusEffectComponent = CreateDefaultSubobject<UStatusEffectComponent>("StatusEffect");
 }
 
 // Called when the game starts or when spawned
@@ -65,6 +68,18 @@ void AEnemy::BeginPlay()
 	SetActorLocation(FromTile.ToWorldLocation());
 
 	CollisionCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
+
+	StatusEffectComponent->OnSpeedMultiplierChangedDelegate.AddUniqueDynamic(this, &AEnemy::OnSpeedMultiplierChanged);
+}
+
+UStatusEffectComponent* AEnemy::GetStatusEffectComponent() const
+{
+	return StatusEffectComponent;
+}
+
+void AEnemy::OnSpeedMultiplierChanged(const float NewSpeedMultiplier)
+{
+	CurrentMovementSpeed = NewSpeedMultiplier * MovementSpeed;
 }
 
 float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
@@ -90,7 +105,7 @@ float AEnemy::DistanceToGoalTile(const FVector& StartPos) const
 void AEnemy::MoveTowardsGoal(float DeltaTime)
 {
 	// Get movement distance
-	float DistanceToTravel = MovementSpeed * DeltaTime;
+	float DistanceToTravel = CurrentMovementSpeed * DeltaTime;
 	//UE_LOG(LogTemp, Warning, TEXT("DistanceToTravel: %f"), DistanceToTravel)
 
 	FVector TargetPos = GetActorLocation();

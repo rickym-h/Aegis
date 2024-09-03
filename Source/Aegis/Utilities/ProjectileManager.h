@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraSystem.h"
+#include "Aegis/Enemies/Components/StatusEffectComponent.h"
 #include "ProjectileManager.generated.h"
 
 class AEnemy;
@@ -15,9 +16,12 @@ struct FProjectileDamagePackage
 
 	FProjectileDamagePackage()
 	{
-		PhysicalDamage = 0;
-		ExplosionRadius = 0;
-		OnHitParticleSystem = nullptr;
+		this->PhysicalDamage = 0;
+		this->ExplosionRadius = 0;
+
+		this->SlowEffect = FSlowEffect();
+		
+		this->OnHitParticleSystem = nullptr;
 	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
@@ -25,6 +29,9 @@ struct FProjectileDamagePackage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float ExplosionRadius;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Status Effects")
+	FSlowEffect SlowEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Firing")
 	UNiagaraSystem* OnHitParticleSystem;
