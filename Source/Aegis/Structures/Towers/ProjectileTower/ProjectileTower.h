@@ -4,22 +4,22 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Structures/Towers/Tower.h"
-#include "BombTower.generated.h"
+#include "Aegis/Utilities/ProjectileManager.h"
+#include "ProjectileTower.generated.h"
 
-class AEnemy;
-class UProjectileComponent;
 class UDefenderRangeComponent;
+class UProjectileComponent;
 
 UCLASS()
-class AEGIS_API ABombTower : public ATower
+class AEGIS_API AProjectileTower : public ATower
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this actor's properties
-	ABombTower();
+	AProjectileTower();
 
-	void InitBombTowerData(const int InRangeInMeters, const float InShotsPerSecond, const float InDamage, const float InExplosionRadius);
+	void InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed, const float InRangeMetres, UStaticMesh* InProjectileMesh);
 
 protected:
 	// Called when the game starts or when spawned
@@ -29,21 +29,22 @@ protected:
 	UDefenderRangeComponent* RangeComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UProjectileComponent* ProjectileComponent;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Bomb Tower Data")
-	float ShotsPerSecond;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Bomb Tower Data")
-	float Damage;
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Bomb Tower Data")
-	float ExplosionRadius;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	UStaticMesh* ProjectileMesh;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	FProjectileDamagePackage ProjectileDamagePackage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	float AttackSpeed = 0.f;
 	
 	UFUNCTION()
 	void TryFireAtEnemy(const AEnemy* Enemy);
 	bool bShotAvailable = true;
-	
 	UFUNCTION()
 	void ReloadShot();
-	
 	UPROPERTY()
 	FTimerHandle ReloadTimerHandle;
+
 };

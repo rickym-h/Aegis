@@ -74,6 +74,7 @@ void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, 
 	const FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
 	if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
 	{
+		Enemy->GetStatusEffectComponent()->ApplySlowEffect(ProjectilePackage->DamagePackage.SlowEffect); 
 		UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
 	} else
 	{

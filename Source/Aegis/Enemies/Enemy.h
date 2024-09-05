@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
 
+class UStatusEffectComponent;
 class UCapsuleComponent;
 class USphereComponent;
 class AAegisGameStateBase;
@@ -19,7 +20,21 @@ class AEGIS_API AEnemy : public AActor
 public:
 	// Sets default values for this pawn's properties
 	AEnemy();
+	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	float GetDistanceToNexus() const;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
+	USceneComponent* TargetPoint;
+	
+	UFUNCTION(BlueprintCallable)
+	float GetHealthAsPercentage() const;
+
+	UStatusEffectComponent* GetStatusEffectComponent() const;
+	
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -28,6 +43,8 @@ protected:
 	UCapsuleComponent* CollisionCapsuleComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mesh")
 	UStaticMeshComponent* Mesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
+	UStatusEffectComponent* StatusEffectComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTileCoord FromTile;
@@ -36,6 +53,11 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float MovementSpeed = 200.f;
+	float CurrentMovementSpeed = MovementSpeed;
+
+	UFUNCTION()
+	void OnSpeedMultiplierChanged(float NewSpeedMultiplier);
+	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float DamageToNexus = 1.f;
 	
@@ -57,17 +79,4 @@ protected:
 	UFUNCTION()
 	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	                  bool bFromSweep, const FHitResult& SweepResult);
-
-public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
-	UFUNCTION(BlueprintCallable)
-	float GetDistanceToNexus() const;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
-	USceneComponent* TargetPoint;
-	
-	UFUNCTION(BlueprintCallable)
-	float GetHealthAsPercentage() const;
 };
