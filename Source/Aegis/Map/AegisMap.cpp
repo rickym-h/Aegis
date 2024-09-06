@@ -38,7 +38,7 @@ TArray<AMapTile*> UAegisMap::GetTiles() const
 	return Tiles;
 }
 
-UMapTileData* UAegisMap::GetTileData(FTileCoord Coord)
+UMapTileData* UAegisMap::GetTileData(const FTileCoord Coord)
 {
 	if (MapTileDataMap.Contains(Coord))
 	{
