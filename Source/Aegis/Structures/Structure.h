@@ -7,6 +7,7 @@
 #include "GameFramework/Actor.h"
 #include "Structure.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnStructureFinishSpawningSignature);
 
 class UStructureCard;
 
@@ -34,4 +35,6 @@ public:
 	UStructureCard* StructureCard;
 	
 	FTransform ActorTransform;
+
+	FOnStructureFinishSpawningSignature OnStructureFinishSpawning;
 };

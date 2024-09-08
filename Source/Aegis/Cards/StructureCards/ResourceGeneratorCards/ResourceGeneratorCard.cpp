@@ -24,7 +24,7 @@ bool UResourceGeneratorCard::PlayCard_Implementation(const FTileCoord& LocationC
 	// Set structure data (e.g. tower stats)
 	if (AResourceCollector* ResourceCollector = Cast<AResourceCollector>(Structure))
 	{
-		ResourceCollector->InitResourceCollector(WaveEndGeneratedResources);
+		ResourceCollector->InitResourceCollector(WaveEndGeneratedResources, ResourcesToGeneratePerAdjacentResource);
 	} else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UResourceGeneratorCard::PlayCard_Implementation - Structure not ResourceCollector! Failed to InitResourceCollector()"))

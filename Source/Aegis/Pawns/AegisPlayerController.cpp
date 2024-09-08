@@ -108,6 +108,8 @@ void AAegisPlayerController::ClickGround()
 	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
 	
 	const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(HitResultUnderCursor.Location);
+
+	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::ClickGround - Clicked Tile: %ls"), *LocationCoord.ToString())
 	
 	// Attempt to play the selected card, if any
 	if (UPlayerCard* Card = SelectedCard.Get())

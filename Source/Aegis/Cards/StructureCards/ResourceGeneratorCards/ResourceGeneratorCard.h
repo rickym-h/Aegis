@@ -16,8 +16,11 @@ class AEGIS_API UResourceGeneratorCard : public UStructureCard, public IPlayable
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "LumberYard Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ResourceGenerator Data")
 	FResources WaveEndGeneratedResources;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ResourceGenerator Data")
+	TMap<TEnumAsByte<EResourceType>, FResources> ResourcesToGeneratePerAdjacentResource;
 	
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;

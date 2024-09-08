@@ -17,4 +17,6 @@ AStructure::AStructure()
 void AStructure::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	OnStructureFinishSpawning.Broadcast();
 }

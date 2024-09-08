@@ -98,6 +98,7 @@ AStructure* UAegisMap::AddStructureToMap(const UStructureCard* StructureCard, co
 	UE_LOG(LogTemp, Display, TEXT("UAegisMap::AddStructureToMap - Starting spawning structure..."))
 	AStructure* Structure = GetWorld()->SpawnActorDeferred<AStructure>(StructureBlueprintClass, ActorTransform);
 	Structure->ActorTransform = ActorTransform;
+	Structure->CurrentLocation = Location;
 
 	// Add structure to map and add data about the structure to the structure
 	Structure->StructureCard = DuplicateObject(StructureCard, UGameplayStatics::GetGameInstance(this));

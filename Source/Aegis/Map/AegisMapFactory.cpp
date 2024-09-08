@@ -46,7 +46,7 @@ TArray<FTileCoord> UAegisMapFactory::GetPathStartCoords(TMap<FTileCoord, FTileCo
 UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) const
 {
 	const int32 Seed = static_cast<int32>(FDateTime::Now().ToUnixTimestamp());
-	//constexpr int32 Seed = 1724523875;
+	//constexpr int32 Seed = 1725718799;
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Started! Seed: %i"), Seed);
 	const FDateTime TimeSTamp_Start = FDateTime::Now();
 

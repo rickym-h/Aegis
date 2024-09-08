@@ -23,6 +23,17 @@ struct FResources
 	int32 Runes = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Resources")
 	int32 ManaCrystals = 0;
+
+	FResources operator*(const int32 Multiplier) const
+	{
+		FResources R;
+		R.Wood = Wood * Multiplier;
+		R.Stone = Stone * Multiplier;
+		R.Gold = Gold * Multiplier;
+		R.Runes = Runes * Multiplier;
+		R.ManaCrystals = ManaCrystals * Multiplier;
+		return R;
+	}
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnResourcesUpdatedSignature);
