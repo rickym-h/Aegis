@@ -53,16 +53,7 @@ void UMapInterface::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(UGameplayStatics::GetGameState(GetWorld())))
-	{
-		Map = Cast<UAegisGameMap>(GameState->AegisMap);
-	} else
-	{
-		UE_LOG(LogTemp, Error, TEXT("UMapInterface::BeginPlay - Map is NULL"));
-	}
-
-	AStructure* Owner = Cast<AStructure>(GetOwner());
-	Owner->OnStructureFinishSpawning.AddUniqueDynamic(this, &UMapInterface::SetInternalData);
+	SetInternalData();
 }
 
 void UMapInterface::SetInternalData()
