@@ -23,11 +23,14 @@ public:
 	UFUNCTION(BlueprintCallable)
 	TArray<UPlayerCard*> GenerateStarterTowersForCharacter(UObject* OuterGameInstance, const TEnumAsByte<EPlayerCharacter> Character) const;
 	
-	
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cards")
-	TArray<TSubclassOf<UPlayerCard>> StarterCards;
+	TArray<TSubclassOf<UPlayerCard>> DefaultCards;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cards")
-	TArray<TSubclassOf<UPlayerCard>> DariusStarterCards;
+	TArray<TSubclassOf<UPlayerCard>> GodCards;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cards")
+	TArray<TSubclassOf<UPlayerCard>> CaiusCards;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Cards")
+	TArray<TSubclassOf<UPlayerCard>> ValenCards;
 };

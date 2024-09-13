@@ -9,7 +9,7 @@ TArray<UPlayerCard*> UCardFactory::GenerateStarterTowers(UObject* OuterGameInsta
 {
 	TArray<UPlayerCard*> OutCards;
 
-	for (const TSubclassOf<UPlayerCard> StarterCardClass : StarterCards)
+	for (const TSubclassOf<UPlayerCard> StarterCardClass : DefaultCards)
 	{
 		if (!StarterCardClass)
 		{
@@ -42,12 +42,18 @@ TArray<UPlayerCard*> UCardFactory::GenerateStarterTowersForCharacter(UObject* Ou
 	TArray<TSubclassOf<UPlayerCard>> CardClassArray;
 	switch (Character)
 	{
-	case Darius:
-		CardClassArray.Append(DariusStarterCards);
+	case God:
+		CardClassArray.Append(GodCards);
+		break;
+	case Valen:
+		CardClassArray.Append(ValenCards);
+		break;
+	case Caius:
+		CardClassArray.Append(CaiusCards);
 		break;
 	default:
-		UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Character Enum not recognised! Creating default starter towers."));
-		CardClassArray.Append(StarterCards);
+		UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Character Enum not recognised! Creating default starter cards."));
+		CardClassArray.Append(DefaultCards);
 		break;
 	}
 	

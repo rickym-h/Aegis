@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropDown)
 class AEGIS_API UResourceGeneratorCard : public UStructureCard, public IPlayableCardInterface
 {
 	GENERATED_BODY()

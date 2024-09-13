@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS(Blueprintable)
+UCLASS(Blueprintable, HideDropdown)
 class AEGIS_API UPlayerCard : public UObject
 {
 	GENERATED_BODY()

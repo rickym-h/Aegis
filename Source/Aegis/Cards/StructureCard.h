@@ -11,7 +11,7 @@ class AStructure;
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropDown)
 class AEGIS_API UStructureCard : public UPlayerCard
 {
 	GENERATED_BODY()

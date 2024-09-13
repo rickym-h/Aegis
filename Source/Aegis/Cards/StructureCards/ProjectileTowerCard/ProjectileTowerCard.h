@@ -12,7 +12,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropDown)
 class AEGIS_API UProjectileTowerCard : public UStructureCard, public IPlayableCardInterface, public IRangeInterface
 {
 	GENERATED_BODY()

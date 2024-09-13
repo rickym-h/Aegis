@@ -10,8 +10,9 @@
 UENUM(BlueprintType)
 enum EPlayerCharacter
 {
-	Custom = 0,
-	Darius = 1,
+	God = 0,
+	Caius = 1,
+	Valen = 2,
 };
 
 class UPlayerCard;
@@ -26,9 +27,6 @@ class AEGIS_API UPlayerData : public UObject
 public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	FName GetPlayerName() const;
-
-	UFUNCTION(BlueprintCallable, Category = "PlayerData")
-	void SetPlayerName(const FName& InPlayerName);
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	TEnumAsByte<EPlayerCharacter> GetPlayerCharacter() const;
@@ -48,12 +46,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	void SetWorldMapData(const FWorldMapData& InWorldMapData);
 
-private:
+private:	
 	UPROPERTY(EditAnywhere, Category="Player Data")
-	FName PlayerName = "";
-	
-	UPROPERTY(EditAnywhere, Category="Player Data")
-	TEnumAsByte<EPlayerCharacter> PlayerCharacter = Custom;
+	TEnumAsByte<EPlayerCharacter> PlayerCharacter = EPlayerCharacter::God;
 
 	UPROPERTY(EditAnywhere, Category="Player Data")
 	TArray<UPlayerCard*> PlayerDeck = TArray<UPlayerCard*>();

@@ -5,12 +5,13 @@
 
 FName UPlayerData::GetPlayerName() const
 {
-	return PlayerName;
-}
-
-void UPlayerData::SetPlayerName(const FName& InPlayerName)
-{
-	this->PlayerName = InPlayerName;
+	switch(PlayerCharacter)
+	{
+	case God: return FName("God");
+	case Caius: return FName("Caius");
+	case Valen: return FName("Valen");
+	default: return FName("No Name Found");
+	}
 }
 
 TEnumAsByte<EPlayerCharacter> UPlayerData::GetPlayerCharacter() const
