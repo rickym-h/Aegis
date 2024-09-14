@@ -25,4 +25,6 @@ UPlayerData* UAegisGameInstance::GetPlayerData() const
 void UAegisGameInstance::SetPlayerData(UPlayerData* InPlayerData)
 {
 	this->PlayerData = InPlayerData;
+
+	OnPlayerDataUpdated.Broadcast(PlayerData);
 }

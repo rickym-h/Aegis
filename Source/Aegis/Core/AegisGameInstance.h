@@ -11,6 +11,8 @@
 class UPlayerData;
 class UCardFactory;
 class UPlayerCard;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnPlayerDataUpdatedSignature, UPlayerData*, PlayerData);
 /**
  * 
  */
@@ -30,7 +32,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Factories")
 	UCardFactory* CardFactory;
-	
+
+	UPROPERTY(BlueprintAssignable)
+	FOnPlayerDataUpdatedSignature OnPlayerDataUpdated;
+
 protected:
 	
 	UPROPERTY(EditDefaultsOnly, Category="Factories")
