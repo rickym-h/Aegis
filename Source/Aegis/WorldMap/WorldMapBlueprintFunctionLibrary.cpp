@@ -46,23 +46,28 @@ FVector2D UWorldMapBlueprintFunctionLibrary::GetMapPosition(const FMapNodeCoordi
 	return FVector2D(xPos, yPos);
 }
 
-FWorldMapData UWorldMapBlueprintFunctionLibrary::ExploreNode(const FMapNode Node, FWorldMapData WorldMapData)
+FWorldMapData UWorldMapBlueprintFunctionLibrary::TravelToNode(const FMapNode Node, FWorldMapData WorldMapData)
 {
 	if (!WorldMapData.MapNodes.Contains(Node))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UWorldMapBlueprintFunctionLibrary::ExploreNode - Node is not in WorldMapData.MapNodes"));
+		UE_LOG(LogTemp, Error, TEXT("UWorldMapBlueprintFunctionLibrary::TravelToNode - Node is not in WorldMapData.MapNodes"));
 		return WorldMapData;
 	}
 
 	if (!WorldMapData.HeadNode.OutGoingConnections.Contains(Node.NodeCoordinate))
 	{
-		UE_LOG(LogTemp, Error, TEXT("UWorldMapBlueprintFunctionLibrary::ExploreNode - Node coordinate is not a valid explorable coordinate from the head node."));
+		UE_LOG(LogTemp, Error, TEXT("UWorldMapBlueprintFunctionLibrary::TravelToNode - Node coordinate is not a valid explorable coordinate from the head node."));
 		return WorldMapData;
 	}
 	
-	WorldMapData.ExploredNodes.Add(Node);
 	WorldMapData.HeadNode = Node;
 
+	return WorldMapData;
+}
+
+FWorldMapData UWorldMapBlueprintFunctionLibrary::ExploreHeadNode(FWorldMapData WorldMapData)
+{
+	WorldMapData.ExploredNodes.Add(WorldMapData.HeadNode);
 	return WorldMapData;
 }
 

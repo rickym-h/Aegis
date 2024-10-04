@@ -135,7 +135,10 @@ public:
 	static FVector2D GetMapPosition(const FMapNodeCoordinate NodeCoordinate, const float ContainerHeight, const int32 RowCount);
 
 	UFUNCTION(BlueprintCallable)
-	static FWorldMapData ExploreNode(const FMapNode Node, FWorldMapData WorldMapData);
+	static FWorldMapData TravelToNode(const FMapNode Node, FWorldMapData WorldMapData);
+
+	UFUNCTION(BlueprintCallable)
+	static FWorldMapData ExploreHeadNode(FWorldMapData WorldMapData);
 	
 
 	UFUNCTION(BlueprintCallable)
