@@ -5,34 +5,7 @@
 
 FWorldMapData UWorldMapBlueprintFunctionLibrary::GenerateWorldMapData(const FWorldMapCreationConfig MapConfig)
 {
-	// Simple static map for now
-
-	FWorldMapData WorldMapData;
-
-	FMapNode StartingNode = FMapNode(MinorEnemy, FMapNodeCoordinate(0, 0));
-	
-	FMapNode MiddleEnemy = FMapNode(MinorEnemy, FMapNodeCoordinate(1, 0));
-	StartingNode.OutGoingConnections.Add(FMapNodeCoordinate(1, 0));
-	
-	FMapNode MiddleShop = FMapNode(Shop, FMapNodeCoordinate(1, 1));
-	StartingNode.OutGoingConnections.Add(FMapNodeCoordinate(1, 1));
-	
-	FMapNode MiddleRest = FMapNode(RestSite, FMapNodeCoordinate(2, 0));
-	MiddleEnemy.OutGoingConnections.Add(FMapNodeCoordinate(2, 0));
-	MiddleShop.OutGoingConnections.Add(FMapNodeCoordinate(2, 0));
-	
-	FMapNode EndingNode = FMapNode(BossEnemy, FMapNodeCoordinate(3, 1));
-	MiddleRest.OutGoingConnections.Add(FMapNodeCoordinate(3, 1));
-
-	WorldMapData.MapNodes.Add(StartingNode);
-	WorldMapData.MapNodes.Add(MiddleEnemy);
-	WorldMapData.MapNodes.Add(MiddleShop);
-	WorldMapData.MapNodes.Add(MiddleRest);
-	WorldMapData.MapNodes.Add(EndingNode);
-
-	WorldMapData.HeadNode = FMapNode();
-	WorldMapData.HeadNode.OutGoingConnections = {StartingNode.NodeCoordinate};
-
+	FWorldMapData WorldMapData = CreatePrototypeWorldMapData();
 	return WorldMapData;
 }
 
@@ -74,4 +47,36 @@ FWorldMapData UWorldMapBlueprintFunctionLibrary::ExploreHeadNode(FWorldMapData W
 float UWorldMapBlueprintFunctionLibrary::GetAngleBetweenTwoPoints(const FVector2D Origin, const FVector2D Destination)
 {
 	return FMath::Atan2(Destination.Y - Origin.Y, Destination.X - Origin.X);
+}
+
+FWorldMapData UWorldMapBlueprintFunctionLibrary::CreatePrototypeWorldMapData()
+{
+	// Simple static map for now
+	FWorldMapData WorldMapData;
+
+	FMapNode StartingNode = FMapNode(MinorEnemy, FMapNodeCoordinate(0, 0));
+	
+	FMapNode MiddleEnemy = FMapNode(MinorEnemy, FMapNodeCoordinate(1, 0));
+	StartingNode.OutGoingConnections.Add(FMapNodeCoordinate(1, 0));
+	
+	FMapNode MiddleShop = FMapNode(Shop, FMapNodeCoordinate(1, 1));
+	StartingNode.OutGoingConnections.Add(FMapNodeCoordinate(1, 1));
+	
+	FMapNode MiddleRest = FMapNode(RestSite, FMapNodeCoordinate(2, 0));
+	MiddleEnemy.OutGoingConnections.Add(FMapNodeCoordinate(2, 0));
+	MiddleShop.OutGoingConnections.Add(FMapNodeCoordinate(2, 0));
+	
+	FMapNode EndingNode = FMapNode(BossEnemy, FMapNodeCoordinate(3, 1));
+	MiddleRest.OutGoingConnections.Add(FMapNodeCoordinate(3, 1));
+
+	WorldMapData.MapNodes.Add(StartingNode);
+	WorldMapData.MapNodes.Add(MiddleEnemy);
+	WorldMapData.MapNodes.Add(MiddleShop);
+	WorldMapData.MapNodes.Add(MiddleRest);
+	WorldMapData.MapNodes.Add(EndingNode);
+
+	WorldMapData.HeadNode = FMapNode();
+	WorldMapData.HeadNode.OutGoingConnections = {StartingNode.NodeCoordinate};
+
+	return WorldMapData;
 }

@@ -140,7 +140,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static FWorldMapData ExploreHeadNode(FWorldMapData WorldMapData);
 	
-
 	UFUNCTION(BlueprintCallable)
 	static float GetAngleBetweenTwoPoints(const FVector2D Origin, const FVector2D Destination);
+
+private:
+	static FWorldMapData CreatePrototypeWorldMapData();
 };
