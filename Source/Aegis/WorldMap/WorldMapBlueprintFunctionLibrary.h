@@ -38,7 +38,17 @@ struct FMapNodeCoordinate
 	{
 		return (this->Layer == RHSMapNodeCoordinate.Layer && this->Row == RHSMapNodeCoordinate.Row);
 	}
+
+	bool operator!=(const FMapNodeCoordinate& RHSMapNodeCoordinate) const
+	{
+		return (this->Layer != RHSMapNodeCoordinate.Layer || this->Row != RHSMapNodeCoordinate.Row);
+	}
 };
+
+FORCEINLINE uint32 GetTypeHash(const FMapNodeCoordinate& MapNodeCoord)
+{
+	return FCrc::MemCrc32(&MapNodeCoord, sizeof(FMapNodeCoordinate));
+}
 
 
 USTRUCT(BlueprintType)
@@ -58,7 +68,7 @@ struct FMapNode
 	TEnumAsByte<EMapNodeType> NodeType = MinorEnemy;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	TArray<FMapNodeCoordinate> OutGoingConnections = TArray<FMapNodeCoordinate>();
+	TSet<FMapNodeCoordinate> OutGoingConnections = TSet<FMapNodeCoordinate>();
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FMapNodeCoordinate NodeCoordinate = FMapNodeCoordinate();
@@ -66,6 +76,44 @@ struct FMapNode
 	bool operator==(const FMapNode& RHSMapNode) const
 	{
 		return (this->NodeCoordinate == RHSMapNode.NodeCoordinate);
+	}
+};
+
+FORCEINLINE uint32 GetTypeHash(const FMapNode& MapNode)
+{
+	return FCrc::MemCrc32(&MapNode, sizeof(FMapNode));
+}
+
+
+USTRUCT(BlueprintType)
+struct FWorldMapCreationConfig
+{
+	GENERATED_BODY()
+
+	FWorldMapCreationConfig()
+	{
+		StartingLayerNodesCount = 0;
+		PreBossLayerNodesCount = 0;
+		NumOfExtraPaths = 0;
+		LayersCount = 0;
+		GridRows = 0;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 StartingLayerNodesCount;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 PreBossLayerNodesCount;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 NumOfExtraPaths;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 LayersCount;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 GridRows;
+
+	int32 GetGridHeight() const
+	{
+		return FMath::Max(StartingLayerNodesCount, PreBossLayerNodesCount);
 	}
 };
 
@@ -82,39 +130,23 @@ struct FWorldMapData
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FMapNode> MapNodes;
+	int32 GetMapNodeIndex(const FMapNodeCoordinate Coord)
+	{
+		for (int i = 0; i < MapNodes.Num(); i++)
+		{
+			if (MapNodes[i].NodeCoordinate == Coord) { return i; }
+		}
+		return -1;
+	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FMapNode HeadNode;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	TArray<FMapNode> ExploredNodes;
-};
-
-
-USTRUCT(BlueprintType)
-struct FWorldMapCreationConfig
-{
-	GENERATED_BODY()
-
-	FWorldMapCreationConfig()
-	{
-		StartingLayerNodesCount = 0;
-		PreBossLayerNodesCount = 0;
-		LayersCount = 0;
-	}
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 StartingLayerNodesCount;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 PreBossLayerNodesCount;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	int32 LayersCount;
-
-	int32 GetGridHeight() const
-	{
-		return FMath::Max(StartingLayerNodesCount, PreBossLayerNodesCount);
-	}
+	FWorldMapCreationConfig InitialConfig;
 };
 
 
@@ -127,7 +159,6 @@ class AEGIS_API UWorldMapBlueprintFunctionLibrary : public UBlueprintFunctionLib
 	GENERATED_BODY()
 
 public:
-
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	static FWorldMapData GenerateWorldMapData(const FWorldMapCreationConfig MapConfig);
 
@@ -145,4 +176,10 @@ public:
 
 private:
 	static FWorldMapData CreatePrototypeWorldMapData();
+
+	UFUNCTION(Blueprintable)
+	static void GeneratePath(FWorldMapData& WorldMapData, const FMapNodeCoordinate StartNodeCoordinate, const FMapNodeCoordinate EndNodeCoordinate);
+	
+	UFUNCTION(Blueprintable)
+	static void ResolveCrossPaths(const FWorldMapData& WorldMapData);
 };
