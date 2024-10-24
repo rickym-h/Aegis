@@ -212,7 +212,52 @@ void UWorldMapBlueprintFunctionLibrary::GeneratePath(FWorldMapData& WorldMapData
 	return;
 }
 
-void UWorldMapBlueprintFunctionLibrary::ResolveCrossPaths(const FWorldMapData& WorldMapData)
+void UWorldMapBlueprintFunctionLibrary::ResolveCrossPaths(FWorldMapData& WorldMapData)
 {
-	// TODO
+	// For every node, check if there are next row, next layer, and next row+layer nodes
+	for (FMapNode& NodeA : WorldMapData.MapNodes)
+	{
+		const FMapNodeCoordinate CoordA = NodeA.NodeCoordinate;
+		const FMapNodeCoordinate CoordB = FMapNodeCoordinate(CoordA.Layer, CoordA.Row+1);
+		const FMapNodeCoordinate CoordC = FMapNodeCoordinate(CoordA.Layer+1, CoordA.Row);
+		const FMapNodeCoordinate CoordD = FMapNodeCoordinate(CoordA.Layer+1, CoordA.Row+1);
+
+		// Check if nodes B,C,D exist
+		if (WorldMapData.GetMapNodeIndex(CoordB) == -1 ||
+			WorldMapData.GetMapNodeIndex(CoordC) == -1 ||
+			WorldMapData.GetMapNodeIndex(CoordD) == -1)
+		{
+			continue;
+		}
+
+		FMapNode& NodeB = WorldMapData.MapNodes[WorldMapData.GetMapNodeIndex(CoordB)];
+		FMapNode& NodeC = WorldMapData.MapNodes[WorldMapData.GetMapNodeIndex(CoordC)];
+		FMapNode& NodeD = WorldMapData.MapNodes[WorldMapData.GetMapNodeIndex(CoordD)];
+
+		if (!NodeA.OutGoingConnections.Contains(CoordD) || !NodeB.OutGoingConnections.Contains(CoordC))
+		{
+			// A cross-path does not exist...
+			continue;
+		}
+
+		// Remove the cross paths
+		UE_LOG(LogTemp, Warning, TEXT("UWorldMapBlueprintFunctionLibrary::ResolveCrossPaths - Removing a cross-path!!"))
+		NodeA.OutGoingConnections.Remove(CoordD);
+		NodeB.OutGoingConnections.Remove(CoordC);
+		
+		// Add forward paths
+		NodeA.OutGoingConnections.Add(CoordC);
+		NodeB.OutGoingConnections.Add(CoordD);
+		
+		// Add a diagonal path with a chance
+		if (const float R = FMath::FRand(); R < 0.4)
+		{
+			// Add diagonal A
+			NodeA.OutGoingConnections.Add(CoordD);
+		} else if (R < 0.8)
+		{
+			// Add diagonal B
+			NodeB.OutGoingConnections.Add(CoordC);
+		}		
+	}
 }

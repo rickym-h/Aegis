@@ -181,5 +181,5 @@ private:
 	static void GeneratePath(FWorldMapData& WorldMapData, const FMapNodeCoordinate StartNodeCoordinate, const FMapNodeCoordinate EndNodeCoordinate);
 	
 	UFUNCTION(Blueprintable)
-	static void ResolveCrossPaths(const FWorldMapData& WorldMapData);
+	static void ResolveCrossPaths(FWorldMapData& WorldMapData);
 };
