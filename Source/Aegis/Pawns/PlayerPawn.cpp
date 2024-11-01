@@ -203,7 +203,7 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
 	// Get the target zoom location
 	BoomArmTargetLength += InputActionValue.Get<FVector>().Z * 1000;
-	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 10000);
+	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 4000);
 
 	MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
 	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 4;
