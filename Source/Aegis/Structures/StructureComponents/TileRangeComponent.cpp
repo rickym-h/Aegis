@@ -64,6 +64,25 @@ void UTileRangeComponent::InitRange(const FTileCoord OriginCoord, const int Rang
 	}
 }
 
+void UTileRangeComponent::InitRange(const FTileCoord OriginCoord, const TSet<FTileCoord> TileRangeOffsets)
+{
+	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+	if (!GameState) { return; }
+	
+	for (const FTileCoord TileCoordOffset : TileRangeOffsets)
+	{
+		FTileCoord TileInRange = OriginCoord + TileCoordOffset;
+		if (AMapTile* Tile = GameState->AegisMap->GetTile(TileInRange))
+		{
+			// Add tile to our TilesInRange TArray
+			TilesInRange.Add(Tile);
+
+			// Subscribe Enemy Entered range function to Overlap delegate in Tile Collision Mesh
+			Tile->CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &UTileRangeComponent::OnEnemyEnterRange);
+		}
+	}
+}
+
 TSet<AEnemy*> UTileRangeComponent::GetAllEnemiesInRange()
 {
 	TSet<AEnemy*> Enemies;

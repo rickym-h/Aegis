@@ -10,7 +10,7 @@ class AEnemy;
 struct FTileCoord;
 class AMapTile;
 // Delegate signature
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterTileRangeSignature, AEnemy*, OutEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterTileRangeSignature, const  AEnemy*, OutEnemy);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class AEGIS_API UTileRangeComponent : public UActorComponent
@@ -36,6 +36,7 @@ public:
 	FOnEnemyEnterTileRangeSignature OnEnemyEnterRangeDelegate;
 
 	void InitRange(const FTileCoord OriginCoord, const int RangeInTiles);
+	void InitRange(const FTileCoord OriginCoord, const TSet<FTileCoord> TileRangeOffsets);
 
 	TSet<AEnemy*> GetAllEnemiesInRange();
 
