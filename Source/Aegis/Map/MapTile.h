@@ -35,6 +35,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tile Data")
 	FVector StructureLocation;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UStaticMeshComponent* CollisionVolume;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -68,9 +71,6 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Tile Data")
 	float PathingGradient;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
-	UStaticMeshComponent* CollisionVolume;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
 	UStaticMeshComponent* TileMesh;
