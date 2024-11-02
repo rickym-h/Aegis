@@ -3,9 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Cards/PlayableCardInterface.h"
-#include "Aegis/Cards/RangeInterface.h"
 #include "Aegis/Cards/StructureCard.h"
+#include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
+#include "Aegis/Cards/Interfaces/RangeInterface.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTowerCard.generated.h"
 

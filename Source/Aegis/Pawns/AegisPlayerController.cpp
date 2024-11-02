@@ -4,8 +4,8 @@
 #include "AegisPlayerController.h"
 
 #include "ResourcesData.h"
-#include "Aegis/Cards/PlayableCardInterface.h"
 #include "Aegis/Cards/PlayerCard.h"
+#include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
 #include "Aegis/Core/AegisGameInstance.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Core/Player/PlayerData.h"

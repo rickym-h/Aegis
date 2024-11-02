@@ -3,8 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Cards/PlayableCardInterface.h"
 #include "Aegis/Cards/StructureCard.h"
+#include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
 #include "ResourceGeneratorCard.generated.h"
 
 /**
