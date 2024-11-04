@@ -17,10 +17,10 @@ class AEGIS_API UTileThumperCard : public UStructureCard, public IPlayableCardIn
 	GENERATED_BODY()
 	
 public:	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Thumper Tower Card Data")
 	float AttackSpeed = 0.f;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Tile Thumper Tower Card Data")
 	TSet<FTileCoord> TileRangeOffsets = TSet<FTileCoord>();
 	
 
