@@ -602,11 +602,11 @@ TMap<FTileCoord, UMapTileData*> UAegisMapFactory::GenerateMapTilesDataAroundPath
 
 	ElevationNoiseDistribution.Sort();
 
-	const float WaterLimit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.1)];
-	const float Grass1Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.8)];
-	const float Grass2Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.9)];
-	const float Grass3Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.95)];
-	const float Grass4Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.98)];
+	const float WaterLimit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.15)];
+	const float Grass1Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.7)];
+	const float Grass2Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.85)];
+	const float Grass3Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.90)];
+	const float Grass4Limit = ElevationNoiseDistribution[static_cast<int>((ElevationNoiseDistribution.Num() - 1) * 0.95)];
 	const float CliffLimit = ElevationNoiseDistribution[static_cast<int>(ElevationNoiseDistribution.Num() - 1 * 1)];
 
 	// Set Terrain and Elevation
@@ -621,41 +621,58 @@ TMap<FTileCoord, UMapTileData*> UAegisMapFactory::GenerateMapTilesDataAroundPath
 			continue;
 		}
 
-		if (Elem.Value->ElevationNoise < WaterLimit)
+		if (Elem.Value->ElevationNoise < Grass1Limit)
 		{
 			Elem.Value->Elevation = 0;
-			Elem.Value->TerrainType = Water;
-		}
-		else if (Elem.Value->ElevationNoise < Grass1Limit)
-		{
-			Elem.Value->Elevation = 0;
-			Elem.Value->TerrainType = Grass;
 		}
 		else if (Elem.Value->ElevationNoise < Grass2Limit)
 		{
 			Elem.Value->Elevation = 1;
-			Elem.Value->TerrainType = Grass;
 		}
 		else if (Elem.Value->ElevationNoise < Grass3Limit)
 		{
 			Elem.Value->Elevation = 2;
-			Elem.Value->TerrainType = Grass;
 		}
 		else if (Elem.Value->ElevationNoise < Grass4Limit)
 		{
 			Elem.Value->Elevation = 3;
-			Elem.Value->TerrainType = Grass;
 		}
 		else
 		{
 			Elem.Value->Elevation = 4;
-			Elem.Value->TerrainType = Cliff;
 		}
 
 		// Set max elevation (and adjust terrain type if necessary) based on distance to the start and end path tiles
 		//const int MaxElevation = FTileCoord::HexDistance(FTileCoord(), Elem.Key);
 		const int MaxElevation = FTileCoord::HexDistanceToTiles(PathTiles, Elem.Key);
 		Elem.Value->Elevation = FMath::Min(Elem.Value->Elevation, MaxElevation);
+
+		switch (Elem.Value->Elevation)
+		{
+		case 0:
+			Elem.Value->TerrainType = Grass;
+			break;
+		case 1:
+			Elem.Value->TerrainType = Grass;
+			break;
+		case 2:
+			Elem.Value->TerrainType = Grass;
+			break;
+		case 3:
+			Elem.Value->TerrainType = Grass;
+			break;
+		case 4:
+			Elem.Value->TerrainType = Cliff;
+			break;
+		default:
+			break;
+		}
+		
+		if (Elem.Value->ElevationNoise < WaterLimit)
+		{
+			Elem.Value->Elevation = 0;
+			Elem.Value->TerrainType = Water;
+		}
 
 	}
 
