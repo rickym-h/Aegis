@@ -8,6 +8,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Cards/Interfaces/RangeInterface.h"
+#include "Aegis/Cards/Interfaces/TileRangeInterface.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Map/MapTile.h"
@@ -75,6 +76,15 @@ void APlayerPawn::ClearStructureHolograms()
 	StructureHolograms = TArray<UStaticMeshComponent*>();
 }
 
+void APlayerPawn::ClearTileRangeDecals()
+{
+	for(UDecalComponent* Component : TileRangeDecals)
+	{
+		Component->DestroyComponent();
+	}
+	TileRangeDecals = TArray<UDecalComponent*>();
+}
+
 void APlayerPawn::UpdateSelectedCard()
 {
 	SelectedCard = AegisController->GetSelectedCard();
@@ -103,7 +113,7 @@ void APlayerPawn::UpdateSelectedCard()
 			}
 		}
 
-		// Set the decal data if applicable
+		// Set the range decal data if applicable
 		if (UKismetSystemLibrary::DoesImplementInterface(SelectedCard, URangeInterface::StaticClass()))
 		{
 			const float Range = IRangeInterface::Execute_GetRangeInMetres(SelectedCard);
@@ -114,10 +124,38 @@ void APlayerPawn::UpdateSelectedCard()
 			RangeIndicatorDecal->SetVisibility(false);
 		}
 		
+		// Clear any possibly existing tile range decals
+		ClearTileRangeDecals();
+		
+		// Set the tile range decal data if applicable
+		if (UKismetSystemLibrary::DoesImplementInterface(SelectedCard, UTileRangeInterface::StaticClass()))
+		{
+			const TSet<FTileCoord> TileRangeOffsets = ITileRangeInterface::Execute_GetRangeTileOffsets(SelectedCard);
+
+			for (int i = 0; i < TileRangeOffsets.Num(); i++)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::UpdateSelectedCard - Creating tile range decal component: %i!"), i)
+				
+				UDecalComponent* TileRangeDecal = NewObject<UDecalComponent>(this, UDecalComponent::StaticClass());
+				TileRangeDecal->RegisterComponent();
+				
+				TileRangeDecal->SetVisibility(false);
+				
+				TileRangeDecal->SetWorldLocation(FVector::ZeroVector);
+				TileRangeDecal->SetWorldRotation(FRotator(90, 0, 0));
+				TileRangeDecal->SetWorldScale3D(FVector(1,1,1));
+				TileRangeDecal->DecalSize = FVector(500, 100, 100);
+				TileRangeDecal->SetDecalMaterial(DecalMaterial);
+				
+				TileRangeDecals.Add(TileRangeDecal);
+			}
+		}
+		
 	} else
 	{
 		ClearStructureHolograms();
 		RangeIndicatorDecal->SetVisibility(false);
+		ClearTileRangeDecals();
 	}
 }
 
@@ -193,6 +231,27 @@ void APlayerPawn::Tick(float DeltaTime)
 				const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(AegisController->GetHoveredHitResult()->Location);
 				const AMapTile* CentreTile = GameState->AegisMap->GetTile(LocationCoord);
 				RangeIndicatorDecal->SetWorldLocation(CentreTile->StructureLocation);
+			}
+		}
+		
+		// If card has tile range, update TileRangeDecals
+		if (UKismetSystemLibrary::DoesImplementInterface(SelectedCard, UTileRangeInterface::StaticClass()))
+		{
+			if (AegisController->GetHoveredHitResult()->IsValidBlockingHit())
+			{
+				const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(AegisController->GetHoveredHitResult()->Location);
+				const AMapTile* CentreTile = GameState->AegisMap->GetTile(LocationCoord);
+
+				// Set tile range decal positions for the offsets
+				const TArray<FTileCoord> TileOffsets = ITileRangeInterface::Execute_GetRangeTileOffsets(SelectedCard).Array();
+				for (int i = 0; i < TileOffsets.Num(); i++)
+				{
+					FTileCoord Offset = TileOffsets[i];
+					FVector TargetLocation = (LocationCoord+Offset).ToWorldLocation();
+					TileRangeDecals[i]->SetWorldLocation(TargetLocation);
+					TileRangeDecals[i]->SetVisibility(true);
+					UE_LOG(LogTemp, Warning, TEXT("Setting Decal %i to position %ls"), i, *(LocationCoord+Offset).ToString())
+				}
 			}
 		}
 	}

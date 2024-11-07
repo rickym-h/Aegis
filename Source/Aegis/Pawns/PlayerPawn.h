@@ -51,7 +51,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
 	TArray<UStaticMeshComponent*> StructureHolograms;
 	void ClearStructureHolograms();
+	void ClearTileRangeDecals();
 	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Placing Structures")
+	TArray<UDecalComponent*> TileRangeDecals;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Decals")
 	UMaterial* DecalMaterial;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Decals")
