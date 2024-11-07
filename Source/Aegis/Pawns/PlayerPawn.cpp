@@ -250,7 +250,6 @@ void APlayerPawn::Tick(float DeltaTime)
 					FVector TargetLocation = (LocationCoord+Offset).ToWorldLocation();
 					TileRangeDecals[i]->SetWorldLocation(TargetLocation);
 					TileRangeDecals[i]->SetVisibility(true);
-					UE_LOG(LogTemp, Warning, TEXT("Setting Decal %i to position %ls"), i, *(LocationCoord+Offset).ToString())
 				}
 			}
 		}
