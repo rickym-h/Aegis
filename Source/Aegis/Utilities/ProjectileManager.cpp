@@ -7,6 +7,7 @@
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Map/AegisGameMap.h"
+#include "Aegis/Structures/Interfaces/ProjectileCallbackInterface.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "GameFramework/GameStateBase.h"
 #include "Kismet/GameplayStatics.h"
@@ -65,40 +66,50 @@ void AProjectileManager::BeginPlay()
 }
 
 void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult)
 {
+	// Check if the overlapped actor was an enemy. Cancel if not an enemy
 	UStaticMeshComponent* ProjectileMesh = Cast<UStaticMeshComponent>(OverlappedComponent);
 	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
 	if (!ProjectileMesh || !Enemy) { return; }
 
+	// Make the NexusBuilding immune to damage from the projectile
+	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+	TArray<AActor*> IgnoredActors;
+	IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
+
+	// Find the relevant damage package associated with this projectile
 	const FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
+
+	// Apply radial damage if there is an ExplosionRadius, otherwise just apply point damage
 	if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
 	{
-		Enemy->GetStatusEffectComponent()->ApplySlowEffect(ProjectilePackage->DamagePackage.SlowEffect); 
-		UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+		float DamageApplied = UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+
+		if (ProjectilePackage->ResponsibleSource->Implements<UProjectileCallbackInterface>())
+		{
+			IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ProjectilePackage->ResponsibleSource, Enemy, DamageApplied, HitResult);
+		}
+		
 	} else
 	{
-		DrawDebugSphere(GetWorld(), OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, 12, FColor::Red, false, -1, 0, 1);
-		const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-		TArray<AActor*> IgnoredActors;
-		IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
-		
 		UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
 	}
 
+	// If a particle system is present, spawn the particle system
 	if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->DamagePackage.OnHitParticleSystem)
 	{
 		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
 	}
+	
 	// Mark projectile to be cleaned
-	// This must be done at the end of the frame instead of as soon as the overlap event is made,
-	// to ensure that it does not break the tick loop
+	// This must be done at the end of the frame instead of as soon as the overlap event is made, to ensure that it does not break the array loop in Tick()
 	ProjectilesToRelease.Add(ProjectileMesh);
 }
 
-UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh)
+UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, UObject* ResponsibleSource, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh)
 {
-	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, Start, TargetEnemy, Speed, GetWorld()->GetTimeSeconds());
+	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, ResponsibleSource, Start, TargetEnemy, Speed, GetWorld()->GetTimeSeconds());
 
 	// Get a MeshComponent to use from the pool
 	UStaticMeshComponent* ProjectileMeshComponent = AcquireProjectile(ProjectilePackage);

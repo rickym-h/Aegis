@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraSystem.h"
-#include "Aegis/Enemies/Components/StatusEffectComponent.h"
 #include "ProjectileManager.generated.h"
 
 class AEnemy;
@@ -18,9 +17,6 @@ struct FProjectileDamagePackage
 	{
 		this->PhysicalDamage = 0;
 		this->ExplosionRadius = 0;
-
-		this->SlowEffect = FSlowEffect();
-		
 		this->OnHitParticleSystem = nullptr;
 	}
 
@@ -29,9 +25,6 @@ struct FProjectileDamagePackage
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
 	float ExplosionRadius;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Status Effects")
-	FSlowEffect SlowEffect;
 
 	UPROPERTY(EditAnywhere, Category = "Firing")
 	UNiagaraSystem* OnHitParticleSystem;
@@ -43,6 +36,7 @@ struct FProjectilePackage
 	FProjectilePackage()
 	{
 		DamagePackage = FProjectileDamagePackage();
+		ResponsibleSource = nullptr;
 		StartPoint = FVector::ZeroVector;
 		ForwardVector = FVector::ZeroVector;
 		TargetEnemy = nullptr;
@@ -50,9 +44,10 @@ struct FProjectilePackage
 		WorldTimeSeconds = 0;
 	}
 	
-	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, const FVector& InStartPoint, const AEnemy* InTargetEnemy, const float InSpeed, const int InWorldTimeSeconds)
+	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, UObject* InResponsibleSource, const FVector& InStartPoint, const AEnemy* InTargetEnemy, const float InSpeed, const int InWorldTimeSeconds)
 	{
 		DamagePackage = InDamagePackage;
+		ResponsibleSource = InResponsibleSource;
 		StartPoint = InStartPoint;
 		ForwardVector = FVector::ZeroVector;
 		TargetEnemy = InTargetEnemy;
@@ -64,6 +59,9 @@ struct FProjectilePackage
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	FProjectileDamagePackage DamagePackage;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	UObject* ResponsibleSource; 
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
 	FVector StartPoint;
@@ -95,8 +93,8 @@ public:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-	UStaticMeshComponent* FireProjectile(const FProjectileDamagePackage DamagePackage, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh);
+	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);
+	UStaticMeshComponent* FireProjectile(const FProjectileDamagePackage DamagePackage, UObject* ResponsibleSource, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh);
 
 protected:
 	UStaticMeshComponent* AcquireProjectile(const FProjectilePackage& ProjectilePackage);

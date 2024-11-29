@@ -25,12 +25,12 @@ protected:
 public:
 
 	UFUNCTION()
-	static void FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy, const float ProjectileSpeed, UStaticMesh* ProjectileMesh);
+	void FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy, const float ProjectileSpeed, UStaticMesh* ProjectileMesh) const;
 
 	UFUNCTION()
-	static void FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage);
+	void FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
 	
 	UFUNCTION()
-	static void FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius);
+	void FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius) const;
 		
 };

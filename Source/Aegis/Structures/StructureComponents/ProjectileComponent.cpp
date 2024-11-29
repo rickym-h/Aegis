@@ -4,6 +4,7 @@
 #include "ProjectileComponent.h"
 
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
+#include "Aegis/Structures/Structure.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 
 // Sets default values for this component's properties
@@ -27,7 +28,7 @@ void UProjectileComponent::BeginPlay()
 }
 
 void UProjectileComponent::FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy,
-	const float ProjectileSpeed, UStaticMesh* ProjectileMesh)
+	const float ProjectileSpeed, UStaticMesh* ProjectileMesh) const
 {
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
 	
@@ -37,10 +38,10 @@ void UProjectileComponent::FireCustomProjectile(const FProjectileDamagePackage& 
 		return;
 	}
 	
-	GameState->ProjectileManager->FireProjectile(DamagePackage, StartPoint, Enemy, ProjectileSpeed, ProjectileMesh);
+	GameState->ProjectileManager->FireProjectile(DamagePackage, Cast<AStructure>(GetOwner()), StartPoint, Enemy, ProjectileSpeed, ProjectileMesh);
 }
 
-void UProjectileComponent::FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage)
+void UProjectileComponent::FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
 {
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
 	
@@ -54,10 +55,10 @@ void UProjectileComponent::FireArrowAtEnemy(const FVector& StartPoint, const AEn
 	DamagePackage.PhysicalDamage = Damage;
 
 	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
-	GameState->ProjectileManager->FireProjectile(DamagePackage, StartPoint, Enemy, 10, ArrowMesh);
+	GameState->ProjectileManager->FireProjectile(DamagePackage, Cast<AStructure>(GetOwner()), StartPoint, Enemy, 10, ArrowMesh);
 }
 
-void UProjectileComponent::FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius)
+void UProjectileComponent::FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius) const
 {
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
 	
@@ -72,5 +73,5 @@ void UProjectileComponent::FireBombProjectileAtEnemy(const FVector& StartPoint, 
 	DamagePackage.ExplosionRadius = ExplosionRadius;
 
 	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
-	GameState->ProjectileManager->FireProjectile(DamagePackage, StartPoint, Enemy, 10, ArrowMesh);
+	GameState->ProjectileManager->FireProjectile(DamagePackage, Cast<AStructure>(GetOwner()), StartPoint, Enemy, 10, ArrowMesh);
 }

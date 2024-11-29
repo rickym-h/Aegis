@@ -4,6 +4,6 @@
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=C029C45B_002D88DE_002D0FE0_002D5119_002D1E1F317A7C48_002Ff_003AAegis_002EBuild_002Ecs/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=E1B10DA5_002D9A29_002D2705_002DA17F_002DA28725470144_002Ff_003AAegisEditor_002ETarget_002Ecs_002Fl_003ASource_003FAegisEditor_002ETarget_002Ecs/@EntryIndexedValue">ExplicitlyExcluded</s:String>
 	<s:String x:Key="/Default/CodeInspection/ExcludedFiles/FilesAndFoldersToSkip2/=E1B10DA5_002D9A29_002D2705_002DA17F_002DA28725470144_002Ff_003AAegis_002ETarget_002Ecs_002Fl_003ASource_003FAegis_002ETarget_002Ecs/@EntryIndexedValue">ExplicitlyExcluded</s:String>
-	<s:String x:Key="/Default/CodeInspection/Highlighting/AnalysisEnabled/@EntryValue">SOLUTION</s:String>
+	
 	
 	<s:String x:Key="/Default/CodeInspection/PencilsConfiguration/ActualSeverity/@EntryValue">INFO</s:String></wpf:ResourceDictionary>
