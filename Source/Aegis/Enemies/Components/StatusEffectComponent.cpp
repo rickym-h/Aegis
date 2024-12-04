@@ -68,7 +68,7 @@ void UStatusEffectComponent::RemoveSlowEffect(const FSlowEffect SlowEffect)
 {
 	const float PreSlowSpeedMultiplier = GetSpeedMultiplier();
 	
-	SlowEffects.Remove(SlowEffect);
+	SlowEffects.RemoveSingle(SlowEffect);
 	
 	if (const float NewSpeedMultiplier = GetSpeedMultiplier(); NewSpeedMultiplier != PreSlowSpeedMultiplier)
 	{

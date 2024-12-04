@@ -68,6 +68,8 @@ void AEnemy::BeginPlay()
 	SetActorLocation(FromTile.ToWorldLocation());
 
 	CollisionCapsuleComponent->OnComponentBeginOverlap.AddDynamic(this, &AEnemy::OverlapBegin);
+	
+	CurrentMovementSpeed = MovementSpeed;
 
 	StatusEffectComponent->OnSpeedMultiplierChangedDelegate.AddUniqueDynamic(this, &AEnemy::OnSpeedMultiplierChanged);
 }

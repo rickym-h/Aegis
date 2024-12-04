@@ -53,7 +53,7 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float MovementSpeed = 200.f;
-	float CurrentMovementSpeed = MovementSpeed;
+	float CurrentMovementSpeed;
 
 	UFUNCTION()
 	void OnSpeedMultiplierChanged(float NewSpeedMultiplier);
