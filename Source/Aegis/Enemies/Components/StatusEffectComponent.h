@@ -17,6 +17,12 @@ struct FSlowEffect
 		SpeedMultiplier = 1.f;
 	}
 
+	FSlowEffect(const float InDurationSeconds, const float InSpeedMultiplier)
+	{
+		DurationSeconds = InDurationSeconds;
+		SpeedMultiplier = InSpeedMultiplier;
+	}
+
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	float DurationSeconds;
 
