@@ -6,6 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "BuildingHealthComponent.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealthDepletedSignature);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class AEGIS_API UBuildingHealthComponent : public UActorComponent
@@ -26,9 +27,6 @@ protected:
 	float CurrentHealth = MaxHealth;
 
 public:
-	// Called every frame
-	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
-
 	UFUNCTION()
 	void TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy, AActor* DamageCauser);
 
@@ -37,4 +35,7 @@ public:
 
 	UFUNCTION()
 	void SetCurrentHealth(int Health);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnHealthDepletedSignature OnHealthDepletedDelegate;
 };

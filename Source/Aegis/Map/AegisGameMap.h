@@ -30,7 +30,7 @@ public:
 	void PopulateGameMapData(const TMap<FTileCoord, UMapTileData*>& InMapTileData, const TMap<FTileCoord, FTileCoord>& InPath, const TArray<FTileCoord>& InPathStartCoords, ANexusBuilding* InNexusBuilding);
 
 
-	UPROPERTY()
+	UPROPERTY(BlueprintReadOnly)
 	ANexusBuilding* NexusBuilding;
 protected:
 	

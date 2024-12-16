@@ -29,15 +29,6 @@ void UBuildingHealthComponent::BeginPlay()
 	}
 }
 
-
-// Called every frame
-void UBuildingHealthComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
-{
-	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
-}
-
 void UBuildingHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, const UDamageType* DamageType, AController* InstigatedBy,
                                           AActor* DamageCauser)
 {
@@ -49,6 +40,7 @@ void UBuildingHealthComponent::TakeDamage(AActor* DamagedActor, float Damage, co
 		if (AActor* Owner = GetOwner())
 		{
 			// TODO animation and sound effects before destroying
+			OnHealthDepletedDelegate.Broadcast();
 			Owner->Destroy();
 		}
 	}
