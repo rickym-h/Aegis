@@ -53,9 +53,9 @@ TArray<UPlayerCard*> UCardFactory::GenerateStarterTowersForCharacter(UObject* Ou
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Character Enum not recognised! Creating default starter cards."));
-		CardClassArray.Append(DefaultCards);
 		break;
 	}
+	CardClassArray.Append(DefaultCards);
 	
 
 	for (const TSubclassOf<UPlayerCard> StarterCardClass : CardClassArray)
