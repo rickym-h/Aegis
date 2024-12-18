@@ -29,6 +29,11 @@ TArray<UPlayerCard*> UPlayerData::GetPlayerDeck() const
 	return PlayerDeck;
 }
 
+UResourcesData* UPlayerData::GetPlayerResources() const
+{
+	return ResourcesData;
+}
+
 void UPlayerData::SetPlayerDeck(const TArray<UPlayerCard*>& InPlayerDeck)
 {
 	this->PlayerDeck = InPlayerDeck;

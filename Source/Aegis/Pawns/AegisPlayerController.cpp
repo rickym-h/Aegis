@@ -30,13 +30,13 @@ void AAegisPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// Get cards from the game instance
-	
+	// Get cards and resources from the game instance
 	if (const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld())))
 	{
 		if (const UPlayerData* PlayerData = GameInstance->GetPlayerData())
 		{
-			DrawPile.Append(PlayerData->GetPlayerDeck());	
+			DrawPile.Append(PlayerData->GetPlayerDeck());
+			Resources->InitResources(PlayerData->GetPlayerResources()->GetResources());
 		} else
 		{
 			UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::GameInstance - PlayerData not valid!"))

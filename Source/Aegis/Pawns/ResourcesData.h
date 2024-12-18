@@ -44,6 +44,8 @@ class AEGIS_API UResourcesData : public UObject
 	GENERATED_BODY()
 
 public:
+	void InitResources(const FResources& InResources);
+	
 	UPROPERTY(BlueprintAssignable)
 	FOnResourcesUpdatedSignature OnResourcesUpdatedDelegate;
 	
@@ -56,6 +58,8 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpendResources(const FResources& Cost);
 
+	UFUNCTION(BlueprintCallable)
+	FResources GetResources() const;
 	UFUNCTION(BlueprintCallable)
 	int32 GetWood() const;
 	UFUNCTION(BlueprintCallable)

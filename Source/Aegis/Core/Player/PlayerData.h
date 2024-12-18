@@ -7,6 +7,8 @@
 #include "UObject/Object.h"
 #include "PlayerData.generated.h"
 
+class UResourcesData;
+
 UENUM(BlueprintType)
 enum EPlayerCharacter
 {
@@ -38,6 +40,9 @@ public:
 	TArray<UPlayerCard*> GetPlayerDeck() const;
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
+	UResourcesData* GetPlayerResources() const;
+
+	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	void SetPlayerDeck(const TArray<UPlayerCard*>& InPlayerDeck);
 
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
@@ -55,5 +60,8 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player Data")
 	FWorldMapData WorldMapData = FWorldMapData();
+
+	UPROPERTY(EditAnywhere, Category="Player Data")
+	UResourcesData* ResourcesData;
 
 };

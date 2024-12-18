@@ -3,6 +3,11 @@
 
 #include "ResourcesData.h"
 
+void UResourcesData::InitResources(const FResources& InResources)
+{
+	Resources = InResources;
+}
+
 void UResourcesData::AddResources(const int32 InWood, const int32 InStone, const int32 InGold, const int32 InRunes, const int32 InManaCrystals)
 {
 	Resources.Wood+=InWood;
@@ -52,6 +57,11 @@ void UResourcesData::SpendResources(const FResources& Cost)
 	Resources.Runes -= Cost.Runes;
 	Resources.ManaCrystals -= Cost.ManaCrystals;
 	OnResourcesUpdatedDelegate.Broadcast();
+}
+
+FResources UResourcesData::GetResources() const
+{
+	return Resources;
 }
 
 int32 UResourcesData::GetWood() const
