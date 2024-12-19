@@ -26,6 +26,8 @@ class AEGIS_API UPlayerData : public UObject
 {
 	GENERATED_BODY()
 
+	UPlayerData();
+
 public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	FName GetPlayerName() const;
@@ -63,5 +65,4 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player Data")
 	UResourcesData* ResourcesData;
-
 };

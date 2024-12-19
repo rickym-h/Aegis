@@ -3,6 +3,13 @@
 
 #include "PlayerData.h"
 
+#include "Aegis/Pawns/ResourcesData.h"
+
+UPlayerData::UPlayerData()
+{
+	ResourcesData = CreateDefaultSubobject<UResourcesData>("Resources");
+}
+
 FName UPlayerData::GetPlayerName() const
 {
 	switch(PlayerCharacter)

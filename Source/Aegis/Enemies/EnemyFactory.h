@@ -48,6 +48,9 @@ class AEGIS_API UEnemyFactory : public UObject
 protected:
 	TArray<AEnemy*> EnemiesInWorld;
 
+	int32 NightCounter;
+	int32 WaveCounter;
+
 	UFUNCTION(BlueprintCallable)
 	void RemoveEnemyFromWorld(AActor* DestroyedActor);
 	
@@ -57,7 +60,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="WaveEnemies")
 	TArray<FEnemySpawnData> EnemiesToSpawnInWave;
 	
-	TArray<FEnemySpawnData> GenerateWaveEnemies(const int32 Night, const int32 Wave) const;
+	TArray<FEnemySpawnData> GenerateWaveEnemies(const int32 WorldLayer) const;
 
 	FTimerHandle SpawnEnemyWithDelayTimerHandle;
 	
@@ -65,11 +68,16 @@ protected:
 
 public:
 	UFUNCTION(BlueprintCallable)
-	void BeginWave(const int32 Night, const int32 Wave);
+	void BeginWave(const int32 WorldLayer);
 
 	UFUNCTION(BlueprintCallable)
 	AEnemy* SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnWaveEndSignature OnWaveEndDelegate;
+
+	UFUNCTION(BlueprintCallable)
+	int32 GetWaveCounter() const;
+	UFUNCTION(BlueprintCallable)
+	int32 GetNightCounter() const;
 };

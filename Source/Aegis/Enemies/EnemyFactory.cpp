@@ -22,7 +22,7 @@ void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
 	}
 }
 
-TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 Night, const int32 Wave) const
+TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLayer) const
 {
 	TArray<FEnemySpawnData> WaveEnemies = TArray<FEnemySpawnData>();
 	if (EnemiesToSpawnInWave.Num() != 0)
@@ -66,7 +66,7 @@ void UEnemyFactory::SpawnEnemyFromWave()
 	}
 }
 
-void UEnemyFactory::BeginWave(const int32 Night, const int32 Wave)
+void UEnemyFactory::BeginWave(const int32 WorldLayer)
 {
 	// Ensure wave is able to begin (no enemies in world, no enemies still to be spawned from previous wave
 	if (EnemiesInWorld.Num() != 0 || EnemiesToSpawnInWave.Num() != 0)
@@ -75,8 +75,13 @@ void UEnemyFactory::BeginWave(const int32 Night, const int32 Wave)
 		return;
 	}
 
+	WaveCounter++;
+
+	UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::BeginWave - Starting wave on level/layer %i, Night %i, Wave %i!"), WorldLayer, NightCounter, WaveCounter)
+	
+	
 	// Decide which enemies to be spawned
-	EnemiesToSpawnInWave = GenerateWaveEnemies(Night, Wave);
+	EnemiesToSpawnInWave = GenerateWaveEnemies(WorldLayer);
 
 	// Start Spawn of first enemy in wave
 	GetWorld()->GetTimerManager().SetTimer(
@@ -85,6 +90,7 @@ void UEnemyFactory::BeginWave(const int32 Night, const int32 Wave)
 		&UEnemyFactory::SpawnEnemyFromWave,
 		EnemiesToSpawnInWave.Top().PreSpawnDelay,
 		false);
+
 }
 
 AEnemy* UEnemyFactory::SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass)
@@ -108,4 +114,14 @@ AEnemy* UEnemyFactory::SpawnTestEnemy(TSubclassOf<AEnemy> EnemyClass)
 	Enemy->OnDestroyed.AddUniqueDynamic(this, &UEnemyFactory::RemoveEnemyFromWorld);
 
 	return Enemy;
+}
+
+int32 UEnemyFactory::GetWaveCounter() const
+{
+	return WaveCounter;
+}
+
+int32 UEnemyFactory::GetNightCounter() const
+{
+	return NightCounter;
 }
