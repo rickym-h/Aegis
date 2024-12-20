@@ -30,9 +30,11 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLaye
 		UE_LOG(LogTemp, Fatal, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies to spawn in current wave."))
 		return TArray<FEnemySpawnData>();
 	}
-	// const int32 EnemiesToSpawnCount = Night * Wave;
-	const int32 EnemiesToSpawnCount = 5;
 
+	const int32 DifficultyScore = NightCounter * WaveCounter;
+
+	// TODO Change to choose enemies from a random selection
+	const int32 EnemiesToSpawnCount = DifficultyScore;
 	for (int i = 0; i < EnemiesToSpawnCount; i++)
 	{
 		FEnemySpawnData SpawnData = FEnemySpawnData(
@@ -74,8 +76,12 @@ void UEnemyFactory::BeginWave(const int32 WorldLayer)
 		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies in world, or there are still enemies to spawn in current wave."))
 		return;
 	}
-
+	
 	WaveCounter++;
+	if (WaveCounter == 1)
+	{
+		NightCounter++;
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::BeginWave - Starting wave on level/layer %i, Night %i, Wave %i!"), WorldLayer, NightCounter, WaveCounter)
 	
