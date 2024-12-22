@@ -7,7 +7,7 @@
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTower.generated.h"
 
-class UDefenderRangeComponent;
+class UTileRangeComponent;
 class UProjectileComponent;
 
 UCLASS()
@@ -19,14 +19,14 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileTower();
 
-	void InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed, const float InRangeMetres, UStaticMesh* InProjectileMesh);
+	void InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed, const int32 InRangeTiles, UStaticMesh* InProjectileMesh);
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
-	UDefenderRangeComponent* RangeComponent;
+	UTileRangeComponent* TileRangeComponent;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UProjectileComponent* ProjectileComponent;
 

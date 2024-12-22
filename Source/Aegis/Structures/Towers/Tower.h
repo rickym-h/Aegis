@@ -32,7 +32,4 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
 	USceneComponent* SourcePoint;
 	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Decals")
-	UDecalComponent* RangeIndicatorDecal;
-	
 };

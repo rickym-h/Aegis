@@ -3,25 +3,23 @@
 
 #include "ProjectileTower.h"
 
-#include "Aegis/Structures/StructureComponents/DefenderRangeComponent.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
-#include "Components/DecalComponent.h"
+#include "Aegis/Structures/StructureComponents/TileRangeComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
 AProjectileTower::AProjectileTower()
 {
-	RangeComponent = CreateDefaultSubobject<UDefenderRangeComponent>("Range Component");
-	RangeComponent->SetupAttachment(SourcePoint);
+	TileRangeComponent = CreateDefaultSubobject<UTileRangeComponent>("Range Component");
 	
 	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("Projectile Component");
 }
 
 void AProjectileTower::InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed,
-	const float InRangeMetres, UStaticMesh* InProjectileMesh)
+	const int32 InRangeTiles, UStaticMesh* InProjectileMesh)
 {
-	if (InAttackSpeed < 0 || InRangeMetres < 0)
+	if (InAttackSpeed < 0 || InRangeTiles < 0)
 	{
 		return;
 	}
@@ -29,10 +27,8 @@ void AProjectileTower::InitProjectileTower(const FProjectileDamagePackage InProj
 	this->AttackSpeed = InAttackSpeed;	
 	this->ProjectileMesh = InProjectileMesh;
 
-	RangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
-	RangeComponent->InitRange(CurrentLocation, InRangeMetres);
-
-	RangeIndicatorDecal->SetWorldScale3D(FVector(1, InRangeMetres, InRangeMetres));
+	TileRangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
+	TileRangeComponent->InitRange(CurrentLocation, InRangeTiles);
 }
 
 // Called when the game starts or when spawned
@@ -48,6 +44,8 @@ void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 
 	if (bShotAvailable)
 	{
+		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
+		
 		bShotAvailable = false;
 		ProjectileComponent->FireCustomProjectile(ProjectileDamagePackage, SourcePoint->GetComponentLocation(), Enemy, 10, ProjectileMesh);
 
@@ -58,15 +56,13 @@ void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 			1/AttackSpeed, // float delay until elapsed
 			false); // looping?
 	}
-
-	PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
 }
 
 void AProjectileTower::ReloadShot()
 {
 	bShotAvailable = true;
 
-	if (const AEnemy* Enemy = RangeComponent->GetFrontEnemy(RangeComponent->GetAllEnemiesInRange()))
+	if (const AEnemy* Enemy = TileRangeComponent->GetFrontEnemy(TileRangeComponent->GetAllEnemiesInRange()))
 	{
 		TryFireAtEnemy(Enemy);
 	}

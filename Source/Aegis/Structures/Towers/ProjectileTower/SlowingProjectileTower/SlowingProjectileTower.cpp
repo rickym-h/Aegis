@@ -14,9 +14,9 @@ ASlowingProjectileTower::ASlowingProjectileTower()
 }
 
 void ASlowingProjectileTower::InitSlowingProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed,
-	const float InRangeMetres, UStaticMesh* InProjectileMesh, const FSlowEffect InEffectToApply)
+	const int32 InRangeTiles, UStaticMesh* InProjectileMesh, const FSlowEffect InEffectToApply)
 {
-	InitProjectileTower(InProjectileDamagePackage, InAttackSpeed, InRangeMetres, InProjectileMesh);
+	InitProjectileTower(InProjectileDamagePackage, InAttackSpeed, InRangeTiles, InProjectileMesh);
 
 	EffectToApply = InEffectToApply;
 }
