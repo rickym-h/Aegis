@@ -21,5 +21,4 @@ public:
 
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
-	virtual float GetRangeInMetres_Implementation() override;
 };

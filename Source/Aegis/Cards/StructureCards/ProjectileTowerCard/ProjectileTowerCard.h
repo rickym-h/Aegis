@@ -6,6 +6,7 @@
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
 #include "Aegis/Cards/Interfaces/RangeInterface.h"
+#include "Aegis/Cards/Interfaces/TileRangeInterface.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTowerCard.generated.h"
 
@@ -13,7 +14,7 @@
  * 
  */
 UCLASS(HideDropDown)
-class AEGIS_API UProjectileTowerCard : public UStructureCard, public IPlayableCardInterface, public IRangeInterface
+class AEGIS_API UProjectileTowerCard : public UStructureCard, public IPlayableCardInterface, public ITileRangeInterface
 {
 	GENERATED_BODY()
 
@@ -25,7 +26,7 @@ public:
 	float AttackSpeed = 0.f;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
-	float RangeMetres = 0.f;
+	int32 RangeTiles = 0;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
 	UStaticMesh* ProjectileMesh;
@@ -33,5 +34,5 @@ public:
 
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
-	virtual float GetRangeInMetres_Implementation() override;
+	virtual TSet<FTileCoord> GetRangeTileOffsets_Implementation() override;
 };

@@ -24,7 +24,7 @@ bool UProjectileTowerCard::PlayCard_Implementation(const FTileCoord& LocationCoo
 	// Set structure data (e.g. tower stats)
 	if (AProjectileTower* ProjectileTower = Cast<AProjectileTower>(Structure))
 	{
-		ProjectileTower->InitProjectileTower(ProjectileDamagePackage, AttackSpeed, RangeMetres, ProjectileMesh);
+		ProjectileTower->InitProjectileTower(ProjectileDamagePackage, AttackSpeed, RangeTiles, ProjectileMesh);
 	} else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UProjectileTowerCard::PlayCard_Implementation - Structure not projectile tower! Failed to InitProjectileTower()"))
@@ -38,7 +38,7 @@ bool UProjectileTowerCard::PlayCard_Implementation(const FTileCoord& LocationCoo
 	return true;
 }
 
-float UProjectileTowerCard::GetRangeInMetres_Implementation()
+TSet<FTileCoord> UProjectileTowerCard::GetRangeTileOffsets_Implementation()
 {
-	return RangeMetres;
+	return TSet(FTileCoord::GetTilesInRadius(FTileCoord(), RangeTiles));
 }

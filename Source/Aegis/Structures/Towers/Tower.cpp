@@ -13,18 +13,6 @@ ATower::ATower()
 
 	SourcePoint = CreateDefaultSubobject<USceneComponent>("Source Point");
 	SourcePoint->SetupAttachment(MeshOrigin);
-
-	RangeIndicatorDecal = CreateDefaultSubobject<UDecalComponent>("Range Indicator Decal");
-	RangeIndicatorDecal->SetupAttachment(SourcePoint);
-	RangeIndicatorDecal->SetVisibility(false);
-	RangeIndicatorDecal->SetRelativeLocation(FVector::ZeroVector);
-	RangeIndicatorDecal->SetRelativeRotation(FRotator(90, 0, 0));
-	RangeIndicatorDecal->DecalSize = FVector(500, 100, 100);
-	RangeIndicatorDecal->SetWorldScale3D(FVector(1,1,1));
-	
-	//UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Rotating.M_RangeDecal_Rotating'")).Object;
-	UMaterial* DecalMat = ConstructorHelpers::FObjectFinder<UMaterial>(TEXT("/Script/Engine.Material'/Game/Aegis/Art/Decals/M_RangeDecal_Static.M_RangeDecal_Static'")).Object;
-	RangeIndicatorDecal->SetMaterial(0, DecalMat);
 	
 	PedestalMesh = CreateDefaultSubobject<UStaticMeshComponent>("Pedestal Mesh");
 	PedestalMesh->SetupAttachment(MeshOrigin);

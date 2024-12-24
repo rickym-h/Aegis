@@ -17,7 +17,7 @@ public:
 	// Sets default values for this actor's properties
 	ASlowingProjectileTower();
 
-	void InitSlowingProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed, const float InRangeMetres, UStaticMesh* InProjectileMesh, FSlowEffect InEffectToApply);
+	void InitSlowingProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed, const int32 InRangeTiles, UStaticMesh* InProjectileMesh, FSlowEffect InEffectToApply);
 
 protected:
 	// Called when the game starts or when spawned
