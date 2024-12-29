@@ -77,6 +77,11 @@ struct FMapNode
 	{
 		return (this->NodeCoordinate == RHSMapNode.NodeCoordinate);
 	}
+
+	// Only Applicable if node is a game level
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 FinalWave = 5;
+	//int32 FinalNight = 0;
 };
 
 FORCEINLINE uint32 GetTypeHash(const FMapNode& MapNode)
