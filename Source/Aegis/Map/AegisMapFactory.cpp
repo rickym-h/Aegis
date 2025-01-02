@@ -46,7 +46,7 @@ TArray<FTileCoord> UAegisMapFactory::GetPathStartCoords(TMap<FTileCoord, FTileCo
 UAegisGameMap* UAegisMapFactory::GenerateGameMap(const int PathLengthInNodes) const
 {
 	const int32 Seed = static_cast<int32>(FDateTime::Now().ToUnixTimestamp());
-	//constexpr int32 Seed = 1725718799;
+	//constexpr int32 Seed = 1735852301;
 	UE_LOG(LogTemp, Display, TEXT("UAegisMapFactory::GenerateGameMap - Map Generation Started! Seed: %i"), Seed);
 	const FDateTime TimeSTamp_Start = FDateTime::Now();
 
@@ -466,7 +466,22 @@ TMap<FTileCoord, FTileCoord> UAegisMapFactory::GenerateAStarPathThroughNodes(con
 			const FTileCoord EndTile = PathNodes[NodeIndex+1];
 
 			TMap<FTileCoord, FTileCoord> PathFromEndToStart;
-			if (AStarPathFind(EndTile, StartTile, PathingNoiseOffset, Path, PathFromEndToStart, PathingNoiseExponent))
+
+			// Get set of tiles in existing path. These are used to exclude the path from searches, and to avoid tiles adjacent to the path
+			TSet<FTileCoord> ExcludedPath = {FTileCoord()};
+			for (TTuple<FTileCoord, FTileCoord> Element : Path)
+			{
+				// Add a tile in the path to ExcludedTiles
+				ExcludedPath.Add(Element.Value);
+			}
+			TSet<FTileCoord> ExcludedFutureNodes;
+			for (FTileCoord Element : PathNodes)
+			{
+				// Also exclude each future path node
+				ExcludedFutureNodes.Add(Element);
+			}
+			
+			if (AStarPathFind(EndTile, StartTile, PathingNoiseOffset, ExcludedPath, ExcludedFutureNodes, PathFromEndToStart, PathingNoiseExponent))
 			{
 				Path.Append(PathFromEndToStart);
 			} else
@@ -486,23 +501,19 @@ TMap<FTileCoord, FTileCoord> UAegisMapFactory::GenerateAStarPathThroughNodes(con
 	return TMap<FTileCoord, FTileCoord>();	
 }
 
-bool UAegisMapFactory::AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset,
-                                     const TMap<FTileCoord, FTileCoord>& ExistingPath, TMap<FTileCoord, FTileCoord>& OutputPath, const float WeightExponent)
+bool UAegisMapFactory::AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset, const TSet<FTileCoord>& ExcludedPath, const TSet<FTileCoord>& ExcludedFutureNodes, TMap<FTileCoord, FTileCoord>& OutputPath, float WeightExponent)
 {	
 	if (WeightExponent < 0)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UAegisMapFactory::AStarPathFind - Weight multiplier cannot be below 0! Cancelling A* Search."));
 		return false;
 	}
-	
-	// Get set of tiles in existing path. These are used to exclude the path from searches, and to avoid tiles adjacent to the path
-	TSet<FTileCoord> ExistingPathAndAdjacentTiles = TSet<FTileCoord>(FTileCoord::GetTilesInRadius(FTileCoord(), 1));
-	TSet<FTileCoord> ExistingPathTiles = {FTileCoord()};
-	for (TTuple<FTileCoord, FTileCoord> Element : ExistingPath)
+
+	TSet<FTileCoord> ExcludedPathAdjacent;
+	for (FTileCoord Element : ExcludedPath)
 	{
-		// Add a tile in the path to ExistingPathTiles
-		ExistingPathTiles.Add(Element.Value);
-		ExistingPathAndAdjacentTiles.Append(FTileCoord::GetTilesInRadius(Element.Value, 1));
+		// Find nodes adjacent to the excluded tiles to avoid but not necessarily be excluded from traversing
+		ExcludedPathAdjacent.Append(FTileCoord::GetTilesInRadius(Element, 1));
 	}
 
 	
@@ -533,16 +544,16 @@ bool UAegisMapFactory::AStarPathFind(const FTileCoord StartTile, const FTileCoor
 
 		for (FTileCoord Neighbour : FTileCoord::GetTilesInRadius(Current, 1))
 		{
-			// If the tile is in the path, skip it
-			if (ExistingPathTiles.Contains(Neighbour) && Neighbour != GoalTile) { continue; }
+			// If the tile is in the path, or part of a future node, skip it
+			if ((ExcludedPath.Contains(Neighbour) || ExcludedFutureNodes.Contains(Neighbour)) && Neighbour != GoalTile) { continue; }
 			
 			// Find the weight of the neighbor tile. Fetched using the pathing noise distribution. Low Perlin scale to be more "random".
 			float NextWeight = GetNodeWeight(Neighbour, PathingNoiseOffset, true, WeightExponent);
 
 			// If the tile is adjacent to the path, increase the weight to encourage a spacing. (but will go through it if there is no other option)
-			if (ExistingPathAndAdjacentTiles.Contains(Neighbour))
+			if (ExcludedPathAdjacent.Contains(Neighbour))// && !FTileCoord::GetTilesInRadius(GoalTile, 1).Contains(Neighbour)
 			{
-				NextWeight *= 20;
+				NextWeight += 200;
 			}
 
 			const float NewCost = CostSoFar[Current] + NextWeight;

@@ -136,7 +136,7 @@ protected:
 	static TMap<FTileCoord, TSet<FTileCoord>> GenerateDelaunayTriangulation(const TArray<FTileCoord>& PoissonNodeCoords);
 	static TArray<FTileCoord> SelectRandomPathThroughNodeGraph(const int32 PathLengthInNodes, const TMap<FTileCoord, TSet<FTileCoord>>& PoissonNodeGraph, FRandomStream RandomStream);
 	static TMap<FTileCoord, FTileCoord> GenerateAStarPathThroughNodes(const TArray<FTileCoord>& PathNodes, FVector2D PathingNoiseOffset);
-	static bool AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset, const TMap<FTileCoord, FTileCoord>& ExistingPath, TMap<FTileCoord, FTileCoord>& OutputPath, float WeightExponent);
+	static bool AStarPathFind(const FTileCoord StartTile, const FTileCoord GoalTile, FVector2D PathingNoiseOffset, const TSet<FTileCoord>& ExcludedPath, const TSet<FTileCoord>& ExcludedFutureNodes, TMap<FTileCoord, FTileCoord>& OutputPath, float WeightExponent);
 	static TMap<FTileCoord, UMapTileData*> GenerateMapTilesDataAroundPath(const TMap<FTileCoord, FTileCoord>& Path, FVector2D ElevationNoiseOffset, FVector2D TreeNoiseOffset, FVector2D StoneNoiseOffset);
 	
 	static TArray<FTileCoord> GetPathStartCoords(TMap<FTileCoord, FTileCoord> PathRoute);
