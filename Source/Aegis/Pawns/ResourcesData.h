@@ -5,6 +5,14 @@
 #include "CoreMinimal.h"
 #include "ResourcesData.generated.h"
 
+UENUM(BlueprintType)
+enum ECardCostType
+{
+	PlayerWood,
+	PlayerStone,
+	PlayerGold,
+};
+
 /**
  * 
 */
