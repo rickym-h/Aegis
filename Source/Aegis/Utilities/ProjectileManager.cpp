@@ -24,31 +24,75 @@ void AProjectileManager::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	int32 CurrentWorldSeconds = GetWorld()->GetTimeSeconds();
+	const int32 CurrentWorldSeconds = GetWorld()->GetTimeSeconds();
 
-	for (TTuple<UStaticMeshComponent*, FProjectilePackage> Element : ActiveProjectiles)
+	// Process movement of homing projectiles
+	for (TTuple<UStaticMeshComponent*, FHomingProjectilePackage> Element : ActiveHomingProjectiles)
 	{
 		UStaticMeshComponent* ProjectileMeshComponent = Element.Key;
-		FProjectilePackage* ProjectileData = &Element.Value;
-		const float DistanceToTravel = DeltaSeconds * ProjectileData->Speed * 100;
+		FHomingProjectilePackage* ProjectileData = &Element.Value;
+		
+		const float DistanceToTravel = DeltaSeconds * ProjectileData->ProjectileSpeed * 100;
 
+		// If the enemy is valid, rotate toward it
 		if (IsValid(ProjectileData->TargetEnemy))
 		{
-			FVector ForwardVector = ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation();
-			ProjectileData->ForwardVector = ForwardVector.GetSafeNormal();
+			// Get the current rotation of the mesh
+			const FRotator CurrentRotation = ProjectileMeshComponent->GetComponentRotation();
+
+			// Calculate the direction vector from the mesh to the target point
+			const FVector Direction = (ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation()).GetSafeNormal();
+
+			// Convert the direction vector into a rotation
+			const FRotator TargetRotation = Direction.Rotation();
+
+			// Interpolate between the current rotation and the target rotation
+			const FRotator NewRotation = FMath::RInterpTo(CurrentRotation, TargetRotation, DeltaSeconds, ProjectileData->ProjectileRotationSpeed);
 			
-			ProjectileMeshComponent->SetWorldRotation((ProjectileData->TargetEnemy->TargetPoint->GetComponentLocation() - ProjectileMeshComponent->GetComponentLocation()).Rotation());
-		} else
-		{
-			ProjectileData->ForwardVector = ProjectileMeshComponent->GetComponentRotation().Vector();
+			// Set the new rotation to the mesh
+			ProjectileMeshComponent->SetWorldRotation(NewRotation);
 		}
 
-		const FVector TargetLoc = ProjectileMeshComponent->GetComponentLocation() + (ProjectileData->ForwardVector * DistanceToTravel);
+		const FVector TargetLocation = ProjectileMeshComponent->GetComponentLocation() + (ProjectileMeshComponent->GetForwardVector() * DistanceToTravel);
 
-		ProjectileMeshComponent->SetWorldLocation(TargetLoc, false);
+		ProjectileMeshComponent->SetWorldLocation(TargetLocation, false);
 
-		// Despawn projectile if the elapsed time has passed
-		if (CurrentWorldSeconds - ProjectileData->WorldTimeSeconds > 10)
+		// Despawn projectile if the elapsed time has passed or if it is significantly below the world
+		if (CurrentWorldSeconds - ProjectileData->StartLaunchTime > 20 || ProjectileMeshComponent->GetComponentLocation().Z < -10)
+		{
+			ProjectilesToRelease.Push(Element.Key);
+		}
+	}
+
+	// Process movement of arcing projectiles
+	for (TTuple<UStaticMeshComponent*, FArcProjectilePackage> Element : ActiveArcProjectiles)
+	{
+		UStaticMeshComponent* ProjectileMeshComponent = Element.Key;
+		FArcProjectilePackage* ProjectileData = &Element.Value;
+		
+		const double TimeSinceLaunch = GetWorld()->TimeSeconds - ProjectileData->StartLaunchTime;
+		const double T = TimeSinceLaunch / static_cast<double>(ProjectileData->StartToEndTravelSeconds);
+
+		const FVector StartToCentrePoint = FMath::Lerp(ProjectileData->StartControlPoint, ProjectileData->CentreControlPoint, T);
+		const FVector CentreToEndPoint = FMath::Lerp(ProjectileData->CentreControlPoint, ProjectileData->EndControlPoint, T);
+		const FVector BezierPoint = FMath::Lerp(StartToCentrePoint, CentreToEndPoint, T);
+
+		// Set the new rotation to the mesh
+		// Calculate the direction vector from the mesh to the target point
+		FVector Direction = (CentreToEndPoint - BezierPoint).GetSafeNormal();
+		
+		if (T > 1)
+		{
+			// If T is beyond the target, the CentreToEndPoint will be behind the projectile, so must point backwards
+			Direction = -Direction;
+		}
+		const FRotator TargetRotation = Direction.Rotation();
+		ProjectileMeshComponent->SetWorldRotation(TargetRotation);
+		
+		ProjectileMeshComponent->SetWorldLocation(BezierPoint, false);
+		
+		// Despawn projectile if the elapsed time has passed or if it is significantly below the world
+		if (CurrentWorldSeconds - ProjectileData->StartLaunchTime > 20 || ProjectileMeshComponent->GetComponentLocation().Z < -10)
 		{
 			ProjectilesToRelease.Push(Element.Key);
 		}
@@ -65,71 +109,158 @@ void AProjectileManager::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AProjectileManager::OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+void AProjectileManager::HomingProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
 	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult)
 {
-	// Check if the overlapped actor was an enemy. Cancel if not an enemy
 	UStaticMeshComponent* ProjectileMesh = Cast<UStaticMeshComponent>(OverlappedComponent);
-	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
-	if (!ProjectileMesh || !Enemy) { return; }
-
-	// Make the NexusBuilding immune to damage from the projectile
-	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-	TArray<AActor*> IgnoredActors;
-	IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
-
-	// Find the relevant damage package associated with this projectile
-	const FProjectilePackage* ProjectilePackage = &ActiveProjectiles[ProjectileMesh];
-
-	// Apply radial damage if there is an ExplosionRadius, otherwise just apply point damage
-	if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
-	{
-		float DamageApplied = UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
-
-		if (ProjectilePackage->ResponsibleSource->Implements<UProjectileCallbackInterface>())
-		{
-			IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ProjectilePackage->ResponsibleSource, Enemy, DamageApplied, HitResult);
-		}
-		
-	} else
-	{
-		UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
-	}
-
-	// If a particle system is present, spawn the particle system
-	if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->DamagePackage.OnHitParticleSystem)
-	{
-		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
-	}
+	if (!ProjectileMesh) { return; }
 	
-	// Mark projectile to be cleaned
-	// This must be done at the end of the frame instead of as soon as the overlap event is made, to ensure that it does not break the array loop in Tick()
-	ProjectilesToRelease.Add(ProjectileMesh);
+	// Process hit if the target was an enemy
+	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
+	{
+		// Find the relevant projectile package associated with this projectile
+		const FHomingProjectilePackage* ProjectilePackage = &ActiveHomingProjectiles[ProjectileMesh];
+
+		// Apply single-target damage if there is no explosion radius  
+		if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
+		{
+			const float DamageApplied = UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+
+			// Apply callback function if relevant
+			if (ProjectilePackage->ResponsibleSource->Implements<UProjectileCallbackInterface>())
+			{
+				IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ProjectilePackage->ResponsibleSource, Enemy, DamageApplied, HitResult);
+			}
+		} else
+		{
+			// Ensure the NexusBuilding immune to damage from the projectile
+			const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+			TArray<AActor*> IgnoredActors;
+			IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
+			
+			UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
+		}
+
+		// If a particle system is present, spawn the particle system
+		if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->OnHitParticleSystem)
+		{
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
+		}
+	
+		// Mark projectile to be cleaned
+		// This must be done at the end of the frame instead of as soon as the overlap event is made, to ensure that it does not break the array loop in Tick()
+		ProjectilesToRelease.Add(ProjectileMesh);
+	}
 }
 
-UStaticMeshComponent* AProjectileManager::FireProjectile(const FProjectileDamagePackage DamagePackage, UObject* ResponsibleSource, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh)
+void AProjectileManager::ArcProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult)
 {
-	const FProjectilePackage ProjectilePackage = FProjectilePackage(DamagePackage, ResponsibleSource, Start, TargetEnemy, Speed, GetWorld()->GetTimeSeconds());
+	UStaticMeshComponent* ProjectileMesh = Cast<UStaticMeshComponent>(OverlappedComponent);
+	if (!ProjectileMesh) { return; }
+	
+	// Process hit if the target was an enemy
+	if (AEnemy* Enemy = Cast<AEnemy>(OtherActor))
+	{
+		// Find the relevant projectile package associated with this projectile
+		const FArcProjectilePackage* ProjectilePackage = &ActiveArcProjectiles[ProjectileMesh];
+
+		// Apply single-target damage if there is no explosion radius  
+		if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
+		{
+			const float DamageApplied = UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
+
+			// Apply callback function if relevant
+			if (ProjectilePackage->ResponsibleSource->Implements<UProjectileCallbackInterface>())
+			{
+				IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ProjectilePackage->ResponsibleSource, Enemy, DamageApplied, HitResult);
+			}
+		} else
+		{
+			// Ensure the NexusBuilding immune to damage from the projectile
+			const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+			TArray<AActor*> IgnoredActors;
+			IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
+			
+			UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
+		}
+
+		// If a particle system is present, spawn the particle system
+		if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->OnHitParticleSystem)
+		{
+			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
+		}
+	
+		// Mark projectile to be cleaned
+		// This must be done at the end of the frame instead of as soon as the overlap event is made, to ensure that it does not break the array loop in Tick()
+		ProjectilesToRelease.Add(ProjectileMesh);
+	}
+}
+
+UStaticMeshComponent* AProjectileManager::LaunchHomingProjectile(const FVector& StartPoint, const AEnemy* TargetEnemy, UStaticMesh* Mesh,
+                                                                 const float ProjectileSpeed, const float ProjectileRotationSpeed, const int32 MaxHits, const FProjectileDamagePackage DamagePackage,
+                                                                 UObject* ResponsibleSource, UNiagaraSystem* OnHitParticleSystem, UNiagaraSystem* FlightParticleSystem)
+{
+	// Create a ProjectilePackage 
+	const FHomingProjectilePackage ProjectilePackage{
+		StartPoint,
+		TargetEnemy,
+		ProjectileSpeed,
+		ProjectileRotationSpeed,
+		GetWorld()->GetTimeSeconds(),
+		MaxHits,
+		DamagePackage,
+		ResponsibleSource,
+		OnHitParticleSystem,
+		FlightParticleSystem};
 
 	// Get a MeshComponent to use from the pool
-	UStaticMeshComponent* ProjectileMeshComponent = AcquireProjectile(ProjectilePackage);
+	UStaticMeshComponent* MeshComponent = AcquireProjectile(ProjectilePackage);
 
-	ProjectileMeshComponent->SetWorldLocation(Start);
-	ProjectileMeshComponent->SetWorldRotation((TargetEnemy->GetActorLocation()-Start).Rotation());
+	MeshComponent->SetStaticMesh(Mesh);
+
+	MeshComponent->SetWorldLocation(StartPoint);
+	MeshComponent->SetWorldRotation((TargetEnemy->GetActorLocation()-StartPoint).Rotation());
 	
-	// Set the projectile mesh
-	ProjectileMeshComponent->SetStaticMesh(ProjectileMesh);
+	MeshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectileManager::HomingProjectileOverlapBegin);
 	
-	ProjectileMeshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectileManager::OverlapBegin);
-	
-	return ProjectileMeshComponent;
-	
+	return MeshComponent;
 }
 
-UStaticMeshComponent* AProjectileManager::AcquireProjectile(const FProjectilePackage& ProjectilePackage)
+UStaticMeshComponent* AProjectileManager::LaunchArcProjectile(const FVector& StartControlPoint, const FVector& CentreControlPoint,
+                                                              const FVector& EndControlPoint, UStaticMesh* Mesh, const float StartToEndTravelTime, const FProjectileDamagePackage DamagePackage,
+                                                              UObject* ResponsibleSource, UNiagaraSystem* OnHitParticleSystem, UNiagaraSystem* FlightParticleSystem)
+{
+	// Create a ProjectilePackage 
+	FArcProjectilePackage ProjectilePackage{
+		StartControlPoint,
+		CentreControlPoint,
+		EndControlPoint,
+		StartToEndTravelTime,
+		GetWorld()->GetTimeSeconds(),
+		DamagePackage,
+		ResponsibleSource,
+		OnHitParticleSystem,
+		FlightParticleSystem};
+
+	// Get a MeshComponent to use from the pool
+	UStaticMeshComponent* MeshComponent = AcquireProjectile(ProjectilePackage);
+
+	MeshComponent->SetStaticMesh(Mesh);
+	
+	MeshComponent->SetWorldLocation(StartControlPoint);
+	MeshComponent->OnComponentBeginOverlap.AddUniqueDynamic(this, &AProjectileManager::ArcProjectileOverlapBegin);
+	
+	return MeshComponent;
+}
+
+
+
+UStaticMeshComponent* AProjectileManager::AcquireProjectile(const FHomingProjectilePackage& ProjectilePackage)
 {
 	UStaticMeshComponent* Projectile;
-	
+
+	// If there is an available projectile, take it. Otherwise, create a new one.
 	if (AvailableProjectiles.Num() != 0)
 	{
 		Projectile = AvailableProjectiles.Pop();
@@ -143,8 +274,34 @@ UStaticMeshComponent* AProjectileManager::AcquireProjectile(const FProjectilePac
 		Projectile->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
 		Projectile->bHiddenInGame = false;
 	}
-	
-	ActiveProjectiles.Add(Projectile, ProjectilePackage);
+
+	// Add the projectile to the relevant data array
+	ActiveHomingProjectiles.Add(Projectile, ProjectilePackage);
+
+	return Projectile;
+}
+
+UStaticMeshComponent* AProjectileManager::AcquireProjectile(const FArcProjectilePackage& ProjectilePackage)
+{
+	UStaticMeshComponent* Projectile;
+
+	// If there is an available projectile, take it. Otherwise, create a new one.
+	if (AvailableProjectiles.Num() != 0)
+	{
+		Projectile = AvailableProjectiles.Pop();
+	} else
+	{
+		Projectile = Cast<UStaticMeshComponent>(AddComponentByClass(UStaticMeshComponent::StaticClass(), true, GetTransform(), false));
+		Projectile->AttachToComponent(GetRootComponent(), FAttachmentTransformRules::SnapToTargetNotIncludingScale);
+		Projectile->SetMobility(EComponentMobility::Movable);
+		Projectile->SetCollisionResponseToAllChannels(ECR_Ignore);
+		Projectile->SetCollisionObjectType(ECC_GameTraceChannel4);
+		Projectile->SetCollisionResponseToChannel(ECC_GameTraceChannel2, ECR_Overlap);
+		Projectile->bHiddenInGame = false;
+	}
+
+	// Add the projectile to the relevant data array
+	ActiveArcProjectiles.Add(Projectile, ProjectilePackage);
 
 	return Projectile;
 }
@@ -152,11 +309,14 @@ UStaticMeshComponent* AProjectileManager::AcquireProjectile(const FProjectilePac
 void AProjectileManager::ReleaseProjectile(UStaticMeshComponent* Projectile)
 {
 	CleanProjectile(Projectile);
+
+	ActiveHomingProjectiles.Remove(Projectile);
+	ActiveArcProjectiles.Remove(Projectile);
+	
 	AvailableProjectiles.Add(Projectile);
-	ActiveProjectiles.Remove(Projectile);
 }
 
-void AProjectileManager::CleanProjectile(UStaticMeshComponent* Projectile)
+void AProjectileManager::CleanProjectile(UStaticMeshComponent* Projectile) const
 {
 	Projectile->SetStaticMesh(nullptr);
 	Projectile->OnComponentBeginOverlap.RemoveAll(this);

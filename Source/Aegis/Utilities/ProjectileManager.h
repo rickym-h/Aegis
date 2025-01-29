@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "NiagaraSystem.h"
+#include "Aegis/Enemies/Enemy.h"
 #include "ProjectileManager.generated.h"
 
 class AEnemy;
@@ -13,68 +14,71 @@ struct FProjectileDamagePackage
 {
 	GENERATED_BODY()
 
-	FProjectileDamagePackage()
-	{
-		this->PhysicalDamage = 0;
-		this->ExplosionRadius = 0;
-		this->OnHitParticleSystem = nullptr;
-	}
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
-	float PhysicalDamage;
-
+	float PhysicalDamage = 0.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
-	float ExplosionRadius;
-
-	UPROPERTY(EditAnywhere, Category = "Firing")
-	UNiagaraSystem* OnHitParticleSystem;
+	float MagicDamage = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
+	float TrueDamage = 0.f;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Damage")
+	float ExplosionRadius = 0.f;
 };
 
 USTRUCT(Blueprintable)
-struct FProjectilePackage
+struct FHomingProjectilePackage
 {
-	FProjectilePackage()
-	{
-		DamagePackage = FProjectileDamagePackage();
-		ResponsibleSource = nullptr;
-		StartPoint = FVector::ZeroVector;
-		ForwardVector = FVector::ZeroVector;
-		TargetEnemy = nullptr;
-		Speed = 0;
-		WorldTimeSeconds = 0;
-	}
-	
-	FProjectilePackage(const FProjectileDamagePackage& InDamagePackage, UObject* InResponsibleSource, const FVector& InStartPoint, const AEnemy* InTargetEnemy, const float InSpeed, const int InWorldTimeSeconds)
-	{
-		DamagePackage = InDamagePackage;
-		ResponsibleSource = InResponsibleSource;
-		StartPoint = InStartPoint;
-		ForwardVector = FVector::ZeroVector;
-		TargetEnemy = InTargetEnemy;
-		Speed = InSpeed;
-		WorldTimeSeconds = InWorldTimeSeconds;
-	}
-
 	GENERATED_BODY()
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	FProjectileDamagePackage DamagePackage;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	UObject* ResponsibleSource; 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	FVector StartPoint;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	const AEnemy* TargetEnemy;
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	float Speed;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	FVector StartPoint = FVector::ZeroVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	const AEnemy* TargetEnemy = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	float ProjectileSpeed = 0.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	float ProjectileRotationSpeed = 0.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	double StartLaunchTime = 0.;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	FVector ForwardVector;
-
+	int32 MaxHits = 0;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
-	int32 WorldTimeSeconds;
+	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	UObject* ResponsibleSource = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Particles")
+	UNiagaraSystem* OnHitParticleSystem = nullptr; 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Particles")
+	UNiagaraSystem* FlightParticleSystem = nullptr; 
+};
+
+USTRUCT(Blueprintable)
+struct FArcProjectilePackage
+{
+	GENERATED_BODY()
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	FVector StartControlPoint = FVector::ZeroVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	FVector CentreControlPoint = FVector::ZeroVector;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	FVector EndControlPoint = FVector::ZeroVector;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	float StartToEndTravelSeconds = 0.f;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Trajectory")
+	double StartLaunchTime = 0.;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Data")
+	UObject* ResponsibleSource = nullptr;
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Particles")
+	UNiagaraSystem* OnHitParticleSystem = nullptr;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectile Particles")
+	UNiagaraSystem* FlightParticleSystem = nullptr; 
 };
 
 /**
@@ -91,27 +95,50 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
-
-	UFUNCTION()
-	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);
-	UStaticMeshComponent* FireProjectile(const FProjectileDamagePackage DamagePackage, UObject* ResponsibleSource, const FVector& Start, const AEnemy* TargetEnemy, const float Speed, UStaticMesh* ProjectileMesh);
-
+	
+	UStaticMeshComponent* LaunchHomingProjectile(
+		const FVector& StartPoint,
+		const AEnemy* TargetEnemy,
+		UStaticMesh* Mesh,
+		const float ProjectileSpeed,
+		const float ProjectileRotationSpeed,
+		const int32 MaxHits,
+		const FProjectileDamagePackage DamagePackage,
+		UObject* ResponsibleSource,
+		UNiagaraSystem* OnHitParticleSystem, UNiagaraSystem* FlightParticleSystem);
+	
+	UStaticMeshComponent* LaunchArcProjectile(
+		const FVector& StartControlPoint,
+		const FVector& CentreControlPoint,
+		const FVector& EndControlPoint,
+		UStaticMesh* Mesh,
+		const float StartToEndTravelTime,
+		const FProjectileDamagePackage DamagePackage,
+		UObject* ResponsibleSource,
+		UNiagaraSystem* OnHitParticleSystem, UNiagaraSystem* FlightParticleSystem);
+	
 protected:
-	UStaticMeshComponent* AcquireProjectile(const FProjectilePackage& ProjectilePackage);
+	UStaticMeshComponent* AcquireProjectile(const FHomingProjectilePackage& ProjectilePackage);
+	UStaticMeshComponent* AcquireProjectile(const FArcProjectilePackage& ProjectilePackage);
 
 	void ReleaseProjectile(UStaticMeshComponent* Projectile);
-
-	void CleanProjectile(UStaticMeshComponent* Projectile);
+	void CleanProjectile(UStaticMeshComponent* Projectile) const;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectiles")
 	TArray<UStaticMeshComponent*> AvailableProjectiles;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectiles")
-	TMap<UStaticMeshComponent*, FProjectilePackage> ActiveProjectiles;
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Projectiles")
 	TArray<UStaticMeshComponent*> ProjectilesToRelease;
-
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Active Projectiles")
+	TMap<UStaticMeshComponent*, FHomingProjectilePackage> ActiveHomingProjectiles;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Active Projectiles")
+	TMap<UStaticMeshComponent*, FArcProjectilePackage> ActiveArcProjectiles;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Root")
 	USceneComponent* SceneRootComponent;
+
+	UFUNCTION()
+	void HomingProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);
+	UFUNCTION()
+	void ArcProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);
 };

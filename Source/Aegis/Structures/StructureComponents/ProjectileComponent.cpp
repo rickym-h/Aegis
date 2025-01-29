@@ -23,55 +23,56 @@ void UProjectileComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
-	
+	GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+	if (!GameState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::BeginPlay - GameState not found!!"))
+	}
 }
 
-void UProjectileComponent::FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy,
-	const float ProjectileSpeed, UStaticMesh* ProjectileMesh) const
+void UProjectileComponent::FireArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
 {
-	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
-	
 	if (!GameState)
 	{
 		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
 		return;
 	}
 	
-	GameState->ProjectileManager->FireProjectile(DamagePackage, Cast<AStructure>(GetOwner()), StartPoint, Enemy, ProjectileSpeed, ProjectileMesh);
-}
-
-void UProjectileComponent::FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
-{
-	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
-	
-	if (!GameState)
-	{
-		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
-		return;
-	}
-
 	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
 	DamagePackage.PhysicalDamage = Damage;
 
 	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
-	GameState->ProjectileManager->FireProjectile(DamagePackage, Cast<AStructure>(GetOwner()), StartPoint, Enemy, 10, ArrowMesh);
-}
 
-void UProjectileComponent::FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius) const
-{
-	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(Enemy->GetWorld()->GetGameState());
+	const FVector EndControlPoint = Enemy->TargetPoint->GetComponentLocation();
+	FVector CentreControlPoint = (StartPoint + EndControlPoint)/2;
+	CentreControlPoint.Z = StartPoint.Z + 50 + ((FVector::DistXY(StartPoint, EndControlPoint)/10.f));
 	
-	if (!GameState)
+	float ApproximateBezierLength = 0;
+	FVector PreviousBezierPoint = StartPoint;
+	for (int i = 1; i < 25; i++)
 	{
-		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
-		return;
+		float T = 1.f/static_cast<float>(i);
+		const FVector StartToCentrePoint = FMath::Lerp(StartPoint, CentreControlPoint, T);
+		const FVector CentreToEndPoint = FMath::Lerp(CentreControlPoint, EndControlPoint, T);
+		const FVector BezierPoint = FMath::Lerp(StartToCentrePoint, CentreToEndPoint, T);
+
+		ApproximateBezierLength += FVector::Dist(PreviousBezierPoint, BezierPoint);
+
+		PreviousBezierPoint = BezierPoint;
 	}
+	ApproximateBezierLength /= 100; // Convert bezier length in cm to m.
 
-	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
-	DamagePackage.PhysicalDamage = Damage;
-	DamagePackage.ExplosionRadius = ExplosionRadius;
-
-	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
-	GameState->ProjectileManager->FireProjectile(DamagePackage, Cast<AStructure>(GetOwner()), StartPoint, Enemy, 10, ArrowMesh);
+	constexpr float ProjectileSpeed = 20.f;
+	const float StartToEndTime = ApproximateBezierLength / ProjectileSpeed;
+	
+	GameState->ProjectileManager->LaunchArcProjectile(
+		StartPoint,
+		CentreControlPoint,
+		EndControlPoint,
+		ArrowMesh,
+		StartToEndTime,
+		DamagePackage,
+		GetOwner(),
+		nullptr, nullptr
+	);
 }

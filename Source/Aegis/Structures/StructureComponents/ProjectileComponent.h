@@ -22,15 +22,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	AAegisGameStateBase* GameState;
+
 public:
-
 	UFUNCTION()
-	void FireCustomProjectile(const FProjectileDamagePackage& DamagePackage, const FVector& StartPoint, const AEnemy* Enemy, const float ProjectileSpeed, UStaticMesh* ProjectileMesh) const;
-
-	UFUNCTION()
-	void FireArrowAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
-	
-	UFUNCTION()
-	void FireBombProjectileAtEnemy(const FVector& StartPoint, const AEnemy* Enemy, const float Damage, const float ExplosionRadius) const;
-		
+	void FireArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
 };

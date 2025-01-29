@@ -47,7 +47,7 @@ void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
 		
 		bShotAvailable = false;
-		ProjectileComponent->FireCustomProjectile(ProjectileDamagePackage, SourcePoint->GetComponentLocation(), Enemy, 10, ProjectileMesh);
+		ProjectileComponent->FireArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
 
 		GetWorld()->GetTimerManager().SetTimer(
 			ReloadTimerHandle, // handle to cancel timer at a later time
