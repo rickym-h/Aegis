@@ -5,8 +5,8 @@
 #include "CoreMinimal.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
-#include "Aegis/Cards/Interfaces/RangeInterface.h"
 #include "Aegis/Cards/Interfaces/TileRangeInterface.h"
+#include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTowerCard.generated.h"
 
@@ -19,18 +19,20 @@ class AEGIS_API UProjectileTowerCard : public UStructureCard, public IPlayableCa
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
-	FProjectileDamagePackage ProjectileDamagePackage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Details")
+	TEnumAsByte<EProjectileType>  ProjectileType = EProjectileType::Arrow;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details|Custom Projectile", meta=(EditCondition="ProjectileType==EProjectileType::CustomProjectile", EditConditionHides))
+	FProjectileDamagePackage ProjectileDamagePackage;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details|Custom Projectile", meta=(EditCondition="ProjectileType==EProjectileType::CustomProjectile", EditConditionHides))
+	UStaticMesh* ProjectileMesh;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details")
 	float AttackSpeed = 0.f;
+	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
 	int32 RangeTiles = 0;
-	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
-	UStaticMesh* ProjectileMesh;
-	
 
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;

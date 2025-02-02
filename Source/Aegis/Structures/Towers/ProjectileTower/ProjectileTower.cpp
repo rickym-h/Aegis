@@ -16,13 +16,14 @@ AProjectileTower::AProjectileTower()
 	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("Projectile Component");
 }
 
-void AProjectileTower::InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed,
-	const int32 InRangeTiles, UStaticMesh* InProjectileMesh)
+void AProjectileTower::InitProjectileTower(const EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage,
+                                           UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles)
 {
 	if (InAttackSpeed < 0 || InRangeTiles < 0)
 	{
 		return;
 	}
+	this->ProjectileType = InProjectileType;
 	this->ProjectileDamagePackage = InProjectileDamagePackage;
 	this->AttackSpeed = InAttackSpeed;	
 	this->ProjectileMesh = InProjectileMesh;
@@ -47,7 +48,24 @@ void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
 		
 		bShotAvailable = false;
-		ProjectileComponent->FireArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
+		switch (ProjectileType)
+		{
+		case EProjectileType::Arrow:
+			ProjectileComponent->FireArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
+			break;
+		case EProjectileType::RunicSpark:
+			ProjectileComponent->FireRunicSpark(SourcePoint->GetComponentLocation(), Enemy, 1);
+			break;
+		case EProjectileType::CustomArcProjectile:
+			UE_LOG(LogTemp, Warning, TEXT("Firing Custom Arc Projectile"))
+			break;
+		case EProjectileType::CustomHomingProjectile:
+			UE_LOG(LogTemp, Warning, TEXT("Firing Custom Homing Projectile"))
+			break;
+		default:
+			break;
+		}
+		
 
 		GetWorld()->GetTimerManager().SetTimer(
 			ReloadTimerHandle, // handle to cancel timer at a later time

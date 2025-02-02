@@ -9,6 +9,16 @@
 #include "ProjectileComponent.generated.h"
 
 
+UENUM()
+enum EProjectileType
+{
+	Arrow UMETA(DisplayName = "Arrow"),
+	RunicSpark UMETA(DisplayName = "Runic Spark"),
+	CustomArcProjectile UMETA(DisplayName = "Custom Arc Projectile"),
+	CustomHomingProjectile UMETA(DisplayName = "Custom Homing Projectile"),
+};
+
+
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class AEGIS_API UProjectileComponent : public UActorComponent
 {
@@ -28,4 +38,9 @@ protected:
 public:
 	UFUNCTION()
 	void FireArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
+	UFUNCTION()
+	void FireRunicSpark(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
+	UFUNCTION()
+	void FireCustomArcProjectile(const FVector& StartPoint, const FVector& CentreControlPoint, const FVector& EndPoint, const FProjectileDamagePackage DamagePackage, float
+	                             ProjectileSpeed, UStaticMesh* ProjectileMesh) const;
 };

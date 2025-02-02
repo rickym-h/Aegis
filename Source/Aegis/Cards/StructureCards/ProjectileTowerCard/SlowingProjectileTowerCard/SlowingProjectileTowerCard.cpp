@@ -24,7 +24,7 @@ bool USlowingProjectileTowerCard::PlayCard_Implementation(const FTileCoord& Loca
 	// Set structure data (e.g. tower stats)
 	if (ASlowingProjectileTower* SlowingProjectileTower = Cast<ASlowingProjectileTower>(Structure))
 	{
-		SlowingProjectileTower->InitSlowingProjectileTower(ProjectileDamagePackage, AttackSpeed, RangeTiles, ProjectileMesh, EffectToApply);
+		SlowingProjectileTower->InitSlowingProjectileTower(ProjectileType, ProjectileDamagePackage, AttackSpeed, RangeTiles, ProjectileMesh, EffectToApply);
 	} else
 	{
 		UE_LOG(LogTemp, Error, TEXT("USlowingProjectileTowerCard::PlayCard_Implementation - Structure not projectile tower! Failed to InitSlowingProjectileTower()"))

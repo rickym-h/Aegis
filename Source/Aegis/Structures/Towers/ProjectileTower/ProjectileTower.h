@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Aegis/Utilities/ProjectileManager.h"
+#include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
 #include "ProjectileTower.generated.h"
 
 class UTileRangeComponent;
@@ -19,7 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileTower();
 
-	void InitProjectileTower(const FProjectileDamagePackage InProjectileDamagePackage, const float InAttackSpeed, const int32 InRangeTiles, UStaticMesh* InProjectileMesh);
+	void InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage, UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles);
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,13 +31,16 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UProjectileComponent* ProjectileComponent;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
+	TEnumAsByte<EProjectileType>  ProjectileType;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
 	UStaticMesh* ProjectileMesh;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
 	FProjectileDamagePackage ProjectileDamagePackage;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Tower Data")
+
+	
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
 	float AttackSpeed = 0.f;
 	
 	UFUNCTION()
