@@ -29,7 +29,7 @@ APlayerPawn::APlayerPawn()
 	RootComponent = FocusPoint;
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>("Spring Arm");
 	SpringArm->SetupAttachment(RootComponent);
-	BoomArmTargetLength = 2000;
+	BoomArmTargetLength = 75000;
 	Camera = CreateDefaultSubobject<UCameraComponent>("Camera");
 	Camera->SetupAttachment(SpringArm);
 
@@ -213,8 +213,10 @@ void APlayerPawn::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	// Handle camera movement
-	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 300, 10000), GetWorld()->DeltaRealTimeSeconds, 10);
+	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 30000, 90000), GetWorld()->DeltaRealTimeSeconds, 10);
 
+	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::Tick - SpringArm->TargetArmLength: %f"), SpringArm->TargetArmLength)
+	
 	if (SelectedCard)
 	{
 		// If structure card, update hologram positions
@@ -260,11 +262,12 @@ void APlayerPawn::Tick(float DeltaTime)
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
 	// Get the target zoom location
-	BoomArmTargetLength += InputActionValue.Get<FVector>().Z * 1000;
-	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 0, 4000);
+	BoomArmTargetLength += InputActionValue.Get<FVector>().Z * 5000;
+	BoomArmTargetLength = FMath::Clamp(BoomArmTargetLength, 30000, 90000);
 
-	MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
-	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 4;
+	//MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
+	MovementComponent->MaxSpeed = 0.1 * SpringArm->TargetArmLength;
+	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 7;
 	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
 
 	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 1.01));
