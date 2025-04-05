@@ -215,7 +215,7 @@ void APlayerPawn::Tick(float DeltaTime)
 	// Handle camera movement
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, FMath::Clamp(BoomArmTargetLength, 30000, 90000), GetWorld()->DeltaRealTimeSeconds, 10);
 
-	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::Tick - SpringArm->TargetArmLength: %f"), SpringArm->TargetArmLength)
+	//UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::Tick - SpringArm->TargetArmLength: %f"), SpringArm->TargetArmLength)
 	
 	if (SelectedCard)
 	{
