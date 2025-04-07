@@ -129,6 +129,11 @@ float UWorldMapBlueprintFunctionLibrary::GetAngleBetweenTwoPoints(const FVector2
 	return FMath::Atan2(Destination.Y - Origin.Y, Destination.X - Origin.X);
 }
 
+bool UWorldMapBlueprintFunctionLibrary::AreCoordinatesEqual(const FMapNodeCoordinate A, const FMapNodeCoordinate B)
+{
+	return A == B;
+}
+
 FWorldMapData UWorldMapBlueprintFunctionLibrary::CreatePrototypeWorldMapData()
 {
 	// Simple static map for now

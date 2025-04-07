@@ -179,6 +179,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	static float GetAngleBetweenTwoPoints(const FVector2D Origin, const FVector2D Destination);
 
+	UFUNCTION(BlueprintPure)
+	static bool AreCoordinatesEqual(const FMapNodeCoordinate A, const FMapNodeCoordinate B);
+
 private:
 	static FWorldMapData CreatePrototypeWorldMapData();
 
