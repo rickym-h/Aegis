@@ -182,6 +182,9 @@ public:
 	UFUNCTION(BlueprintPure)
 	static bool AreCoordinatesEqual(const FMapNodeCoordinate A, const FMapNodeCoordinate B);
 
+	UFUNCTION(BlueprintPure)
+	static bool HasCoordinateBeenExplored(const FWorldMapData& MapData, const FMapNodeCoordinate Coord);
+
 private:
 	static FWorldMapData CreatePrototypeWorldMapData();
 

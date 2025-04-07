@@ -134,6 +134,18 @@ bool UWorldMapBlueprintFunctionLibrary::AreCoordinatesEqual(const FMapNodeCoordi
 	return A == B;
 }
 
+bool UWorldMapBlueprintFunctionLibrary::HasCoordinateBeenExplored(const FWorldMapData& MapData, const FMapNodeCoordinate Coord)
+{
+	for (auto ExploredNode : MapData.ExploredNodes)
+	{
+		if (ExploredNode.NodeCoordinate == Coord)
+		{
+			return true;
+		}
+	}
+	return false;
+}
+
 FWorldMapData UWorldMapBlueprintFunctionLibrary::CreatePrototypeWorldMapData()
 {
 	// Simple static map for now
