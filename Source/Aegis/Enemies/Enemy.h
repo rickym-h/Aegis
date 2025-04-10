@@ -41,6 +41,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
+	USceneComponent* FloorLevel;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
 	UCapsuleComponent* CollisionCapsuleComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UPaperFlipbookComponent* FlipbookComponent;

@@ -19,12 +19,16 @@ AEnemy::AEnemy()
 	PrimaryActorTick.bCanEverTick = true;
 
 	RootComponent = CreateDefaultSubobject<USceneComponent>("Root Scene Component");
+
+	FloorLevel = CreateDefaultSubobject<USceneComponent>("Floor Level");
+	FloorLevel->SetupAttachment(RootComponent);
+	FloorLevel->SetRelativeLocation(FVector(0, 0, 37.5));
 	
 	CollisionCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
 	CollisionCapsuleComponent->SetupAttachment(RootComponent);
 
 	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("Paper Flipbook");
-	FlipbookComponent->SetupAttachment(RootComponent);
+	FlipbookComponent->SetupAttachment(FloorLevel);
 	FlipbookComponent->SetUsingAbsoluteRotation(true);
 
 	FlipbookComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
