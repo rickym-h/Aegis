@@ -7,6 +7,7 @@
 #include "GameFramework/Pawn.h"
 #include "Enemy.generated.h"
 
+class UPaperFlipbookComponent;
 class UStatusEffectComponent;
 class UCapsuleComponent;
 class USphereComponent;
@@ -39,10 +40,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Mesh")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Components")
 	UCapsuleComponent* CollisionCapsuleComponent;
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Mesh")
-	UStaticMeshComponent* Mesh;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
+	UPaperFlipbookComponent* FlipbookComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UStatusEffectComponent* StatusEffectComponent;
 

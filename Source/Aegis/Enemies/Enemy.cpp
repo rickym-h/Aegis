@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 
+#include "PaperFlipbookComponent.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Map/MapTile.h"
@@ -22,10 +23,11 @@ AEnemy::AEnemy()
 	CollisionCapsuleComponent = CreateDefaultSubobject<UCapsuleComponent>("Collision Capsule");
 	CollisionCapsuleComponent->SetupAttachment(RootComponent);
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>("Mesh");
-	Mesh->SetupAttachment(RootComponent);
+	FlipbookComponent = CreateDefaultSubobject<UPaperFlipbookComponent>("Paper Flipbook");
+	FlipbookComponent->SetupAttachment(RootComponent);
+	FlipbookComponent->SetUsingAbsoluteRotation(true);
 
-	Mesh->SetCollisionResponseToAllChannels(ECR_Ignore);
+	FlipbookComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionCapsuleComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
 	CollisionCapsuleComponent->SetCollisionObjectType(ECC_GameTraceChannel2);
 	CollisionCapsuleComponent->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Overlap);
