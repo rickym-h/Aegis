@@ -60,8 +60,8 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Decals")
 	UDecalComponent* RangeIndicatorDecal;
 
-	int BoomArmTargetLength;
-
+	int32 TargetArmLevel;
+	
 	UFUNCTION()
 	void UpdateSelectedCard();
 	UPROPERTY()
