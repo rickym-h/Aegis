@@ -16,7 +16,7 @@ class AEGIS_API UCircleMathBlueprintLibrary : public UBlueprintFunctionLibrary
 
 public:
 	UFUNCTION(BlueprintPure, Category="Circle Math")
-	static FVector2D GetPointOnCircle(FVector2D Centre, float Radius, float Angle);
+	static FVector2D GetPointOnCircle(FVector2D Centre, float Radius, float Theta);
 	
 	UFUNCTION(BlueprintPure, Category="Circle Math")
 	static FVector2D GetCentreOfCircleFrom3Points(FVector2D A, FVector2D B, FVector2D C);

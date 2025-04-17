@@ -23,7 +23,7 @@ struct TPriorityQueueNode
 		Priority = InPriority;
 	}
 
-	bool operator<(const TPriorityQueueNode<InElementType> Other) const
+	bool operator<(const TPriorityQueueNode Other) const
 	{
 		return Priority < Other.Priority;
 	}

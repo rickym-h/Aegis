@@ -5,7 +5,7 @@
 
 FVector2D UCircleMathBlueprintLibrary::GetPointOnCircle(const FVector2D Centre, const float Radius, const float Theta)
 {
-	return FVector2D((Radius * FMath::Sin(Theta)) + Centre.X, (Radius * FMath::Cos(Theta)) + Centre.Y);
+	return FVector2D(Radius * FMath::Sin(Theta) + Centre.X, Radius * FMath::Cos(Theta) + Centre.Y);
 }
 
 FVector2D UCircleMathBlueprintLibrary::GetCentreOfCircleFrom3Points(const FVector2D A, const FVector2D B, const FVector2D C)
