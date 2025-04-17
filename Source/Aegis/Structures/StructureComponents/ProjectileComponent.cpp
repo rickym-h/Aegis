@@ -44,7 +44,7 @@ void UProjectileComponent::FireArrow(const FVector& StartPoint, const AEnemy* En
 
 	const FVector EndControlPoint = Enemy->TargetPoint->GetComponentLocation();
 	FVector CentreControlPoint = (StartPoint + EndControlPoint)/2;
-	CentreControlPoint.Z = StartPoint.Z + 50 + ((FVector::DistXY(StartPoint, EndControlPoint)/10.f));
+	CentreControlPoint.Z = StartPoint.Z + 30 + ((FVector::DistXY(StartPoint, EndControlPoint)/10.f));
 	
 	float ApproximateBezierLength = 0;
 	FVector PreviousBezierPoint = StartPoint;
@@ -61,7 +61,7 @@ void UProjectileComponent::FireArrow(const FVector& StartPoint, const AEnemy* En
 	}
 	ApproximateBezierLength /= 100; // Convert bezier length in cm to m.
 
-	constexpr float ProjectileSpeed = 20.f;
+	constexpr float ProjectileSpeed = 40.f;
 	const float StartToEndTime = ApproximateBezierLength / ProjectileSpeed;
 	
 	GameState->ProjectileManager->LaunchArcProjectile(
