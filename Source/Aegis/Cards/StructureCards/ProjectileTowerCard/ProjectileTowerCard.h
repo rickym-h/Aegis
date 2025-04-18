@@ -28,7 +28,7 @@ public:
 	UStaticMesh* ProjectileMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details")
-	float AttackSpeed = 0.f;
+	float AttackSpeed = 0.f; // Higher is faster
 	
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
