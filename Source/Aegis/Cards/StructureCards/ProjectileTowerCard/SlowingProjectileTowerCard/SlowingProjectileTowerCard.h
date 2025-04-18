@@ -10,7 +10,7 @@
 /**
  * 
  */
-UCLASS()
+UCLASS(HideDropdown)
 class AEGIS_API USlowingProjectileTowerCard : public UProjectileTowerCard
 {
 	GENERATED_BODY()
