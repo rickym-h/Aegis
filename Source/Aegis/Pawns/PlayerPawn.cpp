@@ -215,7 +215,8 @@ void APlayerPawn::Tick(float DeltaTime)
 	// Handle camera movement
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, TargetArmLevel*1000, GetWorld()->DeltaRealTimeSeconds, 10);
 
-	//UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::Tick - SpringArm->TargetArmLength: %f"), SpringArm->TargetArmLength)
+	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::Tick - SpringArm->TargetArmLength: %f"), SpringArm->TargetArmLength)
+	UE_LOG(LogTemp, Warning, TEXT("APlayerPawn::Tick - MovementComponent->MaxSpeed: %f"), MovementComponent->MaxSpeed)
 	
 	if (SelectedCard)
 	{
@@ -263,14 +264,14 @@ void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
 	// Get the target zoom location
 	TargetArmLevel += InputActionValue.Get<FVector>().Z;
-	TargetArmLevel = FMath::Max(TargetArmLevel, 1);
+	TargetArmLevel = FMath::Max(TargetArmLevel, 0);
 
 	//MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
-	MovementComponent->MaxSpeed = 1 * SpringArm->TargetArmLength;
+	MovementComponent->MaxSpeed = FMath::Max(1000, 1 * SpringArm->TargetArmLength);
 	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 7;
 	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
 
-	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 2));
+	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 2)+1);
 }
 
 // Called to bind functionality to input
