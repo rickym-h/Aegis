@@ -37,6 +37,21 @@ struct FEnemySpawnData
 	float PostSpawnDelay = 0.f;
 };
 
+USTRUCT(BlueprintType, meta=(ShowOnlyInnerProperties))
+struct FEnemyType
+{
+	GENERATED_BODY()
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AEnemy> EnemyClass;
+
+	UPROPERTY(EditAnywhere)
+	uint32 EnemyValue = 1;
+
+	UPROPERTY(EditAnywhere)
+	uint32 SelectionWeight = 1;
+};
+
 /**
  * 
  */
@@ -56,6 +71,9 @@ protected:
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
 	TSubclassOf<AEnemy> TestEnemyClass;
+	
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
+	TArray<FEnemyType> BasicEnemies;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="WaveEnemies")
 	TArray<FEnemySpawnData> EnemiesToSpawnInWave;

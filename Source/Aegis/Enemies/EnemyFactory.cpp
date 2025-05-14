@@ -31,14 +31,16 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLaye
 		return TArray<FEnemySpawnData>();
 	}
 
-	const int32 DifficultyScore = NightCounter * WaveCounter;
+	const int32 DifficultyScore = NightCounter * WaveCounter + 10;
+	int32 ScoreSoFar = 0;
 
-	// TODO Change to choose enemies from a random selection
-	const int32 EnemiesToSpawnCount = DifficultyScore;
-	for (int i = 0; i < EnemiesToSpawnCount; i++)
+	while (ScoreSoFar < DifficultyScore)
 	{
+		const auto EnemyType = BasicEnemies[FMath::RandRange(0, BasicEnemies.Num()-1)];
+		ScoreSoFar += EnemyType.SelectionWeight;
+
 		FEnemySpawnData SpawnData = FEnemySpawnData(
-			TestEnemyClass,
+			EnemyType.EnemyClass,
 			0.9f,
 			0.1f);
 
