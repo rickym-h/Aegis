@@ -34,6 +34,7 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLaye
 	const int32 DifficultyScore = NightCounter * WaveCounter + 10;
 	int32 ScoreSoFar = 0;
 
+	// Keep adding enemies to the wave until the difficulty score is reached
 	while (ScoreSoFar < DifficultyScore)
 	{
 		const auto EnemyType = BasicEnemies[FMath::RandRange(0, BasicEnemies.Num()-1)];
