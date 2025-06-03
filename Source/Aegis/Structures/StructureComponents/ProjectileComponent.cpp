@@ -29,7 +29,7 @@ void UProjectileComponent::BeginPlay()
 	}
 }
 
-void UProjectileComponent::FireArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
+void UProjectileComponent::FireArcArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
 {
 	if (!GameState)
 	{

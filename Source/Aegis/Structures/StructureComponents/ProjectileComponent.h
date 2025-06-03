@@ -12,7 +12,7 @@
 UENUM()
 enum EProjectileType
 {
-	Arrow UMETA(DisplayName = "Arrow"),
+	ArcArrow UMETA(DisplayName = "Arcing Arrow"),
 	RunicSpark UMETA(DisplayName = "Runic Spark"),
 	CustomArcProjectile UMETA(DisplayName = "Custom Arc Projectile"),
 	CustomHomingProjectile UMETA(DisplayName = "Custom Homing Projectile"),
@@ -37,7 +37,7 @@ protected:
 
 public:
 	UFUNCTION()
-	void FireArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
+	void FireArcArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
 	UFUNCTION()
 	void FireRunicSpark(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
 	UFUNCTION()

@@ -50,8 +50,8 @@ void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 		bShotAvailable = false;
 		switch (ProjectileType)
 		{
-		case EProjectileType::Arrow:
-			ProjectileComponent->FireArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
+		case EProjectileType::ArcArrow:
+			ProjectileComponent->FireArcArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
 			break;
 		case EProjectileType::RunicSpark:
 			ProjectileComponent->FireRunicSpark(SourcePoint->GetComponentLocation(), Enemy, 1);

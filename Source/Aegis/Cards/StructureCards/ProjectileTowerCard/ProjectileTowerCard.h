@@ -20,11 +20,11 @@ class AEGIS_API UProjectileTowerCard : public UStructureCard, public IPlayableCa
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Projectile Details")
-	TEnumAsByte<EProjectileType>  ProjectileType = EProjectileType::Arrow;
+	TEnumAsByte<EProjectileType>  ProjectileType = EProjectileType::ArcArrow;
 	
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details|Custom Projectile", meta=(EditCondition="ProjectileType==EProjectileType::CustomProjectile", EditConditionHides))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details|Custom Projectile", meta=(EditCondition="ProjectileType == EProjectileType::CustomArcProjectile || ProjectileType == EProjectileType::CustomHomingProjectile", EditConditionHides))
 	FProjectileDamagePackage ProjectileDamagePackage;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details|Custom Projectile", meta=(EditCondition="ProjectileType==EProjectileType::CustomProjectile", EditConditionHides))
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details|Custom Projectile", meta=(EditCondition="ProjectileType == EProjectileType::CustomArcProjectile || ProjectileType == EProjectileType::CustomHomingProjectile", EditConditionHides))
 	UStaticMesh* ProjectileMesh;
 	
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Details")
