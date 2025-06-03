@@ -35,10 +35,9 @@ protected:
 	TEnumAsByte<EProjectileType>  ProjectileType;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
 	UStaticMesh* ProjectileMesh;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
-	FProjectileDamagePackage ProjectileDamagePackage;
-
-
+	FProjectileDamagePackage CustomProjectileProjectileDamagePackage;
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
 	float AttackSpeed = 0.f;

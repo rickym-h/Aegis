@@ -29,23 +29,21 @@ void UProjectileComponent::BeginPlay()
 	}
 }
 
-void UProjectileComponent::FireArcArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
+FVector UProjectileComponent::CalculateCentreControlPoint(const FVector& StartPoint, const AEnemy* Enemy)
 {
-	if (!GameState)
-	{
-		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
-		return;
-	}
-	
-	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
-	DamagePackage.PhysicalDamage = Damage;
-
-	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
-
 	const FVector EndControlPoint = Enemy->TargetPoint->GetComponentLocation();
-	FVector CentreControlPoint = (StartPoint + EndControlPoint)/2;
-	CentreControlPoint.Z = StartPoint.Z + 30 + ((FVector::DistXY(StartPoint, EndControlPoint)/10.f));
-	
+	return CalculateCentreControlPoint(StartPoint, EndControlPoint);
+}
+
+FVector UProjectileComponent::CalculateCentreControlPoint(const FVector& StartPoint, const FVector& EndPoint)
+{
+	FVector CentreControlPoint = (StartPoint + EndPoint)/2;
+	CentreControlPoint.Z = StartPoint.Z + 30 + ((FVector::DistXY(StartPoint, EndPoint)/10.f));
+	return CentreControlPoint;
+}
+
+float UProjectileComponent::ApproximateBezierLength(const FVector& StartPoint, const FVector CentreControlPoint, const FVector EndControlPoint)
+{
 	float ApproximateBezierLength = 0;
 	FVector PreviousBezierPoint = StartPoint;
 	for (int i = 1; i < 25; i++)
@@ -60,9 +58,29 @@ void UProjectileComponent::FireArcArrow(const FVector& StartPoint, const AEnemy*
 		PreviousBezierPoint = BezierPoint;
 	}
 	ApproximateBezierLength /= 100; // Convert bezier length in cm to m.
+	return ApproximateBezierLength;
+}
+
+void UProjectileComponent::FireArcArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const
+{
+	if (!GameState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
+		return;
+	}
+	
+	FProjectileDamagePackage DamagePackage = FProjectileDamagePackage();
+	DamagePackage.PhysicalDamage = Damage;
+
+	UStaticMesh* ArrowMesh = LoadObject<UStaticMesh>(nullptr, TEXT("/Script/Engine.StaticMesh'/Game/Aegis/Art/VoxelArt/SM_Arrow.SM_Arrow'"));
+
+	const FVector CentreControlPoint = CalculateCentreControlPoint(StartPoint, Enemy);
+	const FVector EndControlPoint = Enemy->TargetPoint->GetComponentLocation();
+	
+	const float BezierLength = ApproximateBezierLength(StartPoint, CentreControlPoint, EndControlPoint);
 
 	constexpr float ProjectileSpeed = 40.f;
-	const float StartToEndTime = ApproximateBezierLength / ProjectileSpeed;
+	const float StartToEndTime = BezierLength / ProjectileSpeed;
 	
 	GameState->ProjectileManager->LaunchArcProjectile(
 		StartPoint,
@@ -102,6 +120,30 @@ void UProjectileComponent::FireRunicSpark(const FVector& StartPoint, const AEnem
 	);
 }
 
+void UProjectileComponent::FireSimpleArcProjectile(const FVector& StartPoint, const FVector& EndPoint, const FProjectileDamagePackage DamagePackage,
+	float ProjectileSpeed, UStaticMesh* ProjectileMesh)
+{
+	if (!GameState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
+		return;
+	}
+	const FVector CentreControlPoint = CalculateCentreControlPoint(StartPoint, EndPoint);
+	const float BezierLength = ApproximateBezierLength(StartPoint, CentreControlPoint, EndPoint);
+	const float StartToEndTime = BezierLength / ProjectileSpeed;
+	
+	GameState->ProjectileManager->LaunchArcProjectile(
+		StartPoint,
+		CentreControlPoint,
+		EndPoint,
+		ProjectileMesh,
+		StartToEndTime,
+		DamagePackage,
+		GetOwner(),
+		nullptr, nullptr
+	);	
+}
+
 void UProjectileComponent::FireCustomArcProjectile(const FVector& StartPoint, const FVector& CentreControlPoint, const FVector& EndPoint,
                                                    const FProjectileDamagePackage DamagePackage, const float ProjectileSpeed, UStaticMesh* ProjectileMesh) const
 {
@@ -110,23 +152,9 @@ void UProjectileComponent::FireCustomArcProjectile(const FVector& StartPoint, co
 		UE_LOG(LogTemp, Error, TEXT("UProjectileComponent::FireArrowAtEnemy - GameState not found!!"))
 		return;
 	}
-	
-	float ApproximateBezierLength = 0;
-	FVector PreviousBezierPoint = StartPoint;
-	for (int i = 1; i < 25; i++)
-	{
-		float T = 1.f/static_cast<float>(i);
-		const FVector StartToCentrePoint = FMath::Lerp(StartPoint, CentreControlPoint, T);
-		const FVector CentreToEndPoint = FMath::Lerp(CentreControlPoint, EndPoint, T);
-		const FVector BezierPoint = FMath::Lerp(StartToCentrePoint, CentreToEndPoint, T);
 
-		ApproximateBezierLength += FVector::Dist(PreviousBezierPoint, BezierPoint);
-
-		PreviousBezierPoint = BezierPoint;
-	}
-	ApproximateBezierLength /= 100; // Convert bezier length in cm to m.
-
-	const float StartToEndTime = ApproximateBezierLength / ProjectileSpeed;
+	const float BezierLength = ApproximateBezierLength(StartPoint, CentreControlPoint, EndPoint);
+	const float StartToEndTime = BezierLength / ProjectileSpeed;
 	
 	GameState->ProjectileManager->LaunchArcProjectile(
 		StartPoint,

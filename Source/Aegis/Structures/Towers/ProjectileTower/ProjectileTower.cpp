@@ -24,7 +24,7 @@ void AProjectileTower::InitProjectileTower(const EProjectileType InProjectileTyp
 		return;
 	}
 	this->ProjectileType = InProjectileType;
-	this->ProjectileDamagePackage = InProjectileDamagePackage;
+	this->CustomProjectileProjectileDamagePackage = InProjectileDamagePackage;
 	this->AttackSpeed = InAttackSpeed;	
 	this->ProjectileMesh = InProjectileMesh;
 
@@ -58,6 +58,7 @@ void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
 			break;
 		case EProjectileType::CustomArcProjectile:
 			UE_LOG(LogTemp, Warning, TEXT("Firing Custom Arc Projectile"))
+			ProjectileComponent->FireSimpleArcProjectile(SourcePoint->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation(), CustomProjectileProjectileDamagePackage, 40, ProjectileMesh);
 			break;
 		case EProjectileType::CustomHomingProjectile:
 			UE_LOG(LogTemp, Warning, TEXT("Firing Custom Homing Projectile"))

@@ -31,6 +31,10 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
+	
+	static FVector CalculateCentreControlPoint(const FVector& StartPoint, const AEnemy* Enemy);
+	static FVector CalculateCentreControlPoint(const FVector& StartPoint, const FVector& EndPoint);
+	static float ApproximateBezierLength(const FVector& StartPoint, FVector CentreControlPoint, FVector EndControlPoint);
 
 	UPROPERTY()
 	AAegisGameStateBase* GameState;
@@ -40,7 +44,12 @@ public:
 	void FireArcArrow(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
 	UFUNCTION()
 	void FireRunicSpark(const FVector& StartPoint, const AEnemy* Enemy, const float Damage) const;
+
+	
 	UFUNCTION()
-	void FireCustomArcProjectile(const FVector& StartPoint, const FVector& CentreControlPoint, const FVector& EndPoint, const FProjectileDamagePackage DamagePackage, float
-	                             ProjectileSpeed, UStaticMesh* ProjectileMesh) const;
+	void FireSimpleArcProjectile(const FVector& StartPoint, const FVector& EndPoint, const FProjectileDamagePackage DamagePackage, float ProjectileSpeed, UStaticMesh* ProjectileMesh);
+
+	
+	UFUNCTION()
+	void FireCustomArcProjectile(const FVector& StartPoint, const FVector& CentreControlPoint, const FVector& EndPoint, const FProjectileDamagePackage DamagePackage, float ProjectileSpeed, UStaticMesh* ProjectileMesh) const;
 };
