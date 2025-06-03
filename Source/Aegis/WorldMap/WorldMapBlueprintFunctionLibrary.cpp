@@ -36,19 +36,15 @@ FWorldMapData UWorldMapBlueprintFunctionLibrary::GenerateWorldMapData(const FWor
 	TArray<int32> CandidateRows;
 	for (int i = 0; i < MapConfig.GridRows; i++)
 		CandidateRows.Add(i);
-	CandidateRows.Sort([](const int32 A, const int32 B)
-	{
-		return FMath::RandBool();
-	});
+	
+	CandidateRows.Sort([](const int32 A, const int32 B) { return FMath::RandBool(); });
 	TArray<int32> StartingRows;
 	for (int i = 0; i < MapConfig.StartingLayerNodesCount; i++)
 	{
 		StartingRows.Add(CandidateRows[i]);
 	}
-	CandidateRows.Sort([](const int32 A, const int32 B)
-	{
-		return FMath::RandBool();
-	});
+	
+	CandidateRows.Sort([](const int32 A, const int32 B) { return FMath::RandBool(); });
 	TArray<int32> EndNodeRows;
 	for (int i = 0; i < MapConfig.PreBossLayerNodesCount; i++)
 	{
@@ -211,13 +207,26 @@ void UWorldMapBlueprintFunctionLibrary::GeneratePath(FWorldMapData& WorldMapData
 		}
 		UE_LOG(LogTemp, Display, TEXT("UWorldMapBlueprintFunctionLibrary::GeneratePath - Set candidate heads. Count: %i"), CandidateHeads.Num())
 		// Select a random one of the possible nodes, and place a new node there.
-		const int32 RandomIndex = FMath::RandRange(0, CandidateHeads.Num() - 1);
-		FMapNodeCoordinate NewHeadCoord = CandidateHeads[RandomIndex];
+		FMapNodeCoordinate NewHeadCoord = CandidateHeads[FMath::RandRange(0, CandidateHeads.Num() - 1)];
 
 		// Create new node at new head coord if it does not exist
 		if (WorldMapData.GetMapNodeIndex(NewHeadCoord) == -1)
 		{
 			FMapNode NewNode = FMapNode(EMapNodeType::MinorEnemy, NewHeadCoord);
+			if (NewHeadCoord.Layer % 4 == 0)
+			{
+				NewNode.NodeType = EMapNodeType::RestSite;
+			} else
+			{
+				// Randomly select between Shop (Low chance), Elite Enemy (Medium chance), or Minor Enemy (High chance)
+				float RandValue = FMath::FRand();
+				if (RandValue < 0.1)
+				{
+					NewNode.NodeType = EMapNodeType::Shop;
+				} else if (RandValue < 0.5) {
+					NewNode.NodeType = EMapNodeType::EliteEnemy;
+				}
+			}
 			WorldMapData.MapNodes.Add(NewNode);
 		}
 
