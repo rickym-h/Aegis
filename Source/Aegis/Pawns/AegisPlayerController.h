@@ -31,9 +31,7 @@ public:
 	const FHitResult* GetHoveredHitResult() const;
 
 protected:
-
 	virtual void BeginPlay() override;
-	
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cards")
 	TArray<UPlayerCard*> DrawPile;

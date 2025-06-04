@@ -41,20 +41,20 @@ void UResourcesData::AddResources(const FResources& ResourcesToAdd)
 bool UResourcesData::IsResourcesEnough(const FResources& ResourcesCost) const
 {
 	return (
-		Resources.Wood >= ResourcesCost.Wood &&
-		Resources.Stone >= ResourcesCost.Stone &&
-		Resources.Gold >= ResourcesCost.Gold &&
-		Resources.Runes >= ResourcesCost.Runes &&
+		// Resources.Wood >= ResourcesCost.Wood &&
+		// Resources.Stone >= ResourcesCost.Stone &&
+		// Resources.Gold >= ResourcesCost.Gold &&
+		// Resources.Runes >= ResourcesCost.Runes &&
 		Resources.ManaCrystals >= ResourcesCost.ManaCrystals
 		);
 }
 
 void UResourcesData::SpendResources(const FResources& Cost)
 {
-	Resources.Wood -= Cost.Wood;
-	Resources.Stone -= Cost.Stone;
-	Resources.Gold -= Cost.Gold;
-	Resources.Runes -= Cost.Runes;
+	// Resources.Wood -= Cost.Wood;
+	// Resources.Stone -= Cost.Stone;
+	// Resources.Gold -= Cost.Gold;
+	// Resources.Runes -= Cost.Runes;
 	Resources.ManaCrystals -= Cost.ManaCrystals;
 	OnResourcesUpdatedDelegate.Broadcast();
 }
