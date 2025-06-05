@@ -222,6 +222,6 @@ void AAegisPlayerController::Tick(float DeltaSeconds)
 {
 	Super::Tick(DeltaSeconds);
 
-	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
+	GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResultUnderCursor);
 }
 

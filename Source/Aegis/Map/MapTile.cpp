@@ -82,6 +82,8 @@ void AMapTile::SetMapTileData(UMapTileData* Data)
 		TileMesh->SetStaticMesh(PathMesh);
 		TileMesh->SetRelativeScale3D(FVector(1, 1, 0.75));
 	}
+	TileMesh->SetCollisionResponseToChannel(ECC_GameTraceChannel1, ECR_Block);
+	TileMesh->RecreatePhysicsState();
 
 	StructureLocation = TileCoord.ToWorldLocation() + TileMeshLocation + FVector(0, 0, 50);
 
