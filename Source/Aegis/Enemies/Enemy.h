@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Map/AegisMap.h"
-#include "GameFramework/Pawn.h"
+#include "Engine/DataTable.h"
 #include "Enemy.generated.h"
 
 class UPaperFlipbookComponent;
@@ -12,6 +12,7 @@ class UStatusEffectComponent;
 class UCapsuleComponent;
 class USphereComponent;
 class AAegisGameStateBase;
+
 
 UCLASS()
 class AEGIS_API AEnemy : public AActor
@@ -93,4 +94,27 @@ protected:
 	UFUNCTION()
 	void OverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
 	                  bool bFromSweep, const FHitResult& SweepResult);
+};
+
+
+USTRUCT(BlueprintType)
+struct FEnemyData : public FTableRowBase
+{
+	GENERATED_BODY()
+
+	/** Name of Enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Generator")
+	FString Enemy = "DEFAULT ENEMY NAME";
+
+	/** Point Cost of Enemy */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Generator")
+	int32 Points = 1;
+
+	/** Enemy Tooltip */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Generator")
+	FString TooltipText = "DEFAULT TOOLTIP TEXT";
+
+	/** Generator Image */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category="Generator")
+	TSubclassOf<AEnemy> ActorToSpawn;
 };

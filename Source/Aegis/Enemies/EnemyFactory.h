@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Engine/DataTable.h"
 #include "EnemyFactory.generated.h"
 
 class AEnemy;
@@ -61,6 +62,7 @@ class AEGIS_API UEnemyFactory : public UObject
 	GENERATED_BODY()
 
 protected:
+	UPROPERTY()
 	TArray<AEnemy*> EnemiesInWorld;
 
 	int32 NightCounter;
@@ -72,13 +74,13 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
 	TSubclassOf<AEnemy> TestEnemyClass;
 	
-	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category="Enemies")
-	TArray<FEnemyType> BasicEnemies;
-	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="WaveEnemies")
 	TArray<FEnemySpawnData> EnemiesToSpawnInWave;
 	
 	TArray<FEnemySpawnData> GenerateWaveEnemies(const int32 WorldLayer) const;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, meta=(RequiredAssetDataTags = "RowStructure=/Script/Aegis.EnemyData"))
+	UDataTable* EnemyDataTable;
 
 	FTimerHandle SpawnEnemyWithDelayTimerHandle;
 	
