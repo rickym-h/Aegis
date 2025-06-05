@@ -3,6 +3,8 @@
 
 #include "AegisPlayerController.h"
 
+#include "EnhancedInputComponent.h"
+#include "EnhancedInputSubsystems.h"
 #include "ResourcesData.h"
 #include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
@@ -48,6 +50,26 @@ void AAegisPlayerController::BeginPlay()
 
 	const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	GameState->EnemyFactory->OnWaveEndDelegate.AddUniqueDynamic(this, &AAegisPlayerController::DiscardAndReplenishHand);
+}
+
+void AAegisPlayerController::Click()
+{
+	ClickGround();
+}
+
+void AAegisPlayerController::SetupInputComponent()
+{
+	Super::SetupInputComponent();
+
+	if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(GetLocalPlayer()))
+	{
+		Subsystem->AddMappingContext(MappingContext, 0);
+	}
+
+	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
+	{
+		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &AAegisPlayerController::Click);
+	}
 }
 
 void AAegisPlayerController::ShuffleDrawPile()
@@ -108,8 +130,6 @@ void AAegisPlayerController::ClickGround()
 	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
 	
 	const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(HitResultUnderCursor.Location);
-
-	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::ClickGround - Clicked Tile: %ls"), *LocationCoord.ToString())
 	
 	// Attempt to play the selected card, if any
 	if (UPlayerCard* Card = SelectedCard.Get())

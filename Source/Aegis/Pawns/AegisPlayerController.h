@@ -7,6 +7,8 @@
 #include "GameFramework/PlayerController.h"
 #include "AegisPlayerController.generated.h"
 
+class UInputAction;
+class UInputMappingContext;
 class UPlayerCard;
 class UResourcesData;
 
@@ -32,6 +34,16 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void SetupInputComponent() override;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputMappingContext> MappingContext;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> ClickAction;
+	
+	UFUNCTION()
+	void Click();
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cards")
 	TArray<UPlayerCard*> DrawPile;
