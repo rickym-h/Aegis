@@ -6,6 +6,8 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
+#include "Aegis/Enemies/Damage/MagicDamageType.h"
+#include "Aegis/Enemies/Damage/PhysicalDamageType.h"
 #include "Aegis/Map/AegisGameMap.h"
 #include "Aegis/Structures/Interfaces/ProjectileCallbackInterface.h"
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
@@ -109,8 +111,42 @@ void AProjectileManager::BeginPlay()
 	Super::BeginPlay();
 }
 
+void AProjectileManager::ApplyDamageAndEffects(const UPrimitiveComponent* OverlappedComponent, const FHitResult& HitResult,
+	const UStaticMeshComponent* ProjectileMesh, AEnemy* Enemy, const FProjectileDamagePackage* DamagePackage,
+	UNiagaraSystem* OnHitParticleSystem, UObject* ResponsibleSource)
+{
+	// Apply single-target damage if there is no explosion radius  
+	if (DamagePackage->ExplosionRadius <= 0)
+	{
+		const float PhysicalDamageApplied = UGameplayStatics::ApplyDamage(Enemy, DamagePackage->PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UPhysicalDamageType::StaticClass());
+		const float MagicDamageApplied = UGameplayStatics::ApplyDamage(Enemy, DamagePackage->MagicDamage, GetWorld()->GetFirstPlayerController(), this, UMagicDamageType::StaticClass());
+
+		const float TotalDamageApplied = PhysicalDamageApplied + MagicDamageApplied;
+		// Apply callback function if relevant
+		if (ResponsibleSource->Implements<UProjectileCallbackInterface>())
+		{
+			IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ResponsibleSource, Enemy, TotalDamageApplied, HitResult);
+		}
+	} else
+	{
+		// Ensure the NexusBuilding immune to damage from the projectile
+		const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
+		TArray<AActor*> IgnoredActors;
+		IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
+			
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), DamagePackage->PhysicalDamage, OverlappedComponent->GetComponentLocation(), DamagePackage->ExplosionRadius, UPhysicalDamageType::StaticClass(), IgnoredActors);
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), DamagePackage->MagicDamage, OverlappedComponent->GetComponentLocation(), DamagePackage->ExplosionRadius, UMagicDamageType::StaticClass(), IgnoredActors);
+	}
+
+	// If a particle system is present, spawn the particle system
+	if (OnHitParticleSystem)
+	{
+		UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(OnHitParticleSystem, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
+	}
+}
+
 void AProjectileManager::HomingProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult)
+                                                      int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult)
 {
 	UStaticMeshComponent* ProjectileMesh = Cast<UStaticMeshComponent>(OverlappedComponent);
 	if (!ProjectileMesh) { return; }
@@ -121,31 +157,7 @@ void AProjectileManager::HomingProjectileOverlapBegin(UPrimitiveComponent* Overl
 		// Find the relevant projectile package associated with this projectile
 		const FHomingProjectilePackage* ProjectilePackage = &ActiveHomingProjectiles[ProjectileMesh];
 
-		// Apply single-target damage if there is no explosion radius  
-		if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
-		{
-			const float DamageApplied = UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
-
-			// Apply callback function if relevant
-			if (ProjectilePackage->ResponsibleSource->Implements<UProjectileCallbackInterface>())
-			{
-				IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ProjectilePackage->ResponsibleSource, Enemy, DamageApplied, HitResult);
-			}
-		} else
-		{
-			// Ensure the NexusBuilding immune to damage from the projectile
-			const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-			TArray<AActor*> IgnoredActors;
-			IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
-			
-			UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
-		}
-
-		// If a particle system is present, spawn the particle system
-		if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->OnHitParticleSystem)
-		{
-			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
-		}
+		ApplyDamageAndEffects(OverlappedComponent, HitResult, ProjectileMesh, Enemy, &ProjectilePackage->DamagePackage, ProjectilePackage->OnHitParticleSystem, ProjectilePackage->ResponsibleSource);
 	
 		// Mark projectile to be cleaned
 		// This must be done at the end of the frame instead of as soon as the overlap event is made, to ensure that it does not break the array loop in Tick()
@@ -165,31 +177,7 @@ void AProjectileManager::ArcProjectileOverlapBegin(UPrimitiveComponent* Overlapp
 		// Find the relevant projectile package associated with this projectile
 		const FArcProjectilePackage* ProjectilePackage = &ActiveArcProjectiles[ProjectileMesh];
 
-		// Apply single-target damage if there is no explosion radius  
-		if (ProjectilePackage->DamagePackage.ExplosionRadius <= 0)
-		{
-			const float DamageApplied = UGameplayStatics::ApplyDamage(Enemy, ProjectilePackage->DamagePackage.PhysicalDamage, GetWorld()->GetFirstPlayerController(), this, UDamageType::StaticClass());
-
-			// Apply callback function if relevant
-			if (ProjectilePackage->ResponsibleSource->Implements<UProjectileCallbackInterface>())
-			{
-				IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ProjectilePackage->ResponsibleSource, Enemy, DamageApplied, HitResult);
-			}
-		} else
-		{
-			// Ensure the NexusBuilding immune to damage from the projectile
-			const AAegisGameStateBase* GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
-			TArray<AActor*> IgnoredActors;
-			IgnoredActors.Add(GameState->AegisMap->NexusBuilding);
-			
-			UGameplayStatics::ApplyRadialDamage(GetWorld(), ProjectilePackage->DamagePackage.PhysicalDamage, OverlappedComponent->GetComponentLocation(), ProjectilePackage->DamagePackage.ExplosionRadius, UDamageType::StaticClass(), IgnoredActors);
-		}
-
-		// If a particle system is present, spawn the particle system
-		if (UNiagaraSystem* NiagaraSystemTemplate = ProjectilePackage->OnHitParticleSystem)
-		{
-			UNiagaraComponent* NiagaraComp = UNiagaraFunctionLibrary::SpawnSystemAttached(NiagaraSystemTemplate, RootComponent, NAME_None, ProjectileMesh->GetComponentLocation(), FRotator::ZeroRotator, EAttachLocation::Type::KeepRelativeOffset, true);
-		}
+		ApplyDamageAndEffects(OverlappedComponent, HitResult, ProjectileMesh, Enemy, &ProjectilePackage->DamagePackage, ProjectilePackage->OnHitParticleSystem, ProjectilePackage->ResponsibleSource);
 	
 		// Mark projectile to be cleaned
 		// This must be done at the end of the frame instead of as soon as the overlap event is made, to ensure that it does not break the array loop in Tick()

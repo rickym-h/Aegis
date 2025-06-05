@@ -10,6 +10,9 @@
 #include "Aegis/Structures/NexusBuilding/NexusBuilding.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/StatusEffectComponent.h"
+#include "Damage/MagicDamageType.h"
+#include "Damage/PhysicalDamageType.h"
+#include "Engine/DamageEvents.h"
 #include "Kismet/GameplayStatics.h"
 
 // Sets default values
@@ -50,6 +53,8 @@ void AEnemy::BeginPlay()
 	Super::BeginPlay();
 
 	Health = MaxHealth;
+	Armour = MaxArmour;
+	MagicResist = MaxMagicResist;
 
 	GameState = Cast<AAegisGameStateBase>(GetWorld()->GetGameState());
 	if (!GameState)
@@ -90,14 +95,24 @@ void AEnemy::OnSpeedMultiplierChanged(const float NewSpeedMultiplier)
 	CurrentMovementSpeed = NewSpeedMultiplier * MovementSpeed;
 }
 
-float AEnemy::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+float AEnemy::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
-	Health -= DamageAmount;
+	float FinalDamageAmount = DamageAmount;
+	if (DamageEvent.DamageTypeClass->IsChildOf(UPhysicalDamageType::StaticClass()))
+	{
+		FinalDamageAmount *= (1.f - Armour);
+	}
+	if (DamageEvent.DamageTypeClass->IsChildOf(UMagicDamageType::StaticClass()))
+	{
+		FinalDamageAmount *= (1.f - MagicResist);
+	}
+	
+	Health -= FinalDamageAmount;
 	if (Health <= 0)
 	{
 		Destroy();
 	}
-	return DamageAmount;
+	return FinalDamageAmount;
 }
 
 float AEnemy::DistanceToGoalTile() const

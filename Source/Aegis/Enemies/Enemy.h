@@ -68,6 +68,17 @@ protected:
 	float MaxHealth;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float Health = MaxHealth;
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float MaxArmour;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float Armour = MaxArmour;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float MaxMagicResist;
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Enemy Data")
+	float MagicResist = MaxMagicResist;
+
+	
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 

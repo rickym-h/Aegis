@@ -95,7 +95,7 @@ public:
 
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void BeginPlay() override;
-	
+
 	UStaticMeshComponent* LaunchHomingProjectile(
 		const FVector& StartPoint,
 		const AEnemy* TargetEnemy,
@@ -141,4 +141,7 @@ protected:
 	void HomingProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);
 	UFUNCTION()
 	void ArcProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);
+	void ApplyDamageAndEffects(const UPrimitiveComponent* OverlappedComponent, const FHitResult& HitResult, const UStaticMeshComponent* ProjectileMesh,
+							   AEnemy* Enemy,
+							   const FProjectileDamagePackage* DamagePackage, UNiagaraSystem* OnHitParticleSystem, UObject* ResponsibleSource);
 };
