@@ -12,6 +12,7 @@
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Core/Player/PlayerData.h"
 #include "Aegis/Enemies/EnemyFactory.h"
+#include "Aegis/Game/Interfaces/Clickable.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
@@ -127,18 +128,22 @@ void AAegisPlayerController::TryPlayCardAtLocation(UPlayerCard* Card, const FTil
 
 void AAegisPlayerController::ClickGround()
 {
-	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
-	
-	const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(HitResultUnderCursor.Location);
-	
 	// Attempt to play the selected card, if any
 	if (UPlayerCard* Card = SelectedCard.Get())
 	{
+		GetHitResultUnderCursor(ECC_GameTraceChannel1, true, HitResultUnderCursor);
+	
+		const FTileCoord LocationCoord = FTileCoord::FromWorldLocation(HitResultUnderCursor.Location);
 		TryPlayCardAtLocation(Card, LocationCoord);
 		return;
 	}
 
-	// TODO select a building or tile on ground
+	// Select a building or tile on ground
+	GetHitResultUnderCursor(ECC_Visibility, true, HitResultUnderCursor);
+	if (HitResultUnderCursor.GetActor() && UKismetSystemLibrary::DoesImplementInterface(HitResultUnderCursor.GetActor(), UClickable::StaticClass()))
+	{
+		IClickable::Execute_Clicked(HitResultUnderCursor.GetActor());
+	}
 }
 
 TArray<UPlayerCard*> AAegisPlayerController::GetCardsInHand()

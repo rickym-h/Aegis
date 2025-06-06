@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Game/Interfaces/Clickable.h"
 #include "Aegis/Map/AegisMap.h"
 #include "GameFramework/Actor.h"
 #include "Structure.generated.h"
@@ -10,7 +11,7 @@
 class UStructureCard;
 
 UCLASS()
-class AEGIS_API AStructure : public AActor
+class AEGIS_API AStructure : public AActor, public IClickable
 {
 	GENERATED_BODY()
 

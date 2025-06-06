@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
+#include "Aegis/Widgets/SelectedStructureDetails.h"
 #include "GameFramework/PlayerController.h"
 #include "AegisPlayerController.generated.h"
 
@@ -73,6 +74,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void ClickGround();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	USelectedStructureDetails* SelectedStructureDetailsWidget;
 	
 	/**
 	 * 
