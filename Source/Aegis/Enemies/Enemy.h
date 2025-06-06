@@ -32,6 +32,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Tower Data")
 	USceneComponent* TargetPoint;
 	
+
 	UFUNCTION(BlueprintCallable)
 	float GetHealthAsPercentage() const;
 
@@ -47,6 +48,8 @@ protected:
 	UCapsuleComponent* CollisionCapsuleComponent;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UPaperFlipbookComponent* FlipbookComponent;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
+	bool bShouldFlip;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
 	UStatusEffectComponent* StatusEffectComponent;
 

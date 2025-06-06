@@ -157,6 +157,10 @@ void AEnemy::MoveTowardsGoal(float DeltaTime)
 			}
 		}
 	}
+	// Get vector from current location to goal
+	const FVector ForwardVector = GoalTile.ToWorldLocation() - FromTile.ToWorldLocation();
+	bShouldFlip = ForwardVector.Y < 0;
+	
 	SetActorLocation(TargetPos, true);
 }
 
