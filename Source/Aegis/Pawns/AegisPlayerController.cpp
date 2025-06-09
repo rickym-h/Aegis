@@ -5,6 +5,7 @@
 
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "PlayerPawn.h"
 #include "ResourcesData.h"
 #include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Cards/StructureCard.h"
@@ -62,8 +63,6 @@ void AAegisPlayerController::Click()
 
 void AAegisPlayerController::Scroll(const FInputActionValue& InputActionValue)
 {
-	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::Scroll: %ls"), *InputActionValue.ToString())
-	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::Scroll: %ls"), *InputActionValue.ToString())
 	if (UPlayerCard* Card = SelectedCard.Get())
 	{
 		// Rotate the building if appliccable
@@ -72,6 +71,11 @@ void AAegisPlayerController::Scroll(const FInputActionValue& InputActionValue)
 
 		bool bClockwise = InputActionValue.Get<float>() == 1.f;
 		Structure->StructureOffsets = UTileCoordHelperLibrary::RotateTileCoords(Structure->StructureOffsets, bClockwise);
+	} else
+	{
+		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(GetPawn());
+		if (!PlayerPawn) { return; }
+		PlayerPawn->Zoom(InputActionValue.Get<float>());
 	}
 }
 

@@ -262,16 +262,19 @@ void APlayerPawn::Tick(float DeltaTime)
 
 void APlayerPawn::Move(const FInputActionValue& InputActionValue)
 {
-	// Get the target zoom location
-	TargetArmLevel += InputActionValue.Get<FVector>().Z;
-	TargetArmLevel = FMath::Max(TargetArmLevel, 0);
-
 	//MovementComponent->MaxSpeed = 2000 + FMath::Pow(SpringArm->TargetArmLength, 0.95);
 	MovementComponent->MaxSpeed = FMath::Max(1000, 1 * SpringArm->TargetArmLength);
 	MovementComponent->Acceleration = MovementComponent->MaxSpeed * 7;
 	MovementComponent->Deceleration = MovementComponent->MaxSpeed * 9;
 
 	AddMovementInput(FVector(InputActionValue.Get<FVector>().X, InputActionValue.Get<FVector>().Y, 0), FMath::Pow(SpringArm->TargetArmLength, 2)+1);
+}
+
+void APlayerPawn::Zoom(const float ZoomAmount)
+{
+	// Get the target zoom location
+	TargetArmLevel += ZoomAmount;
+	TargetArmLevel = FMath::Max(TargetArmLevel, 0);
 }
 
 // Called to bind functionality to input
