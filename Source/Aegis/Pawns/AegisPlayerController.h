@@ -42,9 +42,13 @@ protected:
 	TObjectPtr<UInputMappingContext> MappingContext;
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
 	TObjectPtr<UInputAction> ClickAction;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input")
+	TObjectPtr<UInputAction> ScrollAction;
 	
 	UFUNCTION()
 	void Click();
+	UFUNCTION()
+	void Scroll(const FInputActionValue& InputActionValue);
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Cards")
 	TArray<UPlayerCard*> DrawPile;

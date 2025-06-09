@@ -26,4 +26,6 @@ public:
 	UFUNCTION(BlueprintNativeEvent, BlueprintCallable, Category = "Interface Functions")
 	TSet<FTileCoord> GetRangeTileOffsets();
 	virtual TSet<FTileCoord> GetRangeTileOffsets_Implementation() { return TSet<FTileCoord>(); };
+
+	// TODO rotatetile range offsets 
 };

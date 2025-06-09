@@ -167,4 +167,7 @@ class AEGIS_API UTileCoordHelperLibrary : public UBlueprintFunctionLibrary
 public:
 	UFUNCTION(BlueprintPure, Category = "TileCoord", meta = (BlueprintThreadSafe))
 	static FTileCoord MakeTileCoordStruct(int Q, int R);
+	
+	UFUNCTION(BlueprintPure, Category = "TileCoord", meta = (BlueprintThreadSafe))
+	static TArray<FTileCoord> RotateTileCoords(const TArray<FTileCoord>& Coords, const bool bClockwise);
 };

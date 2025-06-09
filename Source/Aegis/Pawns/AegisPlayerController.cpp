@@ -7,6 +7,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "ResourcesData.h"
 #include "Aegis/Cards/PlayerCard.h"
+#include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
 #include "Aegis/Core/AegisGameInstance.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
@@ -14,6 +15,7 @@
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Game/Interfaces/Clickable.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
+#include "Compression/lz4.h"
 #include "Kismet/GameplayStatics.h"
 
 AAegisPlayerController::AAegisPlayerController()
@@ -58,6 +60,22 @@ void AAegisPlayerController::Click()
 	ClickGround();
 }
 
+void AAegisPlayerController::Scroll(const FInputActionValue& InputActionValue)
+{
+	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::Scroll: %ls"), *InputActionValue.ToString())
+	UE_LOG(LogTemp, Display, TEXT("AAegisPlayerController::Scroll: %ls"), *InputActionValue.ToString())
+	if (UPlayerCard* Card = SelectedCard.Get())
+	{
+		// Rotate the building if appliccable
+		UStructureCard* Structure = Cast<UStructureCard>(Card);
+		if (!Structure) { return;}
+
+		bool bClockwise = InputActionValue.Get<float>() == 1.f;
+		Structure->StructureOffsets = UTileCoordHelperLibrary::RotateTileCoords(Structure->StructureOffsets, bClockwise);
+	}
+}
+
+
 void AAegisPlayerController::SetupInputComponent()
 {
 	Super::SetupInputComponent();
@@ -70,6 +88,7 @@ void AAegisPlayerController::SetupInputComponent()
 	if (UEnhancedInputComponent* EnhancedInputComponent = CastChecked<UEnhancedInputComponent>(InputComponent))
 	{
 		EnhancedInputComponent->BindAction(ClickAction, ETriggerEvent::Triggered, this, &AAegisPlayerController::Click);
+		EnhancedInputComponent->BindAction(ScrollAction, ETriggerEvent::Triggered, this, &AAegisPlayerController::Scroll);
 	}
 }
 

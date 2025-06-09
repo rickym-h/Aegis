@@ -7,3 +7,27 @@ FTileCoord UTileCoordHelperLibrary::MakeTileCoordStruct(int Q, int R)
 {
 	return FTileCoord(Q, R);
 }
+
+TArray<FTileCoord> UTileCoordHelperLibrary::RotateTileCoords(const TArray<FTileCoord>& Coords, const bool bClockwise)
+{
+	//https://www.redblobgames.com/grids/hexagons/#rotation
+	
+	TArray<FTileCoord> RotatedCoords;
+	RotatedCoords.Reserve(Coords.Num());
+
+	for (const FTileCoord& Coord : Coords)
+	{
+		if (bClockwise)
+		{
+			// Clockwise rotation: [q,r,s] -> [-r,-s,-q]
+			RotatedCoords.Add(FTileCoord(-Coord.R, -(-(Coord.Q) - Coord.R)));
+		}
+		else
+		{
+			// Counter-clockwise rotation: [q,r,s] -> [-s,-q,-r]
+			RotatedCoords.Add(FTileCoord(-(-(Coord.Q) - Coord.R), -Coord.Q));
+		}
+	}
+
+	return RotatedCoords;
+}
