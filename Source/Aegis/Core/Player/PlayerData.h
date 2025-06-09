@@ -8,6 +8,7 @@
 #include "PlayerData.generated.h"
 
 class UResourcesData;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnHealthDepletedSignature, int32, NewHealth);
 
 UENUM(BlueprintType)
 enum EPlayerCharacter
@@ -53,6 +54,15 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "PlayerData")
 	void SetWorldMapData(const FWorldMapData& InWorldMapData);
 
+	UFUNCTION(BlueprintCallable, Category = "PlayerData")
+	int32 GetLivesCount() const;
+	
+	UFUNCTION(BlueprintCallable, Category = "PlayerData")
+	int32 TakeLives(const int32 LivesToTake);
+
+	UPROPERTY(EditAnywhere, BlueprintAssignable, Category = "PlayerData")
+	FOnHealthDepletedSignature OnHealthDepletedDelegate;
+
 private:	
 	UPROPERTY(EditAnywhere, Category="Player Data")
 	TEnumAsByte<EPlayerCharacter> PlayerCharacter = EPlayerCharacter::God;
@@ -65,4 +75,7 @@ private:
 
 	UPROPERTY(EditAnywhere, Category="Player Data")
 	UResourcesData* ResourcesData;
+
+	UPROPERTY(EditAnywhere, Category="Player Data")
+	int32 LivesCount;
 };

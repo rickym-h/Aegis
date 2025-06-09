@@ -3,10 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Core/Player/PlayerData.h"
 #include "Components/ActorComponent.h"
 #include "BuildingHealthComponent.generated.h"
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnHealthDepletedSignature);
+class UAegisGameInstance;
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class AEGIS_API UBuildingHealthComponent : public UActorComponent
@@ -22,9 +23,11 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
-	float MaxHealth = 100.f;
+	float MaxHealth;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
-	float CurrentHealth = MaxHealth;
+	float CurrentHealth;
+
+	UAegisGameInstance* GameInstance;
 
 public:
 	UFUNCTION()
@@ -34,7 +37,7 @@ public:
 	int GetCurrentHealth();
 
 	UFUNCTION()
-	void SetCurrentHealth(int Health);
+	void SetCurrentHealth(const int Health);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthDepletedSignature OnHealthDepletedDelegate;

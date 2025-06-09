@@ -8,6 +8,7 @@
 UPlayerData::UPlayerData()
 {
 	ResourcesData = CreateDefaultSubobject<UResourcesData>("Resources");
+	LivesCount = 0;
 }
 
 FName UPlayerData::GetPlayerName() const
@@ -54,4 +55,16 @@ FWorldMapData UPlayerData::GetWorldMapData() const
 void UPlayerData::SetWorldMapData(const FWorldMapData& InWorldMapData)
 {
 	this->WorldMapData = InWorldMapData;
+}
+
+int32 UPlayerData::GetLivesCount() const
+{
+	return LivesCount;
+}
+
+int32 UPlayerData::TakeLives(const int32 LivesToTake)
+{
+	LivesCount -= LivesToTake;
+	OnHealthDepletedDelegate.Broadcast(LivesCount);
+	return LivesCount;
 }
