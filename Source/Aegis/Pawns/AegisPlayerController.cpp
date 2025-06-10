@@ -81,7 +81,7 @@ void AAegisPlayerController::Scroll(const FInputActionValue& InputActionValue)
 	{
 		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(GetPawn());
 		if (!PlayerPawn) { return; }
-		PlayerPawn->Zoom(InputActionValue.Get<float>());
+		PlayerPawn->Zoom(-InputActionValue.Get<float>());
 	}
 }
 
