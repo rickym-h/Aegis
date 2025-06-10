@@ -5,31 +5,6 @@
 
 #include "PlayerCard.h"
 
-TArray<UPlayerCard*> UCardFactory::GenerateStarterTowers(UObject* OuterGameInstance) const
-{
-	TArray<UPlayerCard*> OutCards;
-
-	for (const TSubclassOf<UPlayerCard> StarterCardClass : DefaultCards)
-	{
-		if (!StarterCardClass)
-		{
-			UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Encountered a null StarterCard"))
-			return OutCards;
-		}
-		if (!OuterGameInstance)
-		{
-			UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Encountered a null OuterGameInstance"))
-			return OutCards;
-		}
-
-		UPlayerCard* StructureData = NewObject<UPlayerCard>(OuterGameInstance, StarterCardClass);
-		
-		OutCards.Add(StructureData);
-	}
-
-	return OutCards;
-}
-
 TArray<UPlayerCard*> UCardFactory::GenerateStarterTowersForCharacter(UObject* OuterGameInstance, const TEnumAsByte<EPlayerCharacter> Character) const
 {
 	TArray<UPlayerCard*> OutCards;
@@ -39,25 +14,33 @@ TArray<UPlayerCard*> UCardFactory::GenerateStarterTowersForCharacter(UObject* Ou
 		return OutCards;
 	}
 	
-	TArray<TSubclassOf<UPlayerCard>> CardClassArray;
+	// Load the card lists from the data tables
+	TArray<FCardData*> CardData;
+	const FString ContextString = "Loading Enemy Data...";
 	switch (Character)
 	{
 	case God:
-		CardClassArray.Append(GodCards);
+		DefaultKamiCards->GetAllRows<FCardData>(ContextString, CardData);
 		break;
 	case Valen:
-		CardClassArray.Append(ValenCards);
+		DefaultValenCards->GetAllRows<FCardData>(ContextString, CardData);
 		break;
 	case Caius:
-		CardClassArray.Append(CaiusCards);
+		DefaultCaiusCards->GetAllRows<FCardData>(ContextString, CardData);
 		break;
 	default:
 		UE_LOG(LogTemp, Error, TEXT("UCardFactory::GenerateStarterTowers - Character Enum not recognised! Creating default starter cards."));
 		break;
 	}
-	CardClassArray.Append(DefaultCards);
-	
 
+	// Get each class from the data table rows
+	TArray<TSubclassOf<UPlayerCard>> CardClassArray;
+	for (const FCardData* Card : CardData)
+	{
+		CardClassArray.Add(Card->CardClass);
+	}
+
+	// Create instances of each class to return
 	for (const TSubclassOf<UPlayerCard> StarterCardClass : CardClassArray)
 	{
 		if (!StarterCardClass)

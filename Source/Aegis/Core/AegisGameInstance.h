@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Aegis/Utilities/CircleMathBlueprintLibrary.h"
-#include "Aegis/WorldMap/WorldMapBlueprintFunctionLibrary.h"
 #include "Engine/GameInstance.h"
 #include "AegisGameInstance.generated.h"
 

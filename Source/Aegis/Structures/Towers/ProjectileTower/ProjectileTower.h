@@ -38,8 +38,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
 	FProjectileDamagePackage CustomProjectileProjectileDamagePackage;
-	
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details")
+
+	// Higher is faster
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Projectile Details", meta=(ToolTip="Higher is faster. e.g. 0.5 is once every 2 seconds, 3 is 3 shots per second."))
 	float AttackSpeed = 0.f;
 	
 	UFUNCTION()
