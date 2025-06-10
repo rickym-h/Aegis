@@ -23,8 +23,15 @@ AAegisPlayerController::AAegisPlayerController()
 {
 	// Set this pawn to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	const UAegisGameInstance* GameInstance = Cast<UAegisGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (!GameInstance)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AAegisPlayerController::AAegisPlayerController - GameInstance not valid!"))
+		return;
+	}
 	
-	Resources = CreateDefaultSubobject<UResourcesData>("Resources");
+	Resources = GameInstance->GetPlayerData()->GetPlayerResources();
 }
 
 const FHitResult* AAegisPlayerController::GetHoveredHitResult() const
