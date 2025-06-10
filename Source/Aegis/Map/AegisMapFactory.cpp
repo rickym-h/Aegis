@@ -586,7 +586,7 @@ TMap<FTileCoord, UMapTileData*> UAegisMapFactory::GenerateMapTilesDataAroundPath
 
 	int TargetRadius = 1;
 	int TilesInTargetRadius = FTileCoord::GetTilesInRadius(PathTiles, TargetRadius).Num();
-	while (TilesInTargetRadius < (Path.Num() * 20))
+	while (TilesInTargetRadius < (Path.Num() * 8))
 	{
 		TargetRadius++;
 		TilesInTargetRadius = FTileCoord::GetTilesInRadius(PathTiles, TargetRadius).Num();

@@ -45,7 +45,7 @@ void AAegisGameStateBase::GenerateTestMapFromMapFactory()
 		UE_LOG(LogTemp, Error, TEXT("AAegisGameStateBase::GenerateTestMapFromMapFactory - No implementation found to destroy map!"))
 	}
 
-	AegisMap = MapFactory->GenerateGameMap(3);
+	AegisMap = MapFactory->GenerateGameMap(2);
 }
 
 void AAegisGameStateBase::SaveGame()
