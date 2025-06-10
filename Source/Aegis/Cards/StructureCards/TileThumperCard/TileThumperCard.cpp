@@ -41,3 +41,9 @@ TSet<FTileCoord> UTileThumperCard::GetRangeTileOffsets_Implementation()
 {
 	return TileRangeOffsets;
 }
+
+TSet<FTileCoord> UTileThumperCard::RotateTileRangeOffsets_Implementation(const bool bClockwise)
+{
+	TileRangeOffsets = UTileCoordHelperLibrary::RotateTileCoords(TileRangeOffsets, bClockwise);
+	return TileRangeOffsets;
+}

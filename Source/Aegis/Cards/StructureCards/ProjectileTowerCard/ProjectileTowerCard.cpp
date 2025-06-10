@@ -42,3 +42,9 @@ TSet<FTileCoord> UProjectileTowerCard::GetRangeTileOffsets_Implementation()
 {
 	return TSet(FTileCoord::GetTilesInRadius(FTileCoord(), RangeTiles));
 }
+
+TSet<FTileCoord> UProjectileTowerCard::RotateTileRangeOffsets_Implementation(const bool bClockwise)
+{
+	// No rotation because range is same in every direction
+	return GetRangeTileOffsets_Implementation();
+}

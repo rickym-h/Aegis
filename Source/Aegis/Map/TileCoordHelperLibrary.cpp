@@ -31,3 +31,8 @@ TArray<FTileCoord> UTileCoordHelperLibrary::RotateTileCoords(const TArray<FTileC
 
 	return RotatedCoords;
 }
+
+TSet<FTileCoord> UTileCoordHelperLibrary::RotateTileCoords(const TSet<FTileCoord>& Coords, const bool bClockwise)
+{
+	return TSet(RotateTileCoords(Coords.Array(), bClockwise));
+}

@@ -10,13 +10,13 @@
 #include "Aegis/Cards/PlayerCard.h"
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
+#include "Aegis/Cards/Interfaces/TileRangeInterface.h"
 #include "Aegis/Core/AegisGameInstance.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Core/Player/PlayerData.h"
 #include "Aegis/Enemies/EnemyFactory.h"
 #include "Aegis/Game/Interfaces/Clickable.h"
 #include "Aegis/Map/TileCoordHelperLibrary.h"
-#include "Compression/lz4.h"
 #include "Kismet/GameplayStatics.h"
 
 AAegisPlayerController::AAegisPlayerController()
@@ -71,6 +71,12 @@ void AAegisPlayerController::Scroll(const FInputActionValue& InputActionValue)
 
 		bool bClockwise = InputActionValue.Get<float>() == 1.f;
 		Structure->StructureOffsets = UTileCoordHelperLibrary::RotateTileCoords(Structure->StructureOffsets, bClockwise);
+
+		// Rotate rangetiles
+		if (Structure->Implements<UTileRangeInterface>())
+		{
+			ITileRangeInterface::Execute_RotateTileRangeOffsets(Structure, bClockwise);
+		}
 	} else
 	{
 		APlayerPawn* PlayerPawn = Cast<APlayerPawn>(GetPawn());

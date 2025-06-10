@@ -27,4 +27,5 @@ public:
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
 	virtual TSet<FTileCoord> GetRangeTileOffsets_Implementation() override;
+	virtual TSet<FTileCoord> RotateTileRangeOffsets_Implementation(const bool bClockwise) override;
 };

@@ -170,4 +170,5 @@ public:
 	
 	UFUNCTION(BlueprintPure, Category = "TileCoord", meta = (BlueprintThreadSafe))
 	static TArray<FTileCoord> RotateTileCoords(const TArray<FTileCoord>& Coords, const bool bClockwise);
+	static TSet<FTileCoord> RotateTileCoords(const TSet<FTileCoord>& Coords, const bool bClockwise);
 };
