@@ -4,6 +4,15 @@
 #include "EnemyFactory.h"
 #include "Enemy.h"
 
+UEnemyFactory::UEnemyFactory()
+{
+	NightCounter = 0;
+	WaveCounter = 0;
+
+	MaxNightCount = 3;
+	MaxWaveCount = 5;
+}
+
 void UEnemyFactory::RemoveEnemyFromWorld(AActor* DestroyedActor)
 {
 	AEnemy* Enemy = Cast<AEnemy>(DestroyedActor);
@@ -99,12 +108,17 @@ void UEnemyFactory::BeginWave(const int32 WorldLayer)
 		UE_LOG(LogTemp, Error, TEXT("UEnemyFactory::BeginWave - Cannot start wave because there are still enemies in world, or there are still enemies to spawn in current wave."))
 		return;
 	}
-	
-	WaveCounter++;
-	if (WaveCounter == 1)
+
+	if (WaveCounter >= MaxWaveCount)
 	{
+		WaveCounter = 1;
 		NightCounter++;
+		OnNightCounterChangedDelegate.Broadcast(NightCounter);
+	} else
+	{
+		WaveCounter++;
 	}
+	OnWaveCounterChangedDelegate.Broadcast(WaveCounter);
 
 	UE_LOG(LogTemp, Warning, TEXT("UEnemyFactory::BeginWave - Starting wave on level/layer %i, Night %i, Wave %i!"), WorldLayer, NightCounter, WaveCounter)
 	

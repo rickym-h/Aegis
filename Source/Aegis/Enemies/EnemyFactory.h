@@ -9,6 +9,8 @@
 class AEnemy;
 class AAegisGameStateBase;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnWaveEndSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnWaveCounterChangedSignature, int32, NewWaveCounter);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnNightCounterChangedSignature, int32, NewNightCounter);
 
 USTRUCT(BlueprintType)
 struct FEnemySpawnData
@@ -61,12 +63,20 @@ class AEGIS_API UEnemyFactory : public UObject
 {
 	GENERATED_BODY()
 
+	UEnemyFactory();
+
 protected:
 	UPROPERTY()
 	TArray<AEnemy*> EnemiesInWorld;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Wave")
 	int32 NightCounter;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Wave")
 	int32 WaveCounter;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Wave")
+	int32 MaxNightCount;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Wave")
+	int32 MaxWaveCount;
 
 	UFUNCTION(BlueprintCallable)
 	void RemoveEnemyFromWorld(AActor* DestroyedActor);
@@ -87,6 +97,12 @@ protected:
 	void SpawnEnemyFromWave();
 
 public:
+
+	UPROPERTY(BlueprintAssignable)
+	FOnWaveCounterChangedSignature OnWaveCounterChangedDelegate;
+	UPROPERTY(BlueprintAssignable)
+	FOnNightCounterChangedSignature OnNightCounterChangedDelegate;
+	
 	UFUNCTION(BlueprintCallable)
 	void BeginWave(const int32 WorldLayer);
 
