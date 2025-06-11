@@ -40,8 +40,6 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLaye
 		return TArray<FEnemySpawnData>();
 	}
 
-	const int32 DifficultyScore = NightCounter * WaveCounter + 10;
-	int32 ScoreSoFar = 0;
 
 	const FString ContextString = "Loading Enemy Data...";
 	TArray<FEnemyData*> EnemyData;
@@ -57,13 +55,15 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLaye
 			FEnemyType EnemyType = FEnemyType();
 			EnemyType.EnemyClass = Enemy->ActorToSpawn;
 			EnemyType.EnemyValue = Enemy->Points;
-			EnemyType.SelectionWeight = 1;
+			EnemyType.SelectionWeight = Enemy->Points;
 			
 			EnemyPool.Emplace(EnemyType);
 		}
 	}
 
 	// Keep adding enemies to the wave until the difficulty score is reached
+	const int32 DifficultyScore = NightCounter * WaveCounter + 10;
+	int32 ScoreSoFar = 0;
 	while (ScoreSoFar < DifficultyScore)
 	{
 		const auto EnemyType = EnemyPool[FMath::RandRange(0, EnemyPool.Num()-1)];
