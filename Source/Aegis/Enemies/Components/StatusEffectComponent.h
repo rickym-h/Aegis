@@ -46,18 +46,29 @@ public:
 	// Sets default values for this component's properties
 	UStatusEffectComponent();
 
+	// Slows
 	FOnSpeedMultiplierChangedSignature OnSpeedMultiplierChangedDelegate;
-
 	void ApplySlowEffect(FSlowEffect SlowEffect);
-
 	float GetSpeedMultiplier() const;
+
+	// Poison
+	void ApplyPoisonStacks(const int32 Stacks, const float DurationSeconds);
+	UFUNCTION()
+	void RemovePoisonStacks(const int32 Stacks);
 
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
+	// Slows
 	TArray<FSlowEffect> SlowEffects;
-
 	UFUNCTION()
 	void RemoveSlowEffect(FSlowEffect SlowEffect);
+
+	// Poison
+	UPROPERTY()
+	int32 PoisonStacks;
+	FTimerHandle GlobalApplyPoisonTimerHandle;
+	UFUNCTION()
+	void DealPoisonDamage();
 };

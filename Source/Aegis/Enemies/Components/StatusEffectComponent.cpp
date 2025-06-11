@@ -3,6 +3,9 @@
 
 #include "StatusEffectComponent.h"
 
+#include "Aegis/Enemies/Damage/MagicDamageType.h"
+#include "Kismet/GameplayStatics.h"
+
 
 // Sets default values for this component's properties
 UStatusEffectComponent::UStatusEffectComponent()
@@ -54,6 +57,39 @@ float UStatusEffectComponent::GetSpeedMultiplier() const
 	return LowestSpeedMultiplier;
 }
 
+void UStatusEffectComponent::ApplyPoisonStacks(const int32 Stacks, const float DurationSeconds)
+{
+	PoisonStacks += Stacks;
+
+	FTimerHandle RemovePoisonStacksTimerHandle;
+	FTimerDelegate Delegate; // Delegate to bind function with parameters
+	Delegate.BindUFunction(this, "RemovePoisonStacks", Stacks); // Character is the parameter we wish to pass with the function.
+
+	GetWorld()->GetTimerManager().SetTimer(RemovePoisonStacksTimerHandle, Delegate, DurationSeconds, false);
+
+	if (PoisonStacks == Stacks)
+	{
+		// This stack is first poison applied from nothing, start damage.
+		GlobalApplyPoisonTimerHandle = FTimerHandle();
+		
+		GetWorld()->GetTimerManager().SetTimer(
+			GlobalApplyPoisonTimerHandle, // handle to cancel timer at a later time
+			this, // the owning object
+			&UStatusEffectComponent::DealPoisonDamage, // function to call on elapsed
+			1, // float delay until elapsed
+			true); // looping?
+	}
+}
+
+void UStatusEffectComponent::RemovePoisonStacks(const int32 Stacks)
+{
+	PoisonStacks = FMath::Max(0, PoisonStacks - Stacks);
+	if (PoisonStacks == 0)
+	{
+		GetWorld()->GetTimerManager().ClearTimer(GlobalApplyPoisonTimerHandle);
+	}
+}
+
 
 // Called when the game starts
 void UStatusEffectComponent::BeginPlay()
@@ -74,4 +110,10 @@ void UStatusEffectComponent::RemoveSlowEffect(const FSlowEffect SlowEffect)
 	{
 		OnSpeedMultiplierChangedDelegate.Broadcast(NewSpeedMultiplier);
 	}
+}
+
+void UStatusEffectComponent::DealPoisonDamage()
+{
+	UE_LOG(LogTemp, Warning, TEXT("UStatusEffectComponent::DealPoisonDamage() - Applying poison damage: %i"), PoisonStacks)
+	UGameplayStatics::ApplyDamage(GetOwner(), PoisonStacks, GetWorld()->GetFirstPlayerController(), nullptr, UMagicDamageType::StaticClass());
 }
