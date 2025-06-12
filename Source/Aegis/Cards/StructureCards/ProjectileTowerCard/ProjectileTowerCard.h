@@ -6,6 +6,7 @@
 #include "Aegis/Cards/StructureCard.h"
 #include "Aegis/Cards/Interfaces/PlayableCardInterface.h"
 #include "Aegis/Cards/Interfaces/TileRangeInterface.h"
+#include "Aegis/Enemies/Components/StatusEffectComponent.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "ProjectileTowerCard.generated.h"
@@ -33,6 +34,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Projectile Tower Card Data")
 	int32 RangeTiles = 0;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slowing Projectile Tower Card Data")
+	FSlowEffect SlowEffect;
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
 	virtual TSet<FTileCoord> GetRangeTileOffsets_Implementation() override;

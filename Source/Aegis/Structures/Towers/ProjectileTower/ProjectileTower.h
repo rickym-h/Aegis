@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Aegis/Enemies/Components/StatusEffectComponent.h"
+#include "Aegis/Structures/Interfaces/ProjectileCallbackInterface.h"
 #include "Aegis/Structures/Towers/Tower.h"
 #include "Aegis/Utilities/ProjectileManager.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
@@ -12,7 +14,7 @@ class UTileRangeComponent;
 class UProjectileComponent;
 
 UCLASS()
-class AEGIS_API AProjectileTower : public ATower
+class AEGIS_API AProjectileTower : public ATower, public IProjectileCallbackInterface
 {
 	GENERATED_BODY()
 
@@ -20,7 +22,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileTower();
 
-	void InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage, UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles);
+	void InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage, UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles, const FSlowEffect InSlowEffect);
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,5 +52,8 @@ protected:
 	void ReloadShot();
 	UPROPERTY()
 	FTimerHandle ReloadTimerHandle;
+	
+	FSlowEffect SlowEffect;
+	virtual void SingleTargetProjectileCallback_Implementation(AEnemy* HitEnemy, const float DamageApplied, const FHitResult& HitResult) override;
 
 };

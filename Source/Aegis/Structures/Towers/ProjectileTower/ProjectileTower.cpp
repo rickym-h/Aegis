@@ -3,6 +3,7 @@
 
 #include "ProjectileTower.h"
 
+#include "Aegis/Enemies/Components/StatusEffectComponent.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
 #include "Aegis/Structures/StructureComponents/TileRangeComponent.h"
 #include "Kismet/KismetMathLibrary.h"
@@ -16,8 +17,8 @@ AProjectileTower::AProjectileTower()
 	ProjectileComponent = CreateDefaultSubobject<UProjectileComponent>("Projectile Component");
 }
 
-void AProjectileTower::InitProjectileTower(const EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage,
-                                           UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles)
+void AProjectileTower::InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage,
+	UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles, const FSlowEffect InSlowEffect)
 {
 	if (InAttackSpeed < 0 || InRangeTiles < 0)
 	{
@@ -30,6 +31,8 @@ void AProjectileTower::InitProjectileTower(const EProjectileType InProjectileTyp
 
 	TileRangeComponent->OnEnemyEnterRangeDelegate.AddUniqueDynamic(this, &AProjectileTower::TryFireAtEnemy);
 	TileRangeComponent->InitRange(CurrentLocation, InRangeTiles);
+	
+	SlowEffect = InSlowEffect;
 }
 
 // Called when the game starts or when spawned
@@ -85,4 +88,10 @@ void AProjectileTower::ReloadShot()
 	{
 		TryFireAtEnemy(Enemy);
 	}
+}
+
+void AProjectileTower::SingleTargetProjectileCallback_Implementation(AEnemy* HitEnemy, const float DamageApplied, const FHitResult& HitResult)
+{
+	UE_LOG(LogTemp, Warning, TEXT("ASlowingProjectileTower::SingleTargetProjectileCallback_Implementation - Applied slow effect!"))
+	HitEnemy->GetStatusEffectComponent()->ApplySlowEffect(SlowEffect);
 }
