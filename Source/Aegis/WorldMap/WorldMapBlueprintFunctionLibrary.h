@@ -81,7 +81,8 @@ struct FMapNode
 	// Only Applicable if node is a game level
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	int32 FinalWave = 5;
-	//int32 FinalNight = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	int32 FinalNight = 3;
 };
 
 FORCEINLINE uint32 GetTypeHash(const FMapNode& MapNode)
