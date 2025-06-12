@@ -76,8 +76,9 @@ public:
 
 	// Poison
 	void ApplyPoisonStacks(const FPoisonEffect PoisonEffect);
+	
 	UFUNCTION()
-	void RemovePoisonStacks(const int32 Stacks);
+	void RemovePoisonStacks(const int32 &Stacks);
 
 protected:
 	// Called when the game starts

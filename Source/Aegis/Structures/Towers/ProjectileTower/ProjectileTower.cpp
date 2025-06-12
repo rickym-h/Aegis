@@ -94,7 +94,10 @@ void AProjectileTower::ReloadShot()
 
 void AProjectileTower::SingleTargetProjectileCallback_Implementation(AEnemy* HitEnemy, const float DamageApplied, const FHitResult& HitResult)
 {
-	UE_LOG(LogTemp, Warning, TEXT("ASlowingProjectileTower::SingleTargetProjectileCallback_Implementation - Applied slow effect!"))
-	HitEnemy->GetStatusEffectComponent()->ApplySlowEffect(SlowEffect);
-	HitEnemy->GetStatusEffectComponent()->ApplyPoisonStacks(PoisonEffect);
+	// It is possible that the enemy has been marked for garbage collection if they have already "died", so check before applying status effects.
+	if (IsValid(HitEnemy))
+	{
+		HitEnemy->GetStatusEffectComponent()->ApplySlowEffect(SlowEffect);
+		HitEnemy->GetStatusEffectComponent()->ApplyPoisonStacks(PoisonEffect);
+	}
 }

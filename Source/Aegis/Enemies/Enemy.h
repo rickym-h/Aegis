@@ -51,7 +51,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components")
 	bool bShouldFlip;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Components")
-	UStatusEffectComponent* StatusEffectComponent;
+	TObjectPtr<UStatusEffectComponent> StatusEffectComponent;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FTileCoord FromTile;

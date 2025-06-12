@@ -62,11 +62,12 @@ void UStatusEffectComponent::ApplyPoisonStacks(const FPoisonEffect PoisonEffect)
 	PoisonStacks += PoisonEffect.PoisonStacks;
 	
 	const int32 StacksToRemove = PoisonEffect.PoisonStacks;
-	FTimerHandle RemovePoisonStacksTimerHandle;
-	FTimerDelegate Delegate; // Delegate to bind function with parameters
-	Delegate.BindUFunction(this, FName("RemovePoisonStacks"), StacksToRemove); // Character is the parameter we wish to pass with the function.
+	const float Delay = PoisonEffect.DurationSeconds;
 
-	GetWorld()->GetTimerManager().SetTimer(RemovePoisonStacksTimerHandle, Delegate, PoisonEffect.DurationSeconds, false);
+	FTimerDelegate TimerDelegate;
+	FTimerHandle PoisonTimerHandle;
+	TimerDelegate.BindUFunction(this, FName("RemovePoisonStacks"), StacksToRemove);
+	GetWorld()->GetTimerManager().SetTimer(PoisonTimerHandle, TimerDelegate, Delay, false);
 
 	if (PoisonStacks == PoisonEffect.PoisonStacks)
 	{
@@ -82,7 +83,7 @@ void UStatusEffectComponent::ApplyPoisonStacks(const FPoisonEffect PoisonEffect)
 	}
 }
 
-void UStatusEffectComponent::RemovePoisonStacks(const int32 Stacks)
+void UStatusEffectComponent::RemovePoisonStacks(const int32 &Stacks)
 {
 	PoisonStacks = FMath::Max(0, PoisonStacks - Stacks);
 	if (PoisonStacks == 0)
