@@ -18,7 +18,8 @@ AProjectileTower::AProjectileTower()
 }
 
 void AProjectileTower::InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage,
-	UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles, const FSlowEffect InSlowEffect)
+	UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles, const FSlowEffect InSlowEffect,
+	const FPoisonEffect InPoisonEffect)
 {
 	if (InAttackSpeed < 0 || InRangeTiles < 0)
 	{
@@ -33,6 +34,7 @@ void AProjectileTower::InitProjectileTower(EProjectileType InProjectileType, con
 	TileRangeComponent->InitRange(CurrentLocation, InRangeTiles);
 	
 	SlowEffect = InSlowEffect;
+	PoisonEffect = InPoisonEffect;
 }
 
 // Called when the game starts or when spawned
@@ -94,4 +96,5 @@ void AProjectileTower::SingleTargetProjectileCallback_Implementation(AEnemy* Hit
 {
 	UE_LOG(LogTemp, Warning, TEXT("ASlowingProjectileTower::SingleTargetProjectileCallback_Implementation - Applied slow effect!"))
 	HitEnemy->GetStatusEffectComponent()->ApplySlowEffect(SlowEffect);
+	HitEnemy->GetStatusEffectComponent()->ApplyPoisonStacks(PoisonEffect);
 }

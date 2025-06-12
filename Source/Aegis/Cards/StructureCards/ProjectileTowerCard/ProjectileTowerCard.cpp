@@ -24,7 +24,7 @@ bool UProjectileTowerCard::PlayCard_Implementation(const FTileCoord& LocationCoo
 	// Set structure data (e.g. tower stats)
 	if (AProjectileTower* ProjectileTower = Cast<AProjectileTower>(Structure))
 	{
-		ProjectileTower->InitProjectileTower(ProjectileType, ProjectileDamagePackage, ProjectileMesh, AttackSpeed, RangeTiles, SlowEffect);
+		ProjectileTower->InitProjectileTower(ProjectileType, ProjectileDamagePackage, ProjectileMesh, AttackSpeed, RangeTiles, SlowEffect, PoisonEffect);
 	} else
 	{
 		UE_LOG(LogTemp, Error, TEXT("UProjectileTowerCard::PlayCard_Implementation - Structure not projectile tower! Failed to InitProjectileTower()"))

@@ -57,17 +57,17 @@ float UStatusEffectComponent::GetSpeedMultiplier() const
 	return LowestSpeedMultiplier;
 }
 
-void UStatusEffectComponent::ApplyPoisonStacks(const int32 Stacks, const float DurationSeconds)
+void UStatusEffectComponent::ApplyPoisonStacks(const FPoisonEffect PoisonEffect)
 {
-	PoisonStacks += Stacks;
+	PoisonStacks += PoisonEffect.PoisonStacks;
 
 	FTimerHandle RemovePoisonStacksTimerHandle;
 	FTimerDelegate Delegate; // Delegate to bind function with parameters
-	Delegate.BindUFunction(this, "RemovePoisonStacks", Stacks); // Character is the parameter we wish to pass with the function.
+	Delegate.BindUFunction(this, "RemovePoisonStacks", PoisonEffect.PoisonStacks); // Character is the parameter we wish to pass with the function.
 
-	GetWorld()->GetTimerManager().SetTimer(RemovePoisonStacksTimerHandle, Delegate, DurationSeconds, false);
+	GetWorld()->GetTimerManager().SetTimer(RemovePoisonStacksTimerHandle, Delegate, PoisonEffect.DurationSeconds, false);
 
-	if (PoisonStacks == Stacks)
+	if (PoisonStacks == PoisonEffect.PoisonStacks)
 	{
 		// This stack is first poison applied from nothing, start damage.
 		GlobalApplyPoisonTimerHandle = FTimerHandle();

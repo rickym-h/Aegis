@@ -36,6 +36,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slowing Projectile Tower Card Data")
 	FSlowEffect SlowEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Poison Projectile Tower Card Data")
+	FPoisonEffect PoisonEffect;
 protected:
 	virtual bool PlayCard_Implementation(const FTileCoord& LocationCoord) override;
 	virtual TSet<FTileCoord> GetRangeTileOffsets_Implementation() override;

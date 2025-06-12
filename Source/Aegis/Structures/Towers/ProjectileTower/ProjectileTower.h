@@ -22,7 +22,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectileTower();
 
-	void InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage, UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles, const FSlowEffect InSlowEffect);
+	void InitProjectileTower(EProjectileType InProjectileType, const FProjectileDamagePackage InProjectileDamagePackage, UStaticMesh* InProjectileMesh, const float InAttackSpeed, const int32 InRangeTiles, const FSlowEffect InSlowEffect, const FPoisonEffect InPoisonEffect);
 
 protected:
 	// Called when the game starts or when spawned
@@ -54,6 +54,7 @@ protected:
 	FTimerHandle ReloadTimerHandle;
 	
 	FSlowEffect SlowEffect;
+	FPoisonEffect PoisonEffect;
 	virtual void SingleTargetProjectileCallback_Implementation(AEnemy* HitEnemy, const float DamageApplied, const FHitResult& HitResult) override;
 
 };

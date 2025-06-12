@@ -34,6 +34,29 @@ struct FSlowEffect
 		return (this->DurationSeconds ==  Other.DurationSeconds && this->SpeedMultiplier ==  Other.SpeedMultiplier);
 	}
 };
+USTRUCT(Blueprintable)
+struct FPoisonEffect
+{
+	GENERATED_BODY()
+
+	FPoisonEffect()
+	{
+		DurationSeconds = 0.f;
+		PoisonStacks = 1.f;
+	}
+
+	FPoisonEffect(const float InDurationSeconds, const float InPoisonStacks)
+	{
+		DurationSeconds = InDurationSeconds;
+		PoisonStacks = InPoisonStacks;
+	}
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	float DurationSeconds;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 PoisonStacks;
+};
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSpeedMultiplierChangedSignature, float, NewSpeedMultiplier);
 
@@ -48,11 +71,11 @@ public:
 
 	// Slows
 	FOnSpeedMultiplierChangedSignature OnSpeedMultiplierChangedDelegate;
-	void ApplySlowEffect(FSlowEffect SlowEffect);
+	void ApplySlowEffect(const FSlowEffect SlowEffect);
 	float GetSpeedMultiplier() const;
 
 	// Poison
-	void ApplyPoisonStacks(const int32 Stacks, const float DurationSeconds);
+	void ApplyPoisonStacks(const FPoisonEffect PoisonEffect);
 	UFUNCTION()
 	void RemovePoisonStacks(const int32 Stacks);
 
