@@ -60,10 +60,11 @@ float UStatusEffectComponent::GetSpeedMultiplier() const
 void UStatusEffectComponent::ApplyPoisonStacks(const FPoisonEffect PoisonEffect)
 {
 	PoisonStacks += PoisonEffect.PoisonStacks;
-
+	
+	const int32 StacksToRemove = PoisonEffect.PoisonStacks;
 	FTimerHandle RemovePoisonStacksTimerHandle;
 	FTimerDelegate Delegate; // Delegate to bind function with parameters
-	Delegate.BindUFunction(this, "RemovePoisonStacks", PoisonEffect.PoisonStacks); // Character is the parameter we wish to pass with the function.
+	Delegate.BindUFunction(this, FName("RemovePoisonStacks"), StacksToRemove); // Character is the parameter we wish to pass with the function.
 
 	GetWorld()->GetTimerManager().SetTimer(RemovePoisonStacksTimerHandle, Delegate, PoisonEffect.DurationSeconds, false);
 
