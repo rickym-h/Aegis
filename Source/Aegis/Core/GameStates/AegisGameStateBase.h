@@ -50,6 +50,8 @@ protected:
 	TSubclassOf<UAegisMapFactory> MapFactoryClass;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Factory Classes")
 	TSubclassOf<UEnemyFactory> EnemyFactoryClass;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category="Projectile Manager")
+	TSubclassOf<AProjectileManager> ProjectileManagerClass;
 
 	UFUNCTION()
 	void SaveGameDelegateFunction(const FString& SlotName, const int32 UserIndex, bool bSuccess);

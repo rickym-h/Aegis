@@ -37,6 +37,12 @@ public:
 	float GetHealthAsPercentage() const;
 
 	UStatusEffectComponent* GetStatusEffectComponent() const;
+
+	
+	UPaperFlipbookComponent* GetFlipbookComponent() const
+	{
+		return FlipbookComponent;
+	}
 	
 protected:
 	// Called when the game starts or when spawned

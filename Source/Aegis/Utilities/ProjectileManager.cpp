@@ -4,6 +4,7 @@
 #include "ProjectileManager.h"
 
 #include "NiagaraFunctionLibrary.h"
+#include "PaperFlipbookComponent.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Enemies/Damage/MagicDamageType.h"
@@ -126,6 +127,11 @@ void AProjectileManager::ApplyDamageAndEffects(const UPrimitiveComponent* Overla
 		if (ResponsibleSource->Implements<UProjectileCallbackInterface>())
 		{
 			IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ResponsibleSource, Enemy, TotalDamageApplied, HitResult);
+		}
+
+		if (BloodHitParticleEffect)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), BloodHitParticleEffect, Enemy->GetFlipbookComponent()->GetComponentLocation(), FRotator::ZeroRotator, FVector(1));
 		}
 	} else
 	{

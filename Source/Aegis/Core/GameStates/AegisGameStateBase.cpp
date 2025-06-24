@@ -17,7 +17,10 @@ void AAegisGameStateBase::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ProjectileManager = GetWorld()->SpawnActor<AProjectileManager>(FVector::ZeroVector, FRotator::ZeroRotator, FActorSpawnParameters());
+	if (ProjectileManagerClass)
+	{
+		ProjectileManager = GetWorld()->SpawnActor<AProjectileManager>(ProjectileManagerClass, FVector::ZeroVector, FRotator::ZeroRotator, FActorSpawnParameters());
+	}
 	
 	GenerateTestMapFromMapFactory();
 }
