@@ -129,7 +129,7 @@ void AProjectileManager::ApplyDamageAndEffects(const UPrimitiveComponent* Overla
 			IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ResponsibleSource, Enemy, TotalDamageApplied, HitResult);
 		}
 
-		if (BloodHitParticleEffect)
+		if (BloodHitParticleEffect && PhysicalDamageApplied>0)
 		{
 			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), BloodHitParticleEffect, Enemy->GetFlipbookComponent()->GetComponentLocation(), FRotator::ZeroRotator, FVector(1));
 		}

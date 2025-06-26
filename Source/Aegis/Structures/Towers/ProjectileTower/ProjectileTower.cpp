@@ -3,6 +3,8 @@
 
 #include "ProjectileTower.h"
 
+#include "NiagaraFunctionLibrary.h"
+#include "PaperFlipbookComponent.h"
 #include "Aegis/Enemies/Components/StatusEffectComponent.h"
 #include "Aegis/Structures/StructureComponents/ProjectileComponent.h"
 #include "Aegis/Structures/StructureComponents/TileRangeComponent.h"
@@ -99,5 +101,10 @@ void AProjectileTower::SingleTargetProjectileCallback_Implementation(AEnemy* Hit
 	{
 		HitEnemy->GetStatusEffectComponent()->ApplySlowEffect(SlowEffect);
 		HitEnemy->GetStatusEffectComponent()->ApplyPoisonStacks(PoisonEffect);
+	}
+
+	if (OnHitEffect)
+	{
+		UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), OnHitEffect, HitEnemy->GetFlipbookComponent()->GetComponentLocation(), FRotator::ZeroRotator, FVector(1));
 	}
 }

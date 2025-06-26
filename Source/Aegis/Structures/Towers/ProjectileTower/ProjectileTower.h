@@ -53,8 +53,12 @@ protected:
 	UPROPERTY()
 	FTimerHandle ReloadTimerHandle;
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OnHitEffects")
 	FSlowEffect SlowEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OnHitEffects")
 	FPoisonEffect PoisonEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="OnHitEffects")
+	TObjectPtr<UNiagaraSystem> OnHitEffect;
 	virtual void SingleTargetProjectileCallback_Implementation(AEnemy* HitEnemy, const float DamageApplied, const FHitResult& HitResult) override;
 
 };
