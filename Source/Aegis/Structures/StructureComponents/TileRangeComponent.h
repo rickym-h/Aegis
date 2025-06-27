@@ -10,7 +10,8 @@ class AEnemy;
 struct FTileCoord;
 class AMapTile;
 // Delegate signature
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterTileRangeSignature, const  AEnemy*, OutEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyEnterTileRangeSignature, AEnemy*, OutEnemy);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnEnemyLeaveTileRangeSignature, AEnemy*, OutEnemy);
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
 class AEGIS_API UTileRangeComponent : public UActorComponent
@@ -28,12 +29,15 @@ protected:
 	TArray<AMapTile*> TilesInRange;
 
 	UFUNCTION()
-	void OnEnemyEnterRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex,
-						   bool bFromSweep, const FHitResult& SweepResult);
+	void OnEnemyEnterRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+	UFUNCTION()
+	void OnEnemyLeaveRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 public:
 	UPROPERTY()
 	FOnEnemyEnterTileRangeSignature OnEnemyEnterRangeDelegate;
+	UPROPERTY()
+	FOnEnemyLeaveTileRangeSignature OnEnemyLeaveRangeDelegate;
 
 	void InitRange(const FTileCoord OriginCoord, const int RangeInTiles);
 	void InitRange(const FTileCoord OriginCoord, const TSet<FTileCoord> TileRangeOffsets);

@@ -46,7 +46,7 @@ protected:
 	float AttackSpeed = 0.f;
 	
 	UFUNCTION()
-	void TryFireAtEnemy(const AEnemy* Enemy);
+	void TryFireAtEnemy(AEnemy* Enemy);
 	bool bShotAvailable = true;
 	UFUNCTION()
 	void ReloadShot();

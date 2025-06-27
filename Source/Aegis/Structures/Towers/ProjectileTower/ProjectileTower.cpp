@@ -46,7 +46,7 @@ void AProjectileTower::BeginPlay()
 	
 }
 
-void AProjectileTower::TryFireAtEnemy(const AEnemy* Enemy)
+void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
 
@@ -88,7 +88,7 @@ void AProjectileTower::ReloadShot()
 {
 	bShotAvailable = true;
 
-	if (const AEnemy* Enemy = TileRangeComponent->GetFrontEnemy(TileRangeComponent->GetAllEnemiesInRange()))
+	if (AEnemy* Enemy = TileRangeComponent->GetFrontEnemy(TileRangeComponent->GetAllEnemiesInRange()))
 	{
 		TryFireAtEnemy(Enemy);
 	}

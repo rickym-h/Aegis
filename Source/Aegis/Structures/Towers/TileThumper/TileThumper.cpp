@@ -32,7 +32,7 @@ void ATileThumper::BeginPlay()
 	
 }
 
-void ATileThumper::TryThump(const AEnemy* Enemy)
+void ATileThumper::TryThump(AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
 
@@ -55,7 +55,7 @@ void ATileThumper::RechargeThump()
 {
 	bCanThump = true;
 
-	if (const AEnemy* Enemy = RangeComponent->GetFrontEnemy(RangeComponent->GetAllEnemiesInRange()))
+	if (AEnemy* Enemy = RangeComponent->GetFrontEnemy(RangeComponent->GetAllEnemiesInRange()))
 	{
 		TryThump(Enemy);
 	}

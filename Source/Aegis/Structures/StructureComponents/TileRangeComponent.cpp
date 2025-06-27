@@ -33,6 +33,19 @@ void UTileRangeComponent::OnEnemyEnterRange(UPrimitiveComponent* OverlappedCompo
 	OnEnemyEnterRangeDelegate.Broadcast(GetFrontEnemy(EnemiesInRange));
 }
 
+void UTileRangeComponent::OnEnemyLeaveRange(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
+	int32 OtherBodyIndex)
+{
+	AEnemy* Enemy = Cast<AEnemy>(OtherActor);
+	if (!Enemy) { return; }
+	// TODO check that enemy has actually left range before broadcasting
+
+	if (!GetAllEnemiesInRange().Contains(Enemy))
+	{
+		OnEnemyLeaveRangeDelegate.Broadcast(Enemy);
+	}
+}
+
 // Called when the game starts
 void UTileRangeComponent::BeginPlay()
 {
@@ -60,6 +73,7 @@ void UTileRangeComponent::InitRange(const FTileCoord OriginCoord, const int Rang
 
 			// Subscribe Enemy Entered range function to Overlap delegate in Tile Collision Mesh
 			Tile->CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &UTileRangeComponent::OnEnemyEnterRange);
+			Tile->CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &UTileRangeComponent::OnEnemyLeaveRange);
 		}
 	}
 }
@@ -79,6 +93,7 @@ void UTileRangeComponent::InitRange(const FTileCoord OriginCoord, const TSet<FTi
 
 			// Subscribe Enemy Entered range function to Overlap delegate in Tile Collision Mesh
 			Tile->CollisionVolume->OnComponentBeginOverlap.AddUniqueDynamic(this, &UTileRangeComponent::OnEnemyEnterRange);
+			Tile->CollisionVolume->OnComponentEndOverlap.AddUniqueDynamic(this, &UTileRangeComponent::OnEnemyLeaveRange);
 		}
 	}
 }

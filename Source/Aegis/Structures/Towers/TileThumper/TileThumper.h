@@ -31,7 +31,7 @@ protected:
 	float AttackSpeed = 0.f;
 	
 	UFUNCTION()
-	void TryThump(const AEnemy* Enemy);
+	void TryThump(AEnemy* Enemy);
 	bool bCanThump = true;
 	UFUNCTION()
 	void RechargeThump();
