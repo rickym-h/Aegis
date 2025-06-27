@@ -6,6 +6,8 @@
 #include "Aegis/Structures/Towers/Tower.h"
 #include "LaserTower.generated.h"
 
+class UNiagaraSystem;
+class UNiagaraComponent;
 class AEnemy;
 class UTileRangeComponent;
 
@@ -27,7 +29,9 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Components")
 	UTileRangeComponent* TileRangeComponent;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Components")
+	UNiagaraComponent* LaserParticleComponent;
+	
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Tower Stats")
 	float DamageFireRate;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Tower Stats")

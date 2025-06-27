@@ -3,24 +3,27 @@
 
 #include "LaserTower.h"
 
+#include "NiagaraComponent.h"
 #include "Aegis/Enemies/Enemy.h"
 #include "Aegis/Enemies/Damage/MagicDamageType.h"
 #include "Aegis/Structures/StructureComponents/TileRangeComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Kismet/KismetMathLibrary.h"
 
 
 // Sets default values
 ALaserTower::ALaserTower()
 {
 	TileRangeComponent = CreateDefaultSubobject<UTileRangeComponent>("Range Component");
-
-	
+	LaserParticleComponent = CreateDefaultSubobject<UNiagaraComponent>("Laser Particle Component");
+	LaserParticleComponent->SetupAttachment(PointAtTargetMesh);
 }
 
 void ALaserTower::TryDealDamage()
 {
 	if (TargetedEnemy)
 	{
+		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), TargetedEnemy->TargetPoint->GetComponentLocation()));
 		UGameplayStatics::ApplyDamage(
 			TargetedEnemy,
 			DamagePerSecond / DamageFireRate,
