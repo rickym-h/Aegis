@@ -14,16 +14,16 @@
 // Sets default values
 ALaserTower::ALaserTower()
 {
+	PrimaryActorTick.bCanEverTick = true;
 	TileRangeComponent = CreateDefaultSubobject<UTileRangeComponent>("Range Component");
 	LaserParticleComponent = CreateDefaultSubobject<UNiagaraComponent>("Laser Particle Component");
-	LaserParticleComponent->SetupAttachment(PointAtTargetMesh);
+	LaserParticleComponent->SetupAttachment(SourcePoint);
 }
 
 void ALaserTower::TryDealDamage()
 {
 	if (TargetedEnemy)
 	{
-		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), TargetedEnemy->TargetPoint->GetComponentLocation()));
 		UGameplayStatics::ApplyDamage(
 			TargetedEnemy,
 			DamagePerSecond / DamageFireRate,
@@ -49,6 +49,14 @@ void ALaserTower::InitLaserTower(const int32 InRangeTiles, const float InDamageP
 		true,
 		0
 		);
+
+	if (AEnemy* Enemy = TileRangeComponent->GetFrontEnemy(TileRangeComponent->GetAllEnemiesInRange()))
+	{
+		TryTargetNewEnemy(Enemy);
+	} else
+	{
+		TryStopTargetEnemy(nullptr);
+	}
 }
 
 // Called when the game starts or when spawned
@@ -60,16 +68,31 @@ void ALaserTower::BeginPlay()
 
 void ALaserTower::TryTargetNewEnemy(AEnemy* TargetEnemy)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ALaserTower::TryTargetNewEnemy"))
 	if (TargetedEnemy) return;
 
 	TargetedEnemy = TargetEnemy;
-	
+	LaserParticleComponent->SetVisibility(true);
 }
 
 void ALaserTower::TryStopTargetEnemy(AEnemy* TargetEnemy)
 {
+	UE_LOG(LogTemp, Warning, TEXT("ALaserTower::TryStopTargetEnemy"))
+	if (TileRangeComponent->GetAllEnemiesInRange().Contains(TargetEnemy)) return;
+	
 	if (TargetedEnemy == TargetEnemy)
 	{
 		TargetedEnemy = nullptr;
+		LaserParticleComponent->SetVisibility(false);
+	}
+}
+
+void ALaserTower::Tick(float DeltaSeconds)
+{
+	if (TargetedEnemy)
+	{
+		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), TargetedEnemy->TargetPoint->GetComponentLocation()));
+        
+        LaserParticleComponent->SetVectorParameter("Beam End", TargetedEnemy->TargetPoint->GetComponentLocation() - PointAtTargetMesh->GetComponentLocation());
 	}
 }

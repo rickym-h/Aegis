@@ -44,4 +44,6 @@ protected:
 
 	UPROPERTY()
 	AEnemy* TargetedEnemy;
+
+	virtual void Tick(float DeltaSeconds) override;
 };
