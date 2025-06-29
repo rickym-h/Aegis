@@ -136,8 +136,6 @@ protected:
 	
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Root")
 	USceneComponent* SceneRootComponent;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Root")
-	UNiagaraSystem* BloodHitParticleEffect;
 
 	UFUNCTION()
 	void HomingProjectileOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& HitResult);

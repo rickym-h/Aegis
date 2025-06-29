@@ -64,11 +64,10 @@ void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 			ProjectileComponent->FireRunicSpark(SourcePoint->GetComponentLocation(), Enemy, 1);
 			break;
 		case EProjectileType::CustomArcProjectile:
-			UE_LOG(LogTemp, Warning, TEXT("Firing Custom Arc Projectile"))
 			ProjectileComponent->FireSimpleArcProjectile(SourcePoint->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation(), CustomProjectileProjectileDamagePackage, 40, ProjectileMesh);
 			break;
 		case EProjectileType::CustomHomingProjectile:
-			UE_LOG(LogTemp, Warning, TEXT("Firing Custom Homing Projectile"))
+			UE_LOG(LogTemp, Error, TEXT("Firing Custom Homing Projectile - NOT IMPLEMENTED"))
 			break;
 		default:
 			break;

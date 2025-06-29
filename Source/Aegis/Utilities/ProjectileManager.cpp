@@ -128,11 +128,6 @@ void AProjectileManager::ApplyDamageAndEffects(const UPrimitiveComponent* Overla
 		{
 			IProjectileCallbackInterface::Execute_SingleTargetProjectileCallback(ResponsibleSource, Enemy, TotalDamageApplied, HitResult);
 		}
-
-		if (BloodHitParticleEffect && PhysicalDamageApplied>0)
-		{
-			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), BloodHitParticleEffect, Enemy->GetFlipbookComponent()->GetComponentLocation(), FRotator::ZeroRotator, FVector(1));
-		}
 	} else
 	{
 		// Ensure the NexusBuilding immune to damage from the projectile

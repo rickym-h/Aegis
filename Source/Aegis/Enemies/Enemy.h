@@ -7,6 +7,7 @@
 #include "Engine/DataTable.h"
 #include "Enemy.generated.h"
 
+class UNiagaraSystem;
 class UPaperFlipbookComponent;
 class UStatusEffectComponent;
 class UCapsuleComponent;
@@ -87,8 +88,11 @@ protected:
 	float MaxMagicResist;
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category="Enemy Data")
 	float MagicResist = MaxMagicResist;
-
 	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Particl eEffects")
+	UNiagaraSystem* PhysicalHitParticleEffect;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Particle Effects")
+	UNiagaraSystem* MagicHitParticleEffect;
 
 	virtual float TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 

@@ -3,6 +3,7 @@
 
 #include "Enemy.h"
 
+#include "NiagaraFunctionLibrary.h"
 #include "PaperFlipbookComponent.h"
 #include "Aegis/Core/GameStates/AegisGameStateBase.h"
 #include "Aegis/Map/AegisGameMap.h"
@@ -98,13 +99,22 @@ void AEnemy::OnSpeedMultiplierChanged(const float NewSpeedMultiplier)
 float AEnemy::TakeDamage(const float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float FinalDamageAmount = DamageAmount;
+	if (DamageAmount <= 0) return 0;
 	if (DamageEvent.DamageTypeClass->IsChildOf(UPhysicalDamageType::StaticClass()))
 	{
 		FinalDamageAmount *= (1.f - Armour);
+		if (PhysicalHitParticleEffect)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), PhysicalHitParticleEffect, GetFlipbookComponent()->GetComponentLocation(), FRotator::ZeroRotator, FVector(1));
+		}
 	}
 	if (DamageEvent.DamageTypeClass->IsChildOf(UMagicDamageType::StaticClass()))
 	{
 		FinalDamageAmount *= (1.f - MagicResist);
+		if (MagicHitParticleEffect)
+		{
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(GetWorld(), MagicHitParticleEffect, GetFlipbookComponent()->GetComponentLocation(), FRotator::ZeroRotator, FVector(1));
+		}
 	}
 	
 	Health -= FinalDamageAmount;
