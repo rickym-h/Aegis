@@ -68,13 +68,16 @@ TArray<FEnemySpawnData> UEnemyFactory::GenerateWaveEnemies(const int32 WorldLaye
 	});
 
 	// Keep adding enemies to the wave until the difficulty score is reached
-	const int32 DifficultyScore = NightCounter * WaveCounter + 10;
+	const int32 LayerDifficulty = 10 * FMath::Pow(1.5, WorldLayer);
+	const int32 PseudoLayer = NightCounter - 3;
+	const int32 WaveDifficulty = LayerDifficulty + (NightCounter * (10 * FMath::Pow(1.5, PseudoLayer)));
+	UE_LOG(LogTemp, Warning, TEXT("Generating Wave with difficulty: %i"), WaveDifficulty)
 	int32 ScoreSoFar = 0;
-	while (ScoreSoFar < DifficultyScore)
+	while (ScoreSoFar < WaveDifficulty)
 	{
 		// Filter the possible enemies to only enemies that have a value lower than the remaining score to fill up
 		uint32 LargestIndex = EnemyPool.Num()-1;
-		const uint32 RemainingWaveValue = DifficultyScore - ScoreSoFar;
+		const uint32 RemainingWaveValue = WaveDifficulty - ScoreSoFar;
 		while (EnemyPool[LargestIndex].EnemyValue > RemainingWaveValue)
 		{
 			if (LargestIndex == 0) break;

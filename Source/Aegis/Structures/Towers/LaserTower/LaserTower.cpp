@@ -29,6 +29,15 @@ void ALaserTower::TryDealDamage()
 			DamagePerSecond / DamageFireRate,
 			UGameplayStatics::GetPlayerController(GetWorld(), 0), this, UMagicDamageType::StaticClass());
 	}
+
+	if (!IsValid(TargetedEnemy))
+	{
+		// If the enemy has been killed, attempt to retarget to a new enemy
+		if (AEnemy* Enemy = TileRangeComponent->GetFrontEnemy(TileRangeComponent->GetAllEnemiesInRange()))
+		{
+			TryTargetNewEnemy(Enemy);
+		}
+	}
 }
 
 void ALaserTower::InitLaserTower(const int32 InRangeTiles, const float InDamagePerSecond, const float InDamageFireRate)
@@ -69,8 +78,10 @@ void ALaserTower::BeginPlay()
 void ALaserTower::TryTargetNewEnemy(AEnemy* TargetEnemy)
 {
 	UE_LOG(LogTemp, Warning, TEXT("ALaserTower::TryTargetNewEnemy"))
-	if (TargetedEnemy) return;
+	if (TargetedEnemy && IsValid(TargetedEnemy)) return;
 
+	if (!IsValid(TargetEnemy)) return;
+	
 	TargetedEnemy = TargetEnemy;
 	LaserParticleComponent->SetVisibility(true);
 }
