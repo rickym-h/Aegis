@@ -46,33 +46,37 @@ void AProjectileTower::BeginPlay()
 	
 }
 
+void AProjectileTower::FireAtEnemy(const AEnemy* Enemy)
+{
+	PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
+		
+	bShotAvailable = false;
+	switch (ProjectileType)
+	{
+	case EProjectileType::ArcArrow:
+		ProjectileComponent->FireArcArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
+		break;
+	case EProjectileType::RunicSpark:
+		ProjectileComponent->FireRunicSpark(SourcePoint->GetComponentLocation(), Enemy, 1);
+		break;
+	case EProjectileType::CustomArcProjectile:
+		ProjectileComponent->FireSimpleArcProjectile(SourcePoint->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation(), CustomProjectileProjectileDamagePackage, 40, ProjectileMesh);
+		break;
+	case EProjectileType::CustomHomingProjectile:
+		UE_LOG(LogTemp, Error, TEXT("Firing Custom Homing Projectile - NOT IMPLEMENTED"))
+		break;
+	default:
+		break;
+	}
+}
+
 void AProjectileTower::TryFireAtEnemy(AEnemy* Enemy)
 {
 	if (!Enemy) { return; }
 
 	if (bShotAvailable)
 	{
-		PointAtTargetMesh->SetWorldRotation(UKismetMathLibrary::FindLookAtRotation(PointAtTargetMesh->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation()));
-		
-		bShotAvailable = false;
-		switch (ProjectileType)
-		{
-		case EProjectileType::ArcArrow:
-			ProjectileComponent->FireArcArrow(SourcePoint->GetComponentLocation(), Enemy, 1);
-			break;
-		case EProjectileType::RunicSpark:
-			ProjectileComponent->FireRunicSpark(SourcePoint->GetComponentLocation(), Enemy, 1);
-			break;
-		case EProjectileType::CustomArcProjectile:
-			ProjectileComponent->FireSimpleArcProjectile(SourcePoint->GetComponentLocation(), Enemy->TargetPoint->GetComponentLocation(), CustomProjectileProjectileDamagePackage, 40, ProjectileMesh);
-			break;
-		case EProjectileType::CustomHomingProjectile:
-			UE_LOG(LogTemp, Error, TEXT("Firing Custom Homing Projectile - NOT IMPLEMENTED"))
-			break;
-		default:
-			break;
-		}
-		
+		FireAtEnemy(Enemy);
 
 		GetWorld()->GetTimerManager().SetTimer(
 			ReloadTimerHandle, // handle to cancel timer at a later time

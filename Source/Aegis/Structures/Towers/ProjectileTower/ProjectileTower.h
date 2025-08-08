@@ -47,6 +47,7 @@ protected:
 	
 	UFUNCTION()
 	void TryFireAtEnemy(AEnemy* Enemy);
+	virtual void FireAtEnemy(const AEnemy* Enemy);
 	bool bShotAvailable = true;
 	UFUNCTION()
 	void ReloadShot();

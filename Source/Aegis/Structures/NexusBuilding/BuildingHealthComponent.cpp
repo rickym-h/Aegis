@@ -70,5 +70,10 @@ int UBuildingHealthComponent::GetCurrentHealth()
 
 void UBuildingHealthComponent::SetCurrentHealth(const int Health)
 {
-	CurrentHealth = Health;
+	CurrentHealth = FMath::Clamp(Health, 0, MaxHealth);
+}
+
+void UBuildingHealthComponent::AddHealth(const int HealthToAdd)
+{
+	CurrentHealth = FMath::Clamp(CurrentHealth + HealthToAdd, 0, MaxHealth);
 }

@@ -27,6 +27,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category="Health")
 	float CurrentHealth;
 
+	UPROPERTY()
 	UAegisGameInstance* GameInstance;
 
 public:
@@ -38,6 +39,8 @@ public:
 
 	UFUNCTION()
 	void SetCurrentHealth(const int Health);
+	UFUNCTION()
+	void AddHealth(const int HealthToAdd);
 
 	UPROPERTY(BlueprintAssignable)
 	FOnHealthDepletedSignature OnHealthDepletedDelegate;
